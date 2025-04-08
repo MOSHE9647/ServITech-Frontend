@@ -1,9 +1,9 @@
 # ServITech – Frontend
 
-<div style="display:flex; flex-direction: column; width: 100%; padding: 15px; margin-bottom: 20px">
-	<div style="display: flex; flex-direction: row; justify-content: center; padding: 10px">
-		<img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg" alt="Android Logo" width="200" height="200" style="margin: 0 10px 0 10px">
-		<img src="https://upload.wikimedia.org/wikipedia/commons/7/74/Kotlin_Icon.png" alt="Kotlin Logo" width="180" height="200" style="margin: 0 10px 0 10px">
+<div align="center">
+	<div style="display: flex; justify-content: center; gap: 20px; padding: 30px;">
+		<img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg" alt="Android Logo" width="250" height="250">
+		<img src="https://upload.wikimedia.org/wikipedia/commons/7/74/Kotlin_Icon.png" alt="Kotlin Logo" width="230" height="250">
 	</div>
 </div>
 
