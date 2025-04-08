@@ -1,0 +1,45 @@
+# Archivos y carpetas generados por el sistema
+.DS_Store
+Thumbs.db
+
+# Archivos y carpetas de configuración de IDE
+.idea/
+*.iml
+
+# Archivos locales de configuración de Gradle
+.gradle/
+local.properties
+
+# Archivos de compilación
+/build/
+app/build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Archivos de caché y temporales
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+
+# Archivos de configuración específicos de Android Studio
+/.idea/gradle.xml
+/.idea/misc.xml
+/.idea/runConfigurations.xml
+/.idea/deploymentTargetSelector.xml
+
+# Archivos de configuración de ProGuard
+proguard-rules.pro
+
+# Archivos de configuración de AVD (Android Virtual Device)
+*.avd/
+*.ini
+
+# Archivos de configuración de Kotlin
+/.idea/kotlinc.xml
+
+# Otros archivos innecesarios
+/shelf/
