@@ -43,3 +43,4 @@ proguard-rules.pro
 
 # Otros archivos innecesarios
 /shelf/
+setup-precommit.bat
