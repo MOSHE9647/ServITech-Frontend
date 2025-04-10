@@ -19,11 +19,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,43 +45,60 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moviles.servitech.R
+import com.moviles.servitech.viewmodel.LoginViewModel
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(viewModel: LoginViewModel) {
     Box (
         Modifier
             .fillMaxSize()
             .padding(6.dp)
     ) {
-        Login(Modifier.align(Alignment.Center))
+        Login(Modifier.align(Alignment.Center), viewModel)
     }
 }
 
 @Composable
-fun Login(modifier: Modifier) {
-    Column (modifier = modifier) {
-        HeaderImage(Modifier
-            .align(Alignment.CenterHorizontally)
-            .padding(top = 24.dp)
-            .size(270.dp)
-        )
-        LoginForm(Modifier)
-        Register(Modifier)
-        CustomButton(
-            text = "Continuar como invitado",
-            onClick = {  },
-            modifier = Modifier
+fun Login(modifier: Modifier, viewModel: LoginViewModel) {
+    val isLoading : Boolean by viewModel.isLoading.observeAsState(initial = false)
+
+    if (isLoading) {
+        LoadingIndicator(Modifier.fillMaxSize())
+    } else {
+        Column (modifier = modifier) {
+            HeaderImage(Modifier
                 .align(Alignment.CenterHorizontally)
-                .padding(horizontal = 44.dp, vertical = 24.dp),
-            containerColor = Color(0xFFE3E3E3),
-            contentColor = Color(0xFF1E1E1E),
-            borderColor = Color(0xFF767676),
+                .padding(top = 24.dp)
+                .size(270.dp)
+            )
+            LoginForm(Modifier, viewModel)
+            RegisterMessage(Modifier)
+            CustomButton(
+                text = "Continuar como invitado",
+                onClick = {  },
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(horizontal = 44.dp, vertical = 24.dp),
+                containerColor = Color(0xFFE3E3E3),
+                contentColor = Color(0xFF1E1E1E),
+                borderColor = Color(0xFF767676),
+            )
+        }
+    }
+}
+
+@Composable
+fun LoadingIndicator(modifier: Modifier) {
+    Box (modifier) {
+        CircularProgressIndicator(
+            Modifier.align(Alignment.Center),
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }
 
 @Composable
-fun Register(modifier: Modifier) {
+fun RegisterMessage(modifier: Modifier) {
     val interFont = FontFamily(Font(R.font.inter))
     val textStyle = TextStyle(
         fontSize = 16.sp,
@@ -111,7 +131,11 @@ fun Register(modifier: Modifier) {
 }
 
 @Composable
-fun LoginForm(modifier: Modifier) {
+fun LoginForm(modifier: Modifier, viewModel: LoginViewModel) {
+    val email : String by viewModel.email.observeAsState(initial = "")
+    val password : String by viewModel.password.observeAsState(initial = "")
+    val loginEnable : Boolean by viewModel.loginEnable.observeAsState(initial = false)
+
     Box (
         modifier = modifier
             .fillMaxWidth()
@@ -130,8 +154,8 @@ fun LoginForm(modifier: Modifier) {
             CustomInputField(
                 label = "Correo electrónico",
                 placeholder = "Ej: example@example.com",
-                value = "",
-                onValueChange = {  },
+                value = email,
+                onValueChange = { viewModel.onLoginChanged(it, password) },
                 keyboardType = KeyboardType.Email
             )
 
@@ -140,8 +164,8 @@ fun LoginForm(modifier: Modifier) {
             CustomInputField(
                 label = "Contraseña",
                 placeholder = "Ingrese su contraseña",
-                value = "",
-                onValueChange = {  },
+                value = password,
+                onValueChange = { viewModel.onLoginChanged(email, it) },
                 keyboardType = KeyboardType.Password,
                 isPassword = true
             )
@@ -150,8 +174,8 @@ fun LoginForm(modifier: Modifier) {
 
             CustomButton(
                 text = "Iniciar Sesión",
-                enabled = false,
-                onClick = {  }
+                enabled = loginEnable,
+                onClick = { viewModel.onLoginSelected() }
             )
 
             Spacer(modifier = Modifier.padding(14.dp))
@@ -258,8 +282,8 @@ fun CustomInputField(
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
             colors = TextFieldDefaults.colors(
-                focusedTextColor = Color(0xFFB3B3B3),
-                unfocusedTextColor = Color(0xFFB3B3B3),
+                focusedTextColor = Color(0xFF1E1E1E),
+                unfocusedTextColor = Color(0xFF1E1E1E),
                 focusedContainerColor = MaterialTheme.colorScheme.background,
                 unfocusedContainerColor = MaterialTheme.colorScheme.background,
                 focusedIndicatorColor = Color(0xFFB3B3B3),
