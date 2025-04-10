@@ -53,6 +53,7 @@ dependencies {
     // Project Implementations
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.runtime.livedata)
     implementation(libs.coil.compose)
     implementation(libs.composefilepicker)
     implementation(libs.converter.gson)
