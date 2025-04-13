@@ -1,3 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ServITech</string>
+    <!--  App Strings  -->
+    <string name="app_name" translatable="false">ServITech</string>
+
+    <!--  Login Strings -->
+    <string name="email">Email</string>
+    <string name="email_hint">E.g.: example@example.com</string>
+
+    <string name="password">Password</string>
+    <string name="password_hint">Enter your password</string>
+
+    <string name="login">Log In</string>
+    <string name="forgot_password">Forgot your password?</string>
+
+    <string name="no_account">Don’t have an account?</string>
+    <string name="sign_up">Sign up</string>
+
+    <string name="continue_guest">Continue as guest</string>
 </resources>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="email">Correo electrónico</string>
+    <string name="email_hint">Ej: ejemplo@ejemplo.com</string>
+
+    <string name="password">Contraseña</string>
+    <string name="password_hint">Ingrese su contraseña</string>
+
+    <string name="login">Iniciar Sesión</string>
+    <string name="forgot_password">¿Olvidó su contraseña?</string>
+
+    <string name="no_account">¿No tenés una cuenta?</string>
+    <string name="sign_up">Regístrate</string>
+
+    <string name="continue_guest">Continuar como invitado</string>
+</resources>

@@ -2,6 +2,7 @@ package com.moviles.servitech.view
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +23,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -32,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -49,23 +52,25 @@ import com.moviles.servitech.viewmodel.LoginViewModel
 
 @Composable
 fun LoginScreen(viewModel: LoginViewModel) {
-    Box (
-        Modifier
+    Surface (
+        modifier = Modifier
             .fillMaxSize()
-            .padding(6.dp)
+            .background(MaterialTheme.colorScheme.background)
+            .padding(top = 23.dp, bottom = 23.dp),
+        color = MaterialTheme.colorScheme.background
     ) {
-        Login(Modifier.align(Alignment.Center), viewModel)
+        Login(viewModel)
     }
 }
 
 @Composable
-fun Login(modifier: Modifier, viewModel: LoginViewModel) {
+fun Login(viewModel: LoginViewModel) {
     val isLoading : Boolean by viewModel.isLoading.observeAsState(initial = false)
 
     if (isLoading) {
         LoadingIndicator(Modifier.fillMaxSize())
     } else {
-        Column (modifier = modifier) {
+        Column {
             HeaderImage(Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(top = 24.dp)
@@ -74,7 +79,7 @@ fun Login(modifier: Modifier, viewModel: LoginViewModel) {
             LoginForm(Modifier, viewModel)
             RegisterMessage(Modifier)
             CustomButton(
-                text = "Continuar como invitado",
+                text = stringResource(R.string.continue_guest),
                 onClick = {  },
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
@@ -115,14 +120,14 @@ fun RegisterMessage(modifier: Modifier) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "¿No tenés una cuenta?",
+            text = stringResource(R.string.no_account),
             style = textStyle
         )
 
         Spacer(modifier = Modifier.width(4.dp))
 
         Text(
-            text = "Regístrate",
+            text = stringResource(R.string.sign_up),
             modifier = Modifier.clickable { },
             style = textStyle,
             textDecoration = TextDecoration.Underline
@@ -143,7 +148,8 @@ fun LoginForm(modifier: Modifier, viewModel: LoginViewModel) {
             .border(
                 BorderStroke(
                     1.dp,
-                    Color(0xFFD9D9D9)),
+                    Color(0xFFD9D9D9)
+                ),
                 shape = RoundedCornerShape(8.dp)
             )
     ) {
@@ -152,8 +158,8 @@ fun LoginForm(modifier: Modifier, viewModel: LoginViewModel) {
             .padding(22.dp)
         ) {
             CustomInputField(
-                label = "Correo electrónico",
-                placeholder = "Ej: example@example.com",
+                label = stringResource(R.string.email),
+                placeholder = stringResource(R.string.email_hint),
                 value = email,
                 onValueChange = { viewModel.onLoginChanged(it, password) },
                 keyboardType = KeyboardType.Email
@@ -162,8 +168,8 @@ fun LoginForm(modifier: Modifier, viewModel: LoginViewModel) {
             Spacer(modifier = Modifier.padding(12.dp))
 
             CustomInputField(
-                label = "Contraseña",
-                placeholder = "Ingrese su contraseña",
+                label = stringResource(R.string.password),
+                placeholder = stringResource(R.string.password_hint),
                 value = password,
                 onValueChange = { viewModel.onLoginChanged(email, it) },
                 keyboardType = KeyboardType.Password,
@@ -173,7 +179,7 @@ fun LoginForm(modifier: Modifier, viewModel: LoginViewModel) {
             Spacer(modifier = Modifier.padding(14.dp))
 
             CustomButton(
-                text = "Iniciar Sesión",
+                text = stringResource(R.string.login),
                 enabled = loginEnable,
                 onClick = { viewModel.onLoginSelected() }
             )
@@ -233,7 +239,7 @@ fun CustomButton(
 @Composable
 fun ForgotPassword(modifier: Modifier) {
     Text(
-        text = "Olvidó su contraseña?",
+        text = stringResource(R.string.forgot_password),
         modifier = modifier.clickable { },
         style = TextStyle(
             fontSize = 16.sp,
