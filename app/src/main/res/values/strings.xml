@@ -5,9 +5,11 @@
 
     <!--  Login Strings -->
     <string name="email">Email</string>
+    <string name="email_error">Enter a valid email</string>
     <string name="email_hint">E.g.: example@example.com</string>
 
     <string name="password">Password</string>
+    <string name="password_error">Password must have at least 8 characters</string>
     <string name="password_hint">Enter your password</string>
 
     <string name="login">Log In</string>

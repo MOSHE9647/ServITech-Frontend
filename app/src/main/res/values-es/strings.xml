@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="email">Correo electrónico</string>
+    <string name="email_error">Ingresa un email válido</string>
     <string name="email_hint">Ej: ejemplo@ejemplo.com</string>
 
     <string name="password">Contraseña</string>
+    <string name="password_error">La contraseña debe contener al menos 8 caracteres</string>
     <string name="password_hint">Ingrese su contraseña</string>
 
     <string name="login">Iniciar Sesión</string>

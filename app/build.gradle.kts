@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    // Project Plugins
+    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
 android {
@@ -59,6 +62,9 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.retrofit)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.accompanist.systemuicontroller)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
