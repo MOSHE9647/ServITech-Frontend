@@ -1,4 +1,4 @@
-package com.moviles.servitech.view
+package com.moviles.servitech.view.auth
 
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
@@ -37,12 +37,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.moviles.servitech.R
 import com.moviles.servitech.ui.components.CustomDialog
-import com.moviles.servitech.view.components.AuthNavigationMessage
-import com.moviles.servitech.view.components.CustomButton
-import com.moviles.servitech.view.components.CustomInputField
-import com.moviles.servitech.view.components.HeaderImage
+import com.moviles.servitech.view.auth.components.AuthNavigationMessage
+import com.moviles.servitech.ui.components.CustomButton
+import com.moviles.servitech.ui.components.CustomInputField
+import com.moviles.servitech.ui.components.HeaderImage
 import com.moviles.servitech.ui.components.LoadingIndicator
-import com.moviles.servitech.viewmodel.LoginViewModel
+import com.moviles.servitech.viewmodel.auth.LoginViewModel
 
 @Composable
 fun LoginScreen(

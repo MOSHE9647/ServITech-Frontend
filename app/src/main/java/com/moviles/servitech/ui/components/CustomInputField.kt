@@ -1,4 +1,4 @@
-package com.moviles.servitech.view.components
+package com.moviles.servitech.ui.components
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column

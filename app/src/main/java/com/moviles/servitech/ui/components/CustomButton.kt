@@ -1,4 +1,4 @@
-package com.moviles.servitech.view.components
+package com.moviles.servitech.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.fillMaxWidth

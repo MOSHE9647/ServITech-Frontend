@@ -1,4 +1,4 @@
-package com.moviles.servitech.viewmodel
+package com.moviles.servitech.viewmodel.auth
 
 import android.content.Context
 import androidx.lifecycle.LiveData
@@ -7,8 +7,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moviles.servitech.R
-import com.moviles.servitech.network.repository.AuthRepositoryImpl
-import com.moviles.servitech.network.repository.LoginResult
+import com.moviles.servitech.network.repositories.AuthRepositoryImpl
+import com.moviles.servitech.network.repositories.LoginResult
 import com.moviles.servitech.network.responses.LoginResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

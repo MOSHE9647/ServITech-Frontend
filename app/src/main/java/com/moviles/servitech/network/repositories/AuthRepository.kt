@@ -1,4 +1,4 @@
-package com.moviles.servitech.network.repository
+package com.moviles.servitech.network.repositories
 
 import android.util.Log
 import android.util.Patterns

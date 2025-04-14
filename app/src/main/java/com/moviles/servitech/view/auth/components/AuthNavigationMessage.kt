@@ -1,4 +1,4 @@
-package com.moviles.servitech.view.components
+package com.moviles.servitech.view.auth.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

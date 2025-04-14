@@ -1,4 +1,4 @@
-package com.moviles.servitech.view.components
+package com.moviles.servitech.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
