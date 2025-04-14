@@ -1,10 +1,6 @@
 package com.moviles.servitech.view
 
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,22 +21,27 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.moviles.servitech.R
-import com.moviles.servitech.ui.components.AuthNavigationMessage
-import com.moviles.servitech.ui.components.CustomButton
-import com.moviles.servitech.ui.components.CustomInputField
-import com.moviles.servitech.ui.components.HeaderImage
+import com.moviles.servitech.view.components.AuthNavigationMessage
+import com.moviles.servitech.view.components.CustomButton
+import com.moviles.servitech.view.components.CustomInputField
+import com.moviles.servitech.view.components.HeaderImage
 import com.moviles.servitech.ui.components.LoadingIndicator
 import com.moviles.servitech.viewmodel.LoginViewModel
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel, modifier: Modifier = Modifier) {
-    val isLoading by viewModel.isLoading.observeAsState(initial = false)
+fun LoginScreen(
+    modifier: Modifier = Modifier,
+    viewModel: LoginViewModel = hiltViewModel()
+) {
+    val loginState by viewModel.loginState.observeAsState()
+    val isLoading = loginState is LoginViewModel.LoginState.Loading
 
     Box(
         modifier = modifier
@@ -85,12 +86,22 @@ fun LoginScreen(viewModel: LoginViewModel, modifier: Modifier = Modifier) {
             }
         }
 
-        // Animated loading indicator
-        LoadingIndicator(
-            modifier = Modifier.fillMaxSize(),
-            withBlurBackground = true,
-            isVisible = isLoading
-        )
+        when (val state = loginState) {
+            is LoginViewModel.LoginState.Loading -> {
+                // Animated loading indicator
+                LoadingIndicator(
+                    modifier = Modifier.fillMaxSize(),
+                    withBlurBackground = true,
+                    isVisible = true
+                )
+            }
+
+            is LoginViewModel.LoginState.Error -> Log.d("LoginScreen", state.message)
+            is LoginViewModel.LoginState.Success -> Log.d("LoginScreen", "Success: ${state.data}")
+            else -> {
+                Log.d("LoginScreen", "No login state")
+            }
+        }
     }
 }
 
@@ -101,6 +112,9 @@ fun LoginForm(modifier: Modifier = Modifier, viewModel: LoginViewModel, isLoadin
 
     val emailError: Boolean by viewModel.emailError.observeAsState(initial = false)
     val passwordError: Boolean by viewModel.passwordError.observeAsState(initial = false)
+
+    val emailErrorMsg: String? by viewModel.emailErrorMsg.observeAsState(initial = null)
+    val passwordErrorMsg: String? by viewModel.passwordErrorMsg.observeAsState(initial = null)
     val loginEnable: Boolean by viewModel.loginEnable.observeAsState(initial = false)
 
     Box(
@@ -121,14 +135,14 @@ fun LoginForm(modifier: Modifier = Modifier, viewModel: LoginViewModel, isLoadin
                 label = stringResource(R.string.email),
                 placeholder = stringResource(R.string.email_hint),
                 value = email,
-                onValueChange = { viewModel.onLoginChanged(it, password) },
+                onValueChange = { viewModel.onEmailChanged(it) },
                 keyboardType = KeyboardType.Email,
                 isError = emailError,
                 enabled = !isLoading,
                 supportingText = {
                     if (emailError) {
                         Text(
-                            text = stringResource(R.string.email_error),
+                            text = emailErrorMsg ?: stringResource(R.string.email_error),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.error
                         )
@@ -142,14 +156,14 @@ fun LoginForm(modifier: Modifier = Modifier, viewModel: LoginViewModel, isLoadin
                 label = stringResource(R.string.password),
                 placeholder = stringResource(R.string.password_hint),
                 value = password,
-                onValueChange = { viewModel.onLoginChanged(email, it) },
+                onValueChange = { viewModel.onPasswordChanged(it) },
                 keyboardType = KeyboardType.Password,
                 isPassword = true,
                 isError = passwordError,
                 supportingText = {
                     if (passwordError) {
                         Text(
-                            text = stringResource(R.string.password_error),
+                            text = passwordErrorMsg ?: stringResource(R.string.password_error),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.error
                         )
@@ -160,10 +174,11 @@ fun LoginForm(modifier: Modifier = Modifier, viewModel: LoginViewModel, isLoadin
 
             Spacer(modifier = Modifier.height(10.dp))
 
+            val context = LocalContext.current
             CustomButton(
                 text = stringResource(R.string.login),
                 enabled = loginEnable && !isLoading,
-                onClick = { viewModel.onLoginSelected() }
+                onClick = { viewModel.onLoginSelected(context = context) }
             )
 
             Spacer(modifier = Modifier.height(24.dp))

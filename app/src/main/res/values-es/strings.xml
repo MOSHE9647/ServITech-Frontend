@@ -15,4 +15,7 @@
     <string name="sign_up">Regístrate</string>
 
     <string name="continue_guest">Continuar como invitado</string>
+
+    <string name="unknown_error">Error Desconocido</string>
+    <string name="connection_error">Error de Conexión</string>
 </resources>
