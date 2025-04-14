@@ -22,7 +22,16 @@
 
     <string name="continue_guest">Continue as guest</string>
 
+    <!--  Password Strings  -->
+    <string name="hide_password">Hide password</string>
+    <string name="show_password">Show password</string>
+
     <!--  Network String  -->
     <string name="unknown_error">Unknown Error Occurred</string>
     <string name="connection_error">Connection Error</string>
+    <string name="connection_error_message">An error occurred while trying to connect to the server. Please check your internet connection and try again.</string>
+
+    <!--  Dialogs Strings  -->
+    <string name="dialog_confirm">Confirm</string>
+    <string name="dialog_cancel">Cancel</string>
 </resources>

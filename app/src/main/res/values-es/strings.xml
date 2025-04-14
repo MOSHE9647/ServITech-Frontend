@@ -18,6 +18,13 @@
 
     <string name="continue_guest">Continuar como invitado</string>
 
+    <string name="hide_password">Ocultar contraseña</string>
+    <string name="show_password">Mostrar contraseña</string>
+
     <string name="unknown_error">Error Desconocido</string>
     <string name="connection_error">Error de Conexión</string>
+    <string name="connection_error_message">Ocurrió un error al intentar conectar con el servidor. Por favor, verifica tu conexión a internet.</string>
+
+    <string name="dialog_confirm">Aceptar</string>
+    <string name="dialog_cancel">Cancelar</string>
 </resources>

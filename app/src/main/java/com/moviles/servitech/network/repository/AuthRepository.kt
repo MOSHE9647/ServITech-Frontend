@@ -1,5 +1,6 @@
 package com.moviles.servitech.network.repository
 
+import android.util.Log
 import android.util.Patterns
 import com.moviles.servitech.R
 import com.moviles.servitech.network.requests.LoginRequest
@@ -46,7 +47,8 @@ class AuthRepositoryImpl @Inject constructor(
                 }
             }
         } catch (e: Exception) {
-            Result.failure(Exception(e.localizedMessage))
+            Log.d("AuthRepository", "Error: ${e.message}")
+            Result.failure(Exception(stringProvider.getString(R.string.connection_error)))
         }
     }
 
