@@ -1,129 +1,117 @@
 package com.moviles.servitech.viewmodel
 
 import android.content.Context
-import android.util.Log
-import android.util.Patterns
-import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moviles.servitech.R
-import com.moviles.servitech.network.services.AuthService
-import com.moviles.servitech.network.requests.LoginRequest
-import com.moviles.servitech.network.responses.ApiResponse
-import com.moviles.servitech.network.responses.ErrorResponse
+import com.moviles.servitech.network.repository.AuthRepositoryImpl
+import com.moviles.servitech.network.repository.LoginResult
 import com.moviles.servitech.network.responses.LoginResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import javax.inject.Inject
+
+data class FieldState<T>(
+    val data: MutableLiveData<T> = MutableLiveData(),
+    val error: MutableLiveData<Boolean> = MutableLiveData(false),
+    val errorMessage: MutableLiveData<String?> = MutableLiveData(null)
+)
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val apiService: AuthService
+    private val authRepository: AuthRepositoryImpl
 ) : ViewModel() {
 
-    private val _email = MutableLiveData<String>()
-    val email : LiveData<String> = _email
+    private val emailState = FieldState<String>()
+    val email: LiveData<String> = emailState.data
+    val emailError: LiveData<Boolean> = emailState.error
+    val emailErrorMsg: LiveData<String?> = emailState.errorMessage
 
-    private val _emailError = MutableLiveData<Boolean>()
-    val emailError : LiveData<Boolean> = _emailError
-
-    private val _emailErrorMsg = MutableLiveData<String>()
-    val emailErrorMsg : LiveData<String> = _emailErrorMsg
-
-    private val _password = MutableLiveData<String>()
-    val password : LiveData<String> = _password
-
-    private val _passwordError = MutableLiveData<Boolean>()
-    val passwordError : LiveData<Boolean> = _passwordError
-
-    private val _passwordErrorMsg = MutableLiveData<String>()
-    val passwordErrorMsg : LiveData<String> = _passwordErrorMsg
+    private val passwordState = FieldState<String>()
+    val password: LiveData<String> = passwordState.data
+    val passwordError: LiveData<Boolean> = passwordState.error
+    val passwordErrorMsg: LiveData<String?> = passwordState.errorMessage
 
     private val _loginEnable = MediatorLiveData<Boolean>().apply {
-        addSource(_email) { value = validateForm() }
-        addSource(_password) { value = validateForm() }
+        addSource(emailState.data) { value = validateForm() }
+        addSource(passwordState.data) { value = validateForm() }
     }
     val loginEnable: LiveData<Boolean> = _loginEnable
 
     private val _loginState = MutableLiveData<LoginState>()
     val loginState: LiveData<LoginState> = _loginState
 
-    private fun validateForm(): Boolean {
-        val email= _email.value.orEmpty()
-        val password = _password.value.orEmpty()
-        return isValidEmail(email) && isValidPassword(password)
-    }
-
     fun onEmailChanged(value: String) {
-        _email.value = value
-        _emailError.value = value.isNotEmpty() && !isValidEmail(value)
+        emailState.data.value = value
+        val validation = authRepository.validateEmail(value)
+        emailState.error.value = !validation.isValid
+        emailState.errorMessage.value = validation.errorMessage
     }
 
     fun onPasswordChanged(value: String) {
-        _password.value = value
-        _passwordError.value = value.isNotEmpty() && !isValidPassword(value)
+        passwordState.data.value = value
+        val validation = authRepository.validatePassword(value)
+        passwordState.error.value = !validation.isValid
+        passwordState.errorMessage.value = validation.errorMessage
     }
 
-    private fun isValidPassword(password: String): Boolean = password.length > 8
-
-    private fun isValidEmail(email: String): Boolean = Patterns.EMAIL_ADDRESS.matcher(email).matches()
-
     fun onLoginSelected(context: Context) {
-        val loginRequest = LoginRequest(
-            email = _email.value.orEmpty(),
-            password = _password.value.orEmpty()
-        )
+        val email = emailState.data.value.orEmpty()
+        val password = passwordState.data.value.orEmpty()
+        resetErrors()
 
         viewModelScope.launch {
             _loginState.value = LoginState.Loading
 
-            try {
-                val response = apiService.login(loginRequest)
-
-                if (response.isSuccessful) {
-                    val apiResponse = response.body()!!
-                    if (apiResponse.data != null) {
-                        _loginState.value = LoginState.Success(apiResponse)
-                    } else {
-                        _loginState.value = LoginState.Error(apiResponse.message)
-                    }
-                } else {
-                    // HTTP Error Managing (401, 500, etc.)
-                    val errorBody = response.errorBody()?.string()
-                    if (!errorBody.isNullOrEmpty()) {
-                        val errorResponse = Json.decodeFromString<ErrorResponse>(errorBody)
-                        _loginState.value = LoginState.Error(errorResponse.message)
-
-                        val errors = errorResponse.errors
-                        Log.d("LoginViewModel", "Errors: $errors")
-                        if (errors.isNotEmpty()) {
-                            if (errors.containsKey("email")) {
-                                _emailError.value = true
-                                _emailErrorMsg.value = errors["email"]
-                            }
-                            if (errors.containsKey("password")) {
-                                _passwordError.value = true
-                                _passwordErrorMsg.value = errors["password"]
-                            }
+            authRepository.login(email, password)
+                .onSuccess { loginResult ->
+                    when (loginResult) {
+                        is LoginResult.Success -> {
+                            _loginState.value = LoginState.Success(loginResult.data)
                         }
-                    } else {
-                        _loginState.value = LoginState.Error(getString(context, R.string.unknown_error))
+                        is LoginResult.Error -> {
+                            loginResult.fieldErrors["email"]?.let { errorMsg ->
+                                emailState.error.value = true
+                                emailState.errorMessage.value = errorMsg
+                            }
+                            loginResult.fieldErrors["password"]?.let { errorMsg ->
+                                passwordState.error.value = true
+                                passwordState.errorMessage.value = errorMsg
+                            }
+                            _loginState.value = LoginState.Error(
+                                loginResult.message
+                            )
+                        }
                     }
                 }
-            } catch (e: Exception) {
-                _loginState.value = LoginState.Error(e.message ?: getString(context, R.string.unknown_error))
-            }
+                .onFailure { exception ->
+                    _loginState.value = LoginState.Error(
+                        exception.message ?: context.getString(R.string.unknown_error)
+                    )
+                }
         }
+    }
+
+    private fun validateForm(): Boolean {
+        val email = emailState.data.value.orEmpty()
+        val password = passwordState.data.value.orEmpty()
+        return authRepository.validateEmail(email).isValid &&
+                authRepository.validatePassword(password).isValid
+    }
+
+    private fun resetErrors() {
+        emailState.error.value = false
+        emailState.errorMessage.value = null
+        passwordState.error.value = false
+        passwordState.errorMessage.value = null
     }
 
     sealed class LoginState {
         object Loading : LoginState()
-        data class Success(val data: ApiResponse<LoginResponse>) : LoginState()
+        data class Success(val data: LoginResponse) : LoginState()
         data class Error(val message: String) : LoginState()
     }
-
 }

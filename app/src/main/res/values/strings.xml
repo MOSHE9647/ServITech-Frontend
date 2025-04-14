@@ -5,11 +5,13 @@
 
     <!--  Login Strings -->
     <string name="email">Email</string>
-    <string name="email_error">Enter a valid email</string>
+    <string name="email_invalid_error">Enter a valid email</string>
+    <string name="email_empty_error">Email cannot be empty</string>
     <string name="email_hint">E.g.: example@example.com</string>
 
     <string name="password">Password</string>
-    <string name="password_error">Password must have at least 8 characters</string>
+    <string name="password_empty_error">Password cannot be empty</string>
+    <string name="password_length_error">Password must have at least 8 characters</string>
     <string name="password_hint">Enter your password</string>
 
     <string name="login">Log In</string>
@@ -21,6 +23,6 @@
     <string name="continue_guest">Continue as guest</string>
 
     <!--  Network String  -->
-    <string name="unknown_error">Unknown Error</string>
+    <string name="unknown_error">Unknown Error Occurred</string>
     <string name="connection_error">Connection Error</string>
 </resources>

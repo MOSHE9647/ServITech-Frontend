@@ -142,7 +142,7 @@ fun LoginForm(modifier: Modifier = Modifier, viewModel: LoginViewModel, isLoadin
                 supportingText = {
                     if (emailError) {
                         Text(
-                            text = emailErrorMsg ?: stringResource(R.string.email_error),
+                            text = emailErrorMsg ?: stringResource(R.string.email_invalid_error),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.error
                         )
@@ -163,7 +163,7 @@ fun LoginForm(modifier: Modifier = Modifier, viewModel: LoginViewModel, isLoadin
                 supportingText = {
                     if (passwordError) {
                         Text(
-                            text = passwordErrorMsg ?: stringResource(R.string.password_error),
+                            text = passwordErrorMsg ?: stringResource(R.string.password_length_error),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.error
                         )
