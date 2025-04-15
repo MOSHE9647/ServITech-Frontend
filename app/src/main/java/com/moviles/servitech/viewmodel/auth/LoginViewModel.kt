@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moviles.servitech.R
+import com.moviles.servitech.core.session.SessionManager
 import com.moviles.servitech.network.repositories.AuthRepositoryImpl
 import com.moviles.servitech.network.repositories.LoginResult
 import com.moviles.servitech.network.responses.LoginResponse
@@ -22,7 +23,8 @@ data class FieldState<T>(
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authRepository: AuthRepositoryImpl
+    private val authRepository: AuthRepositoryImpl,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
     private val emailState = FieldState<String>()
@@ -71,6 +73,11 @@ class LoginViewModel @Inject constructor(
                     when (loginResult) {
                         is LoginResult.Success -> {
                             _loginState.value = LoginState.Success(loginResult.data)
+                            sessionManager.saveSession(
+                                token = loginResult.data.token,
+                                expiresIn = loginResult.data.expiresIn,
+                                user = loginResult.data.user
+                            )
                         }
                         is LoginResult.Error -> {
                             loginResult.fieldErrors["email"]?.let { errorMsg ->

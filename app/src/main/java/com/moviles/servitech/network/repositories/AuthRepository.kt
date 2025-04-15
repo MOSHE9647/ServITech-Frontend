@@ -2,17 +2,18 @@ package com.moviles.servitech.network.repositories
 
 import android.util.Log
 import android.util.Patterns
+import com.google.gson.Gson
 import com.moviles.servitech.R
 import com.moviles.servitech.network.requests.LoginRequest
 import com.moviles.servitech.network.responses.ErrorResponse
 import com.moviles.servitech.network.responses.LoginResponse
 import com.moviles.servitech.network.services.AuthService
 import com.moviles.servitech.network.services.providers.StringProvider
-import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 interface AuthRepository {
     suspend fun login(email: String, password: String): Result<LoginResult>
+    suspend fun logout(token: String): Result<LogoutResult>
     fun validateEmail(email: String): ValidationResult
     fun validatePassword(password: String): ValidationResult
 }
@@ -37,7 +38,7 @@ class AuthRepositoryImpl @Inject constructor(
             } else {
                 val errorBody = response.errorBody()?.string()
                 if (!errorBody.isNullOrEmpty()) {
-                    val errorResponse = Json.decodeFromString<ErrorResponse>(errorBody)
+                    val errorResponse = Gson().fromJson(errorBody, ErrorResponse::class.java)
                     Result.success(LoginResult.Error(
                         errorResponse.message,
                         errorResponse.errors
@@ -47,7 +48,33 @@ class AuthRepositoryImpl @Inject constructor(
                 }
             }
         } catch (e: Exception) {
-            Log.d("AuthRepository", "Error: ${e.message}")
+            Log.e("AuthRepository", "Error: ${e.message}")
+            Result.failure(Exception(stringProvider.getString(R.string.connection_error)))
+        }
+    }
+
+    override suspend fun logout(token: String): Result<LogoutResult> {
+        return try {
+            val response = authService.logout("Bearer $token")
+
+            if (response.isSuccessful) {
+                val apiResponse = response.body()!!
+                if (apiResponse.status == 200) {
+                    Result.success(LogoutResult.Success)
+                } else {
+                    Result.success(LogoutResult.Error(apiResponse.message))
+                }
+            } else {
+                val errorBody = response.errorBody()?.string()
+                if (!errorBody.isNullOrEmpty()) {
+                    val errorResponse = Gson().fromJson(errorBody, ErrorResponse::class.java)
+                    Result.success(LogoutResult.Error(errorResponse.message))
+                } else {
+                    Result.failure(Exception(stringProvider.getString(R.string.unknown_error)))
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("AuthRepository", "Error: ${e.message}")
             Result.failure(Exception(stringProvider.getString(R.string.connection_error)))
         }
     }
@@ -87,6 +114,11 @@ sealed class LoginResult {
         val message: String,
         val fieldErrors: Map<String, String> = emptyMap()
     ) : LoginResult()
+}
+
+sealed class LogoutResult {
+    object Success : LogoutResult()
+    data class Error(val message: String) : LogoutResult()
 }
 
 data class ValidationResult(

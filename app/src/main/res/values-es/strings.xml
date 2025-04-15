@@ -27,4 +27,8 @@
 
     <string name="dialog_confirm">Aceptar</string>
     <string name="dialog_cancel">Cancelar</string>
+    <string name="dialog_error_title">Ha ocurrido un error</string>
+
+    <string name="success_logout">La sesión se ha cerrado correctamente</string>
+    <string name="session_expired">La sesión ha caducado, por favor vuelva a iniciar sesión</string>
 </resources>

@@ -34,4 +34,9 @@
     <!--  Dialogs Strings  -->
     <string name="dialog_confirm">Confirm</string>
     <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_error_title">An error occurred</string>
+
+    <!--  Session Strings  -->
+    <string name="success_logout">Successfully logged out</string>
+    <string name="session_expired">The session has expired. Please log in again.</string>
 </resources>

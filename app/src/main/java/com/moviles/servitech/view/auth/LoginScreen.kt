@@ -13,17 +13,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.SignalWifiStatusbarConnectedNoInternet4
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -36,10 +31,10 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.moviles.servitech.R
-import com.moviles.servitech.ui.components.CustomDialog
 import com.moviles.servitech.view.auth.components.AuthNavigationMessage
 import com.moviles.servitech.ui.components.CustomButton
 import com.moviles.servitech.ui.components.CustomInputField
+import com.moviles.servitech.ui.components.HandleServerError
 import com.moviles.servitech.ui.components.HeaderImage
 import com.moviles.servitech.ui.components.LoadingIndicator
 import com.moviles.servitech.viewmodel.auth.LoginViewModel
@@ -47,7 +42,9 @@ import com.moviles.servitech.viewmodel.auth.LoginViewModel
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    viewModel: LoginViewModel = hiltViewModel()
+    viewModel: LoginViewModel = hiltViewModel(),
+    navigateToSignUp: () -> Unit = { },
+    navigateToHome: () -> Unit = { }
 ) {
     val loginState by viewModel.loginState.observeAsState()
     val isLoading = loginState is LoginViewModel.LoginState.Loading
@@ -78,12 +75,16 @@ fun LoginScreen(
                     actionText = stringResource(R.string.sign_up),
                     isClickable = !isLoading
                 ) {
-                    Log.d("LoginScreen", "Sign Up clicked")
+                    // Navigate to Sign Up screen
+                    navigateToSignUp()
                 }
 
                 CustomButton(
                     text = stringResource(R.string.continue_guest),
-                    onClick = { },
+                    onClick = {
+                        // Continue as guest
+                        Log.d("LoginScreen", "Continue as Guest clicked")
+                    },
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .padding(horizontal = 44.dp, vertical = 24.dp),
@@ -104,33 +105,12 @@ fun LoginScreen(
                     isVisible = true
                 )
             }
-            is LoginViewModel.LoginState.Error -> HandleLoginError(state.message)
-            is LoginViewModel.LoginState.Success -> Log.d("LoginScreen", "Success: ${state.data}")
+            is LoginViewModel.LoginState.Success -> {
+                Log.d("LoginScreen", "User Logged In: ${state.data}")
+                navigateToHome()
+            }
+            is LoginViewModel.LoginState.Error -> HandleServerError("LoginScreen", state.message)
             else -> {  }
-        }
-    }
-}
-
-@Composable
-fun HandleLoginError(message: String) {
-    Log.d("LoginScreen", message)
-
-    // Handle error message
-    val message = message
-    val connectionErrorMsg = stringResource(R.string.connection_error)
-    if (message.isNotEmpty() && message == connectionErrorMsg) {
-        var showDialog by remember { mutableStateOf<Boolean>(true) }
-
-        if (showDialog) {
-            CustomDialog(
-                icon = Icons.Filled.SignalWifiStatusbarConnectedNoInternet4,
-                title = connectionErrorMsg,
-                message = stringResource(R.string.connection_error_message),
-                cancelButtonText = stringResource(R.string.dialog_cancel),
-                confirmButtonText = stringResource(R.string.dialog_confirm),
-                showCancelButton = false,
-                onConfirm = { showDialog = false },
-            )
         }
     }
 }
