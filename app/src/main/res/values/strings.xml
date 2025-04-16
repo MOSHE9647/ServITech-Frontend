@@ -22,12 +22,40 @@
 
     <string name="continue_guest">Continue as guest</string>
 
+    <!--  Register Strings  -->
+    <string name="name">Name</string>
+    <string name="name_hint">E.g.: John Doe</string>
+    <string name="name_empty_error">Name cannot be empty</string>
+    <string name="name_length_error">Name must have at least 2 characters</string>
+
+    <string name="phone">Phone Number</string>
+    <string name="phone_hint">E.g.: +506 8888 8888</string>
+    <string name="phone_empty_error">Phone number cannot be empty</string>
+    <string name="phone_invalid_error">Enter a valid phone number</string>
+    <string name="phone_length_error">Phone number must have at least 10 digits</string>
+
+    <string name="confirm_password">Confirm Password</string>
+    <string name="confirm_password_empty_error">Password confirmation cannot be empty</string>
+    <string name="confirm_password_length_error">Password confirmation must have at least 8 characters</string>
+    <string name="confirm_password_not_match">Password confirmation does not match</string>
+    <string name="confirm_password_hint">Re-enter your password</string>
+
+    <string name="register_error">An error occurred while registering. Please try again.</string>
+    <string name="register_success">Registration successful! Please log in.</string>
+
+    <!--  Guest User Strings  -->
+    <string name="guest_name">Guest</string>
+    <string name="guest_email">guest@servitechcr.com</string>
+
+    <string name="register">Register</string>
+    <string name="have_account">Already have an account?</string>
+
     <!--  Password Strings  -->
     <string name="hide_password">Hide password</string>
     <string name="show_password">Show password</string>
 
     <!--  Network String  -->
-    <string name="unknown_error">Unknown Error Occurred</string>
+    <string name="unknown_error">Unknown Error</string>
     <string name="connection_error">Connection Error</string>
     <string name="connection_error_message">An error occurred while trying to connect to the server. Please check your internet connection and try again.</string>
 
@@ -39,4 +67,5 @@
     <!--  Session Strings  -->
     <string name="success_logout">Successfully logged out</string>
     <string name="session_expired">The session has expired. Please log in again.</string>
+    <string name="session_clear_error">An error occurred while clearing the session. Please try again.</string>
 </resources>

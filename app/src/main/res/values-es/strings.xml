@@ -18,6 +18,32 @@
 
     <string name="continue_guest">Continuar como invitado</string>
 
+    <string name="name">Nombre</string>
+    <string name="name_hint">Ej: Juan Pérez</string>
+    <string name="name_empty_error">El nombre no puede estar vacío</string>
+    <string name="name_length_error">El nombre debe tener al menos 2 caracteres</string>
+
+    <string name="phone">N° de Teléfono</string>
+    <string name="phone_hint">Ej: +506 8888 8888</string>
+    <string name="phone_empty_error">El número de teléfono no puede estar vacío</string>
+    <string name="phone_invalid_error">Ingresa un número de teléfono válido</string>
+    <string name="phone_length_error">El número de teléfono debe tener al menos 10 dígitos</string>
+
+    <string name="confirm_password">Confirmar Contraseña</string>
+    <string name="confirm_password_empty_error">La confirmación de contraseña no puede estar vacía</string>
+    <string name="confirm_password_length_error">La confirmación de contraseña debe tener al menos 8 caracteres</string>
+    <string name="confirm_password_not_match">Las contraseñas no coinciden</string>
+    <string name="confirm_password_hint">Reingrese su contraseña</string>
+
+    <string name="register_error">Ocurrió un error al registrarse. Por favor, inténtelo de nuevo.</string>
+    <string name="register_success">¡Registro exitoso! Por favor, inicie sesión.</string>
+
+    <string name="guest_name">Invitado</string>
+    <string name="guest_email">invitado@servitechcr.com</string>
+
+    <string name="register">Registrarse</string>
+    <string name="have_account">¿Ya tienes una cuenta?</string>
+
     <string name="hide_password">Ocultar contraseña</string>
     <string name="show_password">Mostrar contraseña</string>
 
@@ -31,4 +57,5 @@
 
     <string name="success_logout">La sesión se ha cerrado correctamente</string>
     <string name="session_expired">La sesión ha caducado, por favor vuelva a iniciar sesión</string>
+    <string name="session_clear_error">Ocurrió un error al cerrar la sesión. Por favor, inténtelo de nuevo.</string>
 </resources>

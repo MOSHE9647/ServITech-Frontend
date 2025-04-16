@@ -11,11 +11,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.moviles.servitech.common.rememberSessionManager
-import com.moviles.servitech.core.navigation.Screen
 import com.moviles.servitech.ui.components.LoadingIndicator
 
 @Composable
-fun SplashScreen(navigateTo: (String) -> Unit) {
+fun SplashScreen(
+    navigateToHome: () -> Unit = {},
+    navigateToLogin: () -> Unit = {},
+) {
     val context = LocalContext.current.applicationContext
     val sessionManager = rememberSessionManager(context)
 
@@ -35,15 +37,14 @@ fun SplashScreen(navigateTo: (String) -> Unit) {
     // Manage the navigation based on session validity
     LaunchedEffect(isSessionValid) {
         if (!tokenChecked.value) {
-            val destination = if (isSessionValid) Screen.Home.route else Screen.Login.route
-            navigateTo(destination)
+            if (isSessionValid) navigateToHome()
+            else navigateToLogin()
             tokenChecked.value = true
         }
     }
 
     LoadingIndicator(
         modifier = Modifier.fillMaxSize(),
-        withBlurBackground = true,
         isVisible = true
     )
 }

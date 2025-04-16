@@ -1,20 +1,13 @@
 package com.moviles.servitech.view.auth
 
 import android.util.Log
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,7 +15,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -33,10 +25,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.moviles.servitech.R
 import com.moviles.servitech.view.auth.components.AuthNavigationMessage
 import com.moviles.servitech.ui.components.CustomButton
+import com.moviles.servitech.ui.components.CustomCard
 import com.moviles.servitech.ui.components.CustomInputField
-import com.moviles.servitech.ui.components.HandleServerError
+import com.moviles.servitech.ui.components.ErrorText
 import com.moviles.servitech.ui.components.HeaderImage
-import com.moviles.servitech.ui.components.LoadingIndicator
+import com.moviles.servitech.view.auth.components.AuthViewContainer
+import com.moviles.servitech.view.auth.components.HandleAuthState
 import com.moviles.servitech.viewmodel.auth.LoginViewModel
 
 @Composable
@@ -46,77 +40,59 @@ fun LoginScreen(
     navigateToSignUp: () -> Unit = { },
     navigateToHome: () -> Unit = { }
 ) {
+
     val loginState by viewModel.loginState.observeAsState()
     val isLoading = loginState is LoginViewModel.LoginState.Loading
 
-    Box(
+    AuthViewContainer(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.background),
+        authHandler = {
+            HandleAuthState (
+                state = loginState,
+                logTag = "LoginScreen",
+                navigateTo = navigateToHome
+            )
+        }
     ) {
-        // Main content
-        Surface(
+        HeaderImage(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 23.dp, bottom = 23.dp)
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 10.dp)
+        )
+
+        LoginForm(viewModel = viewModel, isLoading = isLoading)
+
+        AuthNavigationMessage(
+            message = stringResource(R.string.no_account),
+            actionText = stringResource(R.string.sign_up),
+            isClickable = !isLoading
         ) {
-            Column {
-                HeaderImage(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(top = 24.dp)
-                        .size(270.dp)
-                )
-
-                LoginForm(viewModel = viewModel, isLoading = isLoading)
-
-                AuthNavigationMessage(
-                    message = stringResource(R.string.no_account),
-                    actionText = stringResource(R.string.sign_up),
-                    isClickable = !isLoading
-                ) {
-                    // Navigate to Sign Up screen
-                    navigateToSignUp()
-                }
-
-                CustomButton(
-                    text = stringResource(R.string.continue_guest),
-                    onClick = {
-                        // Continue as guest
-                        Log.d("LoginScreen", "Continue as Guest clicked")
-                    },
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(horizontal = 44.dp, vertical = 24.dp),
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary,
-                    borderColor = MaterialTheme.colorScheme.outlineVariant,
-                    enabled = !isLoading
-                )
-            }
+            // Navigate to Sign Up screen
+            navigateToSignUp()
         }
 
-        when (val state = loginState) {
-            is LoginViewModel.LoginState.Loading -> {
-                // Animated loading indicator
-                LoadingIndicator(
-                    modifier = Modifier.fillMaxSize(),
-                    withBlurBackground = true,
-                    isVisible = true
-                )
-            }
-            is LoginViewModel.LoginState.Success -> {
-                Log.d("LoginScreen", "User Logged In: ${state.data}")
-                navigateToHome()
-            }
-            is LoginViewModel.LoginState.Error -> HandleServerError("LoginScreen", state.message)
-            else -> {  }
-        }
+        CustomButton(
+            text = stringResource(R.string.continue_guest),
+            onClick = {
+                Log.d("LoginScreen", "Continue as Guest clicked")
+                viewModel.onGuestSelected()
+            },
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(horizontal = 44.dp, vertical = 24.dp),
+            containerColor = MaterialTheme.colorScheme.secondary,
+            contentColor = MaterialTheme.colorScheme.onSecondary,
+            borderColor = MaterialTheme.colorScheme.outlineVariant,
+            enabled = !isLoading
+        )
     }
+
 }
 
 @Composable
-fun LoginForm(modifier: Modifier = Modifier, viewModel: LoginViewModel, isLoading: Boolean) {
+fun LoginForm(viewModel: LoginViewModel, isLoading: Boolean) {
     val email: String by viewModel.email.observeAsState(initial = "")
     val password: String by viewModel.password.observeAsState(initial = "")
 
@@ -129,79 +105,56 @@ fun LoginForm(modifier: Modifier = Modifier, viewModel: LoginViewModel, isLoadin
 
     val focusManager = LocalFocusManager.current
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(24.dp)
-            .border(
-                BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                shape = MaterialTheme.shapes.medium
-            )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(22.dp)
-        ) {
-            CustomInputField(
-                label = stringResource(R.string.email),
-                placeholder = stringResource(R.string.email_hint),
-                value = email,
-                onValueChange = { viewModel.onEmailChanged(it) },
-                keyboardType = KeyboardType.Email,
-                isError = emailError,
-                enabled = !isLoading,
-                supportingText = {
-                    if (emailError) {
-                        Text(
-                            text = emailErrorMsg ?: stringResource(R.string.email_invalid_error),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
-                },
-                imeAction = ImeAction.Next,
-                onImeAction = { focusManager.moveFocus(FocusDirection.Down) }
-            )
+    CustomCard {
+        CustomInputField(
+            label = stringResource(R.string.email),
+            placeholder = stringResource(R.string.email_hint),
+            value = email,
+            onValueChange = { viewModel.onEmailChanged(it) },
+            keyboardType = KeyboardType.Email,
+            isError = emailError,
+            enabled = !isLoading,
+            supportingText = {
+                if (emailError) ErrorText(
+                    emailErrorMsg ?: stringResource(R.string.email_invalid_error),
+                )
+            },
+            imeAction = ImeAction.Next,
+            onImeAction = { focusManager.moveFocus(FocusDirection.Down) }
+        )
 
-            Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-            CustomInputField(
-                label = stringResource(R.string.password),
-                placeholder = stringResource(R.string.password_hint),
-                value = password,
-                onValueChange = { viewModel.onPasswordChanged(it) },
-                keyboardType = KeyboardType.Password,
-                isPassword = true,
-                isError = passwordError,
-                supportingText = {
-                    if (passwordError) {
-                        Text(
-                            text = passwordErrorMsg ?: stringResource(R.string.password_length_error),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
-                },
-                enabled = !isLoading,
-                imeAction = ImeAction.Done,
-                onImeAction = { focusManager.clearFocus() }
-            )
+        CustomInputField(
+            label = stringResource(R.string.password),
+            placeholder = stringResource(R.string.password_hint),
+            value = password,
+            onValueChange = { viewModel.onPasswordChanged(it) },
+            keyboardType = KeyboardType.Password,
+            isPassword = true,
+            isError = passwordError,
+            supportingText = {
+                if (passwordError) ErrorText(
+                    passwordErrorMsg ?: stringResource(R.string.password_length_error)
+                )
+            },
+            enabled = !isLoading,
+            imeAction = ImeAction.Done,
+            onImeAction = { focusManager.clearFocus() }
+        )
 
-            Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-            val context = LocalContext.current
-            CustomButton(
-                text = stringResource(R.string.login),
-                enabled = loginEnable && !isLoading,
-                onClick = { viewModel.onLoginSelected(context = context) }
-            )
+        CustomButton(
+            text = stringResource(R.string.login),
+            enabled = loginEnable && !isLoading,
+            onClick = { viewModel.onLoginSelected() }
+        )
 
-            Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-            ForgotPassword(Modifier.align(Alignment.CenterHorizontally), !isLoading) {
-                Log.d("LoginScreen", "Forgot Password clicked")
-            }
+        ForgotPassword(Modifier.align(Alignment.CenterHorizontally), !isLoading) {
+            Log.d("LoginScreen", "Forgot Password clicked")
         }
     }
 }

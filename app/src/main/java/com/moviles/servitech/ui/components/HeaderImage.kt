@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,6 +18,8 @@ import com.moviles.servitech.R
 @Composable
 fun HeaderImage(
     modifier: Modifier = Modifier,
+    imageID: Int = R.drawable.logo,
+    imageDescription: String = "Logo",
     withBackground: Boolean = false
 ) {
     Box(
@@ -24,16 +27,17 @@ fun HeaderImage(
             modifier
                 .background(MaterialTheme.colorScheme.surfaceVariant)
                 .padding(16.dp)
+                .size(270.dp)
         } else {
-            modifier
+            modifier.size(270.dp)
         },
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.logo),
-            contentScale = ContentScale.Fit,
-            contentDescription = "Logo",
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            painter = painterResource(id = imageID),
+            contentDescription = imageDescription,
+            contentScale = ContentScale.Fit
         )
     }
 }

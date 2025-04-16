@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.moviles.servitech.R
 import com.moviles.servitech.common.rememberSessionManager
-import com.moviles.servitech.core.navigation.Screen
 import com.moviles.servitech.ui.components.HandleServerError
 import com.moviles.servitech.ui.components.LoadingIndicator
 import com.moviles.servitech.viewmodel.auth.LogoutViewModel
@@ -33,7 +32,7 @@ import com.moviles.servitech.viewmodel.auth.LogoutViewModel
 @Composable
 fun HomeScreen(
     viewModel: LogoutViewModel = hiltViewModel(),
-    navigateTo: (String) -> Unit
+    navigateToLogin: () -> Unit = { }
 ) {
     val context = LocalContext.current.applicationContext
     val sessionManager = rememberSessionManager(context)
@@ -68,7 +67,7 @@ fun HomeScreen(
                 Text(text = "Usuario:")
                 Text(text = "ID: ${user?.id}")
                 Text(text = "Rol: ${user?.role}")
-                Text(text = "Nombre: ${user?.name} ${user?.lastName}")
+                Text(text = "Nombre: ${user?.name}")
                 Text(text = "Email: ${user?.email}")
                 Text(text = "Teléfono: ${user?.phone}")
             } else {
@@ -102,7 +101,7 @@ fun HomeScreen(
                     stringResource(R.string.success_logout),
                     Toast.LENGTH_LONG
                 ).show()
-                navigateTo(Screen.Login.route)
+                navigateToLogin()
             }
             is LogoutViewModel.LogoutState.Error -> {
                 HandleServerError("HomeScreen", state.message)

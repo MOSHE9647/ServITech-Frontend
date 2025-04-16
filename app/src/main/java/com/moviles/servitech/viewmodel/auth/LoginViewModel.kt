@@ -1,29 +1,27 @@
 package com.moviles.servitech.viewmodel.auth
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moviles.servitech.R
+import com.moviles.servitech.common.Constants.GUEST_ROLE
 import com.moviles.servitech.core.session.SessionManager
+import com.moviles.servitech.model.User
 import com.moviles.servitech.network.repositories.AuthRepositoryImpl
 import com.moviles.servitech.network.repositories.LoginResult
 import com.moviles.servitech.network.responses.LoginResponse
+import com.moviles.servitech.network.services.providers.StringProvider
+import com.moviles.servitech.viewmodel.FieldState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class FieldState<T>(
-    val data: MutableLiveData<T> = MutableLiveData(),
-    val error: MutableLiveData<Boolean> = MutableLiveData(false),
-    val errorMessage: MutableLiveData<String?> = MutableLiveData(null)
-)
-
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepositoryImpl,
+    private val stringProvider: StringProvider,
     private val sessionManager: SessionManager
 ) : ViewModel() {
 
@@ -60,7 +58,7 @@ class LoginViewModel @Inject constructor(
         passwordState.errorMessage.value = validation.errorMessage
     }
 
-    fun onLoginSelected(context: Context) {
+    fun onLoginSelected() {
         val email = emailState.data.value.orEmpty()
         val password = passwordState.data.value.orEmpty()
         resetErrors()
@@ -78,6 +76,7 @@ class LoginViewModel @Inject constructor(
                                 expiresIn = loginResult.data.expiresIn,
                                 user = loginResult.data.user
                             )
+                            return@onSuccess
                         }
                         is LoginResult.Error -> {
                             loginResult.fieldErrors["email"]?.let { errorMsg ->
@@ -91,14 +90,46 @@ class LoginViewModel @Inject constructor(
                             _loginState.value = LoginState.Error(
                                 loginResult.message
                             )
+                            return@onSuccess
                         }
                     }
                 }
                 .onFailure { exception ->
                     _loginState.value = LoginState.Error(
-                        exception.message ?: context.getString(R.string.unknown_error)
+                        exception.message ?: stringProvider.getString(R.string.unknown_error)
                     )
+                    return@onFailure
                 }
+        }
+    }
+
+    fun onGuestSelected() {
+        val guestUser = User(
+            id = -1,
+            role = GUEST_ROLE,
+            name = stringProvider.getString(R.string.guest_name),
+            email = stringProvider.getString(R.string.guest_email),
+            phone = "+000 0000 0000"
+        )
+
+        val guestLoginResponse = LoginResponse(
+            user = guestUser,
+            token = "guest_token",
+            expiresIn = 3600L
+        )
+
+        resetErrors()
+
+        viewModelScope.launch {
+            _loginState.value = LoginState.Loading
+
+            sessionManager.saveSession(
+                user = guestLoginResponse.user,
+                token = guestLoginResponse.token,
+                expiresIn = guestLoginResponse.expiresIn
+            )
+
+            _loginState.value = LoginState.Success(guestLoginResponse)
         }
     }
 

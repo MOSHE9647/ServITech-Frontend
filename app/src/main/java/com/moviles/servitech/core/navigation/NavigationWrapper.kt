@@ -7,22 +7,34 @@ import androidx.navigation.compose.rememberNavController
 import com.moviles.servitech.view.HomeScreen
 import com.moviles.servitech.view.SplashScreen
 import com.moviles.servitech.view.auth.LoginScreen
+import com.moviles.servitech.view.auth.RegisterScreen
 
 @Composable
 fun NavigationWrapper() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Screen.Splash.route) {
-        composable(Screen.Splash.route) {
-            SplashScreen { screen -> navController.navigate(screen.toString()) { popUpTo(0) } }
+    NavHost(navController = navController, startDestination = Splash) {
+        composable<Splash> {
+            SplashScreen(
+                navigateToHome = { navController.navigate(Home) { popUpTo(0) } },
+                navigateToLogin = { navController.navigate(Login) { popUpTo(0) } }
+            )
         }
-        composable(Screen.Login.route) {
-            LoginScreen {
-                val screen = Screen.Home.route
-                navController.navigate(screen) { popUpTo(0) }
-            }
+        composable<Login> {
+            LoginScreen (
+                navigateToSignUp = { navController.navigate(Register) },
+                navigateToHome = { navController.navigate(Home) { popUpTo(0) } }
+            )
         }
-        composable(Screen.Home.route) {
-            HomeScreen { screen -> navController.navigate(screen) { popUpTo(0) } }
+        composable<Register> {
+            RegisterScreen(
+                navigateToLogin = { navController.navigate(Login) { popUpTo(0) } },
+//                navigateToHome = { navController.navigate(Home) { popUpTo(0) } }
+            )
+        }
+        composable<Home> {
+            HomeScreen(
+                navigateToLogin = { navController.navigate(Login) { popUpTo(0) } }
+            )
         }
     }
 }

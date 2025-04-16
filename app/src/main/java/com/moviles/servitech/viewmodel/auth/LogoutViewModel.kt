@@ -5,11 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moviles.servitech.R
+import com.moviles.servitech.common.Constants.GUEST_ROLE
 import com.moviles.servitech.core.session.SessionManager
 import com.moviles.servitech.network.repositories.AuthRepositoryImpl
 import com.moviles.servitech.network.repositories.LogoutResult
 import com.moviles.servitech.network.services.providers.StringProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,15 +28,25 @@ class LogoutViewModel @Inject constructor(
     fun logout(token: String) {
         viewModelScope.launch {
             _logoutState.value = LogoutState.Loading
+
+            val user = sessionManager.user.firstOrNull()
+            if (user?.role == GUEST_ROLE) {
+                sessionManager.clearSession()
+                _logoutState.value = LogoutState.Success
+                return@launch
+            }
+
             authRepository.logout(token)
                 .onSuccess { logoutResult ->
                     when (logoutResult) {
                         is LogoutResult.Success -> {
                             sessionManager.clearSession()
                             _logoutState.value = LogoutState.Success
+                            return@onSuccess
                         }
                         is LogoutResult.Error -> {
                             _logoutState.value = LogoutState.Error(logoutResult.message)
+                            return@onSuccess
                         }
                     }
                 }
@@ -42,6 +54,7 @@ class LogoutViewModel @Inject constructor(
                     _logoutState.value = LogoutState.Error(
                         exception.message ?: stringProvider.getString(R.string.unknown_error)
                     )
+                    return@onFailure
                 }
         }
     }

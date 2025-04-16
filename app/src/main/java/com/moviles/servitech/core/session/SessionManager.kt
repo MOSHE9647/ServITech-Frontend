@@ -1,6 +1,7 @@
 package com.moviles.servitech.core.session
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.moviles.servitech.R
@@ -30,7 +31,6 @@ class SessionManager @Inject constructor(
         private val EXPIRES_AT = longPreferencesKey("expires_at")
         private val USER_ID = intPreferencesKey("user_id")
         private val USER_NAME = stringPreferencesKey("user_name")
-        private val USER_LAST_NAME = stringPreferencesKey("user_last_name")
         private val USER_EMAIL = stringPreferencesKey("user_email")
         private val USER_PHONE = stringPreferencesKey("user_phone")
         private val USER_ROLE = stringPreferencesKey("user_role")
@@ -45,14 +45,18 @@ class SessionManager @Inject constructor(
             prefs[USER_ID] = user.id ?: 0
             prefs[USER_ROLE] = user.role
             prefs[USER_NAME] = user.name
-            prefs[USER_LAST_NAME] = user.lastName
             prefs[USER_EMAIL] = user.email
             prefs[USER_PHONE] = user.phone ?: ""
         }
     }
 
     suspend fun clearSession() {
-        context.dataStore.edit { it.clear() }
+        try {
+            context.dataStore.edit { it.clear() }
+        } catch (e: Exception) {
+            Log.e("SessionManager", "Error clearing session: ${e.message}")
+            _sessionMessage.value = context.getString(R.string.session_clear_error)
+        }
     }
 
     fun clearSessionMessage() {
@@ -80,7 +84,6 @@ class SessionManager @Inject constructor(
         val id = this[USER_ID]
         val role = this[USER_ROLE]
         val name = this[USER_NAME]
-        val lastName = this[USER_LAST_NAME]
         val email = this[USER_EMAIL]
         val phone = this[USER_PHONE]
 
@@ -89,7 +92,6 @@ class SessionManager @Inject constructor(
                 id = id,
                 role = role ?: DEFAULT_ROLE,
                 name = name,
-                lastName = lastName.orEmpty(),
                 email = email,
                 phone = phone
             )
