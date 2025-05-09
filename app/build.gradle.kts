@@ -13,6 +13,10 @@ android {
     namespace = "com.moviles.servitech"
     compileSdk = 35
 
+    kapt {
+        correctErrorTypes=true
+    }
+
     defaultConfig {
         applicationId = "com.moviles.servitech"
         minSdk = 24

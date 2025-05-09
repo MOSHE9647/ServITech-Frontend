@@ -24,4 +24,6 @@ interface AuthService {
     @POST("$API_AUTH_ROUTE/logout")
     @Headers("Accept: */*")
     suspend fun logout(@Header("Authorization") token: String): Response<ApiResponse<Unit>>
+
+
 }

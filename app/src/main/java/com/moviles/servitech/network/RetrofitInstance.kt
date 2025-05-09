@@ -1,6 +1,7 @@
 package com.moviles.servitech.network
 
 import com.moviles.servitech.common.Constants.API_BASE_URL
+import com.moviles.servitech.network.services.ArticleService
 import com.moviles.servitech.network.services.AuthService
 import dagger.Module
 import dagger.Provides
@@ -26,5 +27,10 @@ object RetrofitInstance {
     @Singleton
     fun provideAuthService(retrofit: Retrofit): AuthService =
         retrofit.create(AuthService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideArticleService(retrofit: Retrofit): ArticleService =
+        retrofit.create(ArticleService::class.java)
 
 }
