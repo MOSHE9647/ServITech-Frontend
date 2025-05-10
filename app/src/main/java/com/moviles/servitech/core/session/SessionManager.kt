@@ -2,57 +2,43 @@ package com.moviles.servitech.core.session
 
 import android.content.Context
 import android.util.Log
-import androidx.datastore.preferences.core.*
-import androidx.datastore.preferences.preferencesDataStore
 import com.moviles.servitech.R
+import com.moviles.servitech.database.dao.UserSessionDao
+import com.moviles.servitech.database.entities.UserSessionEntity
 import com.moviles.servitech.model.User
+import com.moviles.servitech.model.mappers.toEntity
+import com.moviles.servitech.model.mappers.toUser
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private val Context.dataStore by preferencesDataStore(name = "user_prefs")
-
 @Singleton
 class SessionManager @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context, private val userSessionDao: UserSessionDao
 ) {
 
     private val _sessionMessage = MutableStateFlow<String?>(null)
     val sessionMessage: StateFlow<String?> = _sessionMessage.asStateFlow()
 
-    companion object {
-        private val ACCESS_TOKEN = stringPreferencesKey("access_token")
-        private val EXPIRES_AT = longPreferencesKey("expires_at")
-        private val USER_ID = intPreferencesKey("user_id")
-        private val USER_NAME = stringPreferencesKey("user_name")
-        private val USER_EMAIL = stringPreferencesKey("user_email")
-        private val USER_PHONE = stringPreferencesKey("user_phone")
-        private val USER_ROLE = stringPreferencesKey("user_role")
-        private const val DEFAULT_ROLE = "guest"
-    }
-
     suspend fun saveSession(token: String, expiresIn: Long, user: User) {
         val expiresAt = System.currentTimeMillis() + (expiresIn * 1000)
-        context.dataStore.edit { prefs ->
-            prefs[ACCESS_TOKEN] = token
-            prefs[EXPIRES_AT] = expiresAt
-            prefs[USER_ID] = user.id ?: 0
-            prefs[USER_ROLE] = user.role
-            prefs[USER_NAME] = user.name
-            prefs[USER_EMAIL] = user.email
-            prefs[USER_PHONE] = user.phone ?: ""
-        }
+        val userSession = UserSessionEntity(
+            id = 1, // Only one session is allowed
+            user = user.toEntity(), token = token, expiresIn = expiresAt
+        )
+        userSessionDao.saveSession(userSession)
     }
 
     suspend fun clearSession() {
         try {
-            context.dataStore.edit { it.clear() }
+            userSessionDao.clearSession()
         } catch (e: Exception) {
             Log.e("SessionManager", "Error clearing session: ${e.message}")
             _sessionMessage.value = context.getString(R.string.session_clear_error)
@@ -63,38 +49,27 @@ class SessionManager @Inject constructor(
         _sessionMessage.value = null
     }
 
-    val token: Flow<String?> = context.dataStore.data.map { it[ACCESS_TOKEN] }
-    val expiresAt: Flow<Long?> = context.dataStore.data.map { it[EXPIRES_AT] }
-
-    val user: Flow<User?> = context.dataStore.data.map { prefs ->
-        prefs.toUser()
+    val user: Flow<User?> = flow {
+        emit(userSessionDao.getSession()?.toUser())
     }
 
-    val hasSession: Flow<Boolean> = token.map { it != null && it.isNotEmpty() }
+    val token: Flow<String?> = flow {
+        emit(userSessionDao.getSession()?.token)
+    }
 
-    val isSessionValid: Flow<Boolean> = combine(token, expiresAt) { accessToken, expires ->
-        val isValid = !accessToken.isNullOrEmpty() && (expires != null && System.currentTimeMillis() < expires)
+    val expiresAt: Flow<Long?> = flow {
+        emit(userSessionDao.getSession()?.expiresIn)
+    }
+
+    val hasSession: Flow<Boolean> = token.map { !it.isNullOrEmpty() }
+
+    val isSessionValid: Flow<Boolean> = combine(token, expiresAt) { accessToken, expiresAt ->
+        val isValid =
+            !accessToken.isNullOrEmpty() && (expiresAt != null && System.currentTimeMillis() < expiresAt)
         if (!isValid) {
             _sessionMessage.value = context.getString(R.string.session_expired)
         }
         isValid
     }
 
-    private fun Preferences.toUser(): User? {
-        val id = this[USER_ID]
-        val role = this[USER_ROLE]
-        val name = this[USER_NAME]
-        val email = this[USER_EMAIL]
-        val phone = this[USER_PHONE]
-
-        return if (id != null && name != null && email != null) {
-            User(
-                id = id,
-                role = role ?: DEFAULT_ROLE,
-                name = name,
-                email = email,
-                phone = phone
-            )
-        } else null
-    }
 }

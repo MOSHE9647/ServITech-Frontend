@@ -25,6 +25,7 @@ import com.moviles.servitech.ui.components.HeaderImage
 import com.moviles.servitech.view.auth.components.AuthNavigationMessage
 import com.moviles.servitech.view.auth.components.AuthViewContainer
 import com.moviles.servitech.view.auth.components.HandleAuthState
+import com.moviles.servitech.viewmodel.auth.RegisterState
 import com.moviles.servitech.viewmodel.auth.RegisterViewModel
 
 @Composable
@@ -35,7 +36,7 @@ fun RegisterScreen(
 ) {
 
     val registerState by viewModel.registerState.observeAsState()
-    val isLoading = registerState is RegisterViewModel.RegisterState.Loading
+    val isLoading = registerState is RegisterState.Loading
 
     AuthViewContainer(
         modifier = modifier

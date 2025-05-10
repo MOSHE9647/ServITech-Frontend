@@ -10,8 +10,8 @@ import androidx.compose.ui.platform.LocalContext
 import com.moviles.servitech.R
 import com.moviles.servitech.ui.components.HandleServerError
 import com.moviles.servitech.ui.components.LoadingIndicator
-import com.moviles.servitech.viewmodel.auth.LoginViewModel
-import com.moviles.servitech.viewmodel.auth.RegisterViewModel
+import com.moviles.servitech.viewmodel.auth.LoginState
+import com.moviles.servitech.viewmodel.auth.RegisterState
 
 @Composable
 fun <T> HandleAuthState (
@@ -20,31 +20,31 @@ fun <T> HandleAuthState (
     navigateTo: () -> Unit = { },
 ) {
     when (state) {
-        is LoginViewModel.LoginState.Loading, is RegisterViewModel.RegisterState.Loading -> {
+        is LoginState.Loading, is RegisterState.Loading -> {
             LoadingIndicator(
                 modifier = Modifier.fillMaxSize(),
                 withBlurBackground = true,
                 isVisible = true
             )
         }
-        is LoginViewModel.LoginState.Success -> {
+        is LoginState.Success -> {
             handleLoginSuccess(
                 logTag = logTag,
-                state = state as LoginViewModel.LoginState.Success,
+                state = state as LoginState.Success,
                 navigateTo = navigateTo
             )
         }
-        is RegisterViewModel.RegisterState.Success -> {
+        is RegisterState.Success -> {
             handleRegisterSuccess(
                 logTag = logTag,
-                state = state as RegisterViewModel.RegisterState.Success,
+                state = state as RegisterState.Success,
                 context = LocalContext.current.applicationContext,
                 stringResource = R.string.register_success,
                 navigateTo = navigateTo
             )
         }
-        is LoginViewModel.LoginState.Error, is RegisterViewModel.RegisterState.Error -> {
-            HandleServerError(logTag, (state as? LoginViewModel.LoginState.Error)?.message ?: (state as RegisterViewModel.RegisterState.Error).message)
+        is LoginState.Error, is RegisterState.Error -> {
+            HandleServerError(logTag, (state as? LoginState.Error)?.message ?: (state as RegisterState.Error).message)
         }
         else -> { }
     }
@@ -52,7 +52,7 @@ fun <T> HandleAuthState (
 
 fun handleRegisterSuccess(
     logTag: String,
-    state: RegisterViewModel.RegisterState.Success,
+    state: RegisterState.Success,
     context: Context,
     stringResource: Int,
     navigateTo: () -> Unit
@@ -68,7 +68,7 @@ fun handleRegisterSuccess(
 
 fun handleLoginSuccess(
     logTag: String,
-    state: LoginViewModel.LoginState.Success,
+    state: LoginState.Success,
     navigateTo: () -> Unit = { },
 ) {
     Log.d(logTag, "User: ${state.data.user}")

@@ -3,6 +3,12 @@
     <!--  App Strings  -->
     <string name="app_name" translatable="false">ServITech</string>
 
+    <string name="error_null_parameter_msg">The parameter \'%s\' can\'t be null</string>
+    <string name="po_deserealization_error_msg">An error occurred while trying to deserialize the pending operation</string>
+
+    <string name="network_available_msg">Connected to the Internet</string>
+    <string name="network_unavailable_msg">No Internet connection</string>
+
     <!--  Login Strings -->
     <string name="email">Email</string>
     <string name="email_invalid_error">Enter a valid email</string>
