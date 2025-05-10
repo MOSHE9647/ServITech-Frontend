@@ -36,7 +36,7 @@ fun HomeScreen(
     articleVm: ArticleViewModel = hiltViewModel(),
     navigateToArticleDetail: (Int) -> Unit
 ) {
-    // Observa la lista de artículos desde el ViewModel
+    // show the article front  ViewModel
     val articles by articleVm.articles.collectAsState()
 
     Scaffold(
@@ -53,7 +53,7 @@ fun HomeScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // --- Aquí tenías tu sección de usuario y logout, ahora comentada ---
+            // --- user info section (commented out) --- logout
             /*
             item {
               Text(text = "Token: ${token.orEmpty()}", style = MaterialTheme.typography.bodySmall)
@@ -67,7 +67,7 @@ fun HomeScreen(
               Spacer(Modifier.height(24.dp))
             }
             */
-            // --- Fin sección comentada ---
+
 
             item {
                 Text(

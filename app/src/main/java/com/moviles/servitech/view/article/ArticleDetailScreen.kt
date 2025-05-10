@@ -23,7 +23,7 @@ fun ArticleDetailScreen(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
+            TopAppBar(  // change to TopAppBar
                 title = { Text("Detalle #$articleId") },
                 navigationIcon = {
                     IconButton(onClick = navigateBack) {
