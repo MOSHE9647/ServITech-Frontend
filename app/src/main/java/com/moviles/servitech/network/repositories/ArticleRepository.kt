@@ -9,7 +9,7 @@ import javax.inject.Singleton
 class ArticleRepository @Inject constructor(
     private val service: ArticleService
 ) {
-    /** Trae todos los artículos */
+    /** get all articles */
     suspend fun fetchAll(): List<ArticleDto> {
         val resp = service.getArticles()
         return if (resp.isSuccessful) {
@@ -17,7 +17,7 @@ class ArticleRepository @Inject constructor(
         } else emptyList()
     }
 
-    /** Trae sólo los artículos de la categoría indicada */
+    //** get articles by category */
     suspend fun fetchByCategory(category: String): List<ArticleDto> {
         val resp = service.getArticlesByCategory(category)
         return if (resp.isSuccessful) {

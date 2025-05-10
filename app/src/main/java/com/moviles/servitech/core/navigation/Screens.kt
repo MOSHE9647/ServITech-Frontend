@@ -4,7 +4,7 @@ sealed class Screen(val route: String) {
     object Splash   : Screen("splash")
     object Login    : Screen("login")
     object Register : Screen("register")
-    // Esta es la ruta ” genérica que recibe la categoría como parámetro:
+    // get("/category/{category}") generyc route
     object Category : Screen("category/{category}") {
         fun createRoute(cat: String) = "category/$cat"
     }

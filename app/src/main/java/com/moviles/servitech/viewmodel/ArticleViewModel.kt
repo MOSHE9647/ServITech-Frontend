@@ -19,13 +19,13 @@ class ArticleViewModel @Inject constructor(
     val articles: StateFlow<List<ArticleDto>> = _articles
 
     init {
-        // carga inicial (todos los artículos)
+        //  get all articles
         viewModelScope.launch {
             _articles.value = repo.fetchAll()
         }
     }
 
-    /** Nuevo: carga sólo los artículos de la categoría indicada */
+    //* get articles by category */
     fun loadByCategory(category: String) {
         viewModelScope.launch {
             _articles.value = repo.fetchByCategory(category)

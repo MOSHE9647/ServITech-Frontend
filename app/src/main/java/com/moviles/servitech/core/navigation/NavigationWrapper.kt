@@ -10,7 +10,7 @@ import com.moviles.servitech.view.SplashScreen
 import com.moviles.servitech.view.article.CategoryScreen
 import com.moviles.servitech.view.article.ArticleDetailScreen
 
-// … tus imports …
+
 
 @Composable
 fun NavigationWrapper() {
@@ -57,7 +57,7 @@ fun NavigationWrapper() {
             )
         }
 
-        // 4) Category (lista con tabs + búsqueda)
+        // 4) Category list and search
         composable(
             Screen.Category.route,
             arguments = listOf(navArgument("category") { type = NavType.StringType })
@@ -71,7 +71,7 @@ fun NavigationWrapper() {
             )
         }
 
-        // 5) Detalle de artículo
+        // 5)detail article
         composable(
             Screen.Detail.route,
             arguments = listOf(navArgument("articleId") { type = NavType.IntType })
