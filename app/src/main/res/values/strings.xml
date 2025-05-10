@@ -1,3 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ServITech</string>
+    <!--  App Strings  -->
+    <string name="app_name" translatable="false">ServITech</string>
+
+    <string name="error_null_parameter_msg">The parameter \'%s\' can\'t be null</string>
+    <string name="po_deserealization_error_msg">An error occurred while trying to deserialize the pending operation</string>
+
+    <string name="network_available_msg">Connected to the Internet</string>
+    <string name="network_unavailable_msg">No Internet connection</string>
+
+    <!--  Login Strings -->
+    <string name="email">Email</string>
+    <string name="email_invalid_error">Enter a valid email</string>
+    <string name="email_empty_error">Email cannot be empty</string>
+    <string name="email_hint">E.g.: example@example.com</string>
+
+    <string name="password">Password</string>
+    <string name="password_empty_error">Password cannot be empty</string>
+    <string name="password_length_error">Password must have at least 8 characters</string>
+    <string name="password_hint">Enter your password</string>
+
+    <string name="login">Log In</string>
+    <string name="forgot_password">Forgot your password?</string>
+
+    <string name="no_account">Don’t have an account?</string>
+    <string name="sign_up">Sign up</string>
+
+    <string name="continue_guest">Continue as guest</string>
+
+    <!--  Register Strings  -->
+    <string name="name">Name</string>
+    <string name="name_hint">E.g.: John Doe</string>
+    <string name="name_empty_error">Name cannot be empty</string>
+    <string name="name_length_error">Name must have at least 2 characters</string>
+
+    <string name="phone">Phone Number</string>
+    <string name="phone_hint">E.g.: +506 8888 8888</string>
+    <string name="phone_empty_error">Phone number cannot be empty</string>
+    <string name="phone_invalid_error">Enter a valid phone number</string>
+    <string name="phone_length_error">Phone number must have at least 10 digits</string>
+
+    <string name="confirm_password">Confirm Password</string>
+    <string name="confirm_password_empty_error">Password confirmation cannot be empty</string>
+    <string name="confirm_password_length_error">Password confirmation must have at least 8 characters</string>
+    <string name="confirm_password_not_match">Password confirmation does not match</string>
+    <string name="confirm_password_hint">Re-enter your password</string>
+
+    <string name="register_error">An error occurred while registering. Please try again.</string>
+    <string name="register_success">Registration successful! Please log in.</string>
+
+    <!--  Guest User Strings  -->
+    <string name="guest_name">Guest</string>
+    <string name="guest_email">guest@servitechcr.com</string>
+
+    <string name="register">Register</string>
+    <string name="have_account">Already have an account?</string>
+
+    <!--  Password Strings  -->
+    <string name="hide_password">Hide password</string>
+    <string name="show_password">Show password</string>
+
+    <!--  Network String  -->
+    <string name="unknown_error">Unknown Error</string>
+    <string name="connection_error">Connection Error</string>
+    <string name="connection_error_message">An error occurred while trying to connect to the server. Please check your internet connection and try again.</string>
+
+    <!--  Dialogs Strings  -->
+    <string name="dialog_confirm">Confirm</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_error_title">An error occurred</string>
+
+    <!--  Session Strings  -->
+    <string name="success_logout">Successfully logged out</string>
+    <string name="session_expired">The session has expired. Please log in again.</string>
+    <string name="session_clear_error">An error occurred while clearing the session. Please try again.</string>
 </resources>
