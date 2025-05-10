@@ -4,22 +4,25 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moviles.servitech.R
 import com.moviles.servitech.common.Constants.GUEST_ROLE
 import com.moviles.servitech.core.session.SessionManager
-import com.moviles.servitech.network.repositories.AuthRepositoryImpl
-import com.moviles.servitech.network.repositories.LogoutResult
-import com.moviles.servitech.network.services.providers.StringProvider
+import com.moviles.servitech.repositories.AuthResult
+import com.moviles.servitech.services.AuthService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+sealed class LogoutState {
+    object Loading : LogoutState()
+    object Success : LogoutState()
+    data class Error(val message: String) : LogoutState()
+}
+
 @HiltViewModel
 class LogoutViewModel @Inject constructor(
-    private val authRepository: AuthRepositoryImpl,
-    private val sessionManager: SessionManager,
-    private val stringProvider: StringProvider
+    private val authService: AuthService,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
     private val _logoutState = MutableLiveData<LogoutState>()
@@ -36,33 +39,16 @@ class LogoutViewModel @Inject constructor(
                 return@launch
             }
 
-            authRepository.logout(token)
-                .onSuccess { logoutResult ->
-                    when (logoutResult) {
-                        is LogoutResult.Success -> {
-                            sessionManager.clearSession()
-                            _logoutState.value = LogoutState.Success
-                            return@onSuccess
-                        }
-                        is LogoutResult.Error -> {
-                            _logoutState.value = LogoutState.Error(logoutResult.message)
-                            return@onSuccess
-                        }
-                    }
+            when (val logoutResult = authService.logout(token)) {
+                is AuthResult.Success -> {
+                    sessionManager.clearSession()
+                    _logoutState.value = LogoutState.Success
                 }
-                .onFailure { exception ->
-                    _logoutState.value = LogoutState.Error(
-                        exception.message ?: stringProvider.getString(R.string.unknown_error)
-                    )
-                    return@onFailure
+                is AuthResult.Error -> {
+                    _logoutState.value = LogoutState.Error(logoutResult.message)
                 }
+            }
         }
-    }
-
-    sealed class LogoutState {
-        object Loading : LogoutState()
-        object Success : LogoutState()
-        data class Error(val message: String) : LogoutState()
     }
 
 }

@@ -27,6 +27,7 @@ import com.moviles.servitech.R
 import com.moviles.servitech.common.rememberSessionManager
 import com.moviles.servitech.ui.components.HandleServerError
 import com.moviles.servitech.ui.components.LoadingIndicator
+import com.moviles.servitech.viewmodel.auth.LogoutState
 import com.moviles.servitech.viewmodel.auth.LogoutViewModel
 
 @Composable
@@ -87,7 +88,7 @@ fun HomeScreen(
         }
 
         when (val state = logoutState) {
-            is LogoutViewModel.LogoutState.Loading -> {
+            is LogoutState.Loading -> {
                 // Animated loading indicator
                 LoadingIndicator(
                     modifier = Modifier.fillMaxSize(),
@@ -95,7 +96,7 @@ fun HomeScreen(
                     isVisible = true
                 )
             }
-            is LogoutViewModel.LogoutState.Success -> {
+            is LogoutState.Success -> {
                 Toast.makeText(
                     context,
                     stringResource(R.string.success_logout),
@@ -103,7 +104,7 @@ fun HomeScreen(
                 ).show()
                 navigateToLogin()
             }
-            is LogoutViewModel.LogoutState.Error -> {
+            is LogoutState.Error -> {
                 HandleServerError("HomeScreen", state.message)
             }
             else -> { /* No-op */ }

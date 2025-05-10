@@ -2,10 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-
-    // Project Plugins
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ksp)
+
     kotlin("kapt")
 }
 
@@ -32,48 +32,79 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
+    }
+
+    kapt {
+        correctErrorTypes = true
+    }
+
+    tasks.withType<JavaCompile> {
+        options.compilerArgs.add("-Xlint:deprecation")
     }
 }
 
 dependencies {
-
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
+    // --- Jetpack Compose ---
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-
-    // Project Implementations
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.runtime.livedata)
-    implementation(libs.coil.compose)
-    implementation(libs.composefilepicker)
-    implementation(libs.converter.gson)
-    implementation(libs.kotlinx.collections.immutable)
-    implementation(libs.retrofit)
+
+    // --- AndroidX Core & Lifecycle ---
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    // --- Navigation ---
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.kotlinx.serialization.json)
+
+    // --- Accompanist ---
     implementation(libs.accompanist.systemuicontroller)
+
+    // --- Coil ---
+    implementation(libs.coil.compose)
+
+    // --- File Picker ---
+    implementation(libs.composefilepicker)
+
+    // --- Retrofit & Gson ---
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.logging.interceptor)
+
+    // --- Room ---
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+    // --- Kotlinx ---
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.coroutines.android)
+
+    // --- Hilt ---
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
     kapt(libs.hilt.compiler)
-    implementation(libs.androidx.material.icons.extended)
-    implementation(libs.androidx.datastore.preferences)
 
+    // --- Testing ---
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

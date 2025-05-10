@@ -31,6 +31,7 @@ import com.moviles.servitech.ui.components.ErrorText
 import com.moviles.servitech.ui.components.HeaderImage
 import com.moviles.servitech.view.auth.components.AuthViewContainer
 import com.moviles.servitech.view.auth.components.HandleAuthState
+import com.moviles.servitech.viewmodel.auth.LoginState
 import com.moviles.servitech.viewmodel.auth.LoginViewModel
 
 @Composable
@@ -42,7 +43,7 @@ fun LoginScreen(
 ) {
 
     val loginState by viewModel.loginState.observeAsState()
-    val isLoading = loginState is LoginViewModel.LoginState.Loading
+    val isLoading = loginState is LoginState.Loading
 
     AuthViewContainer(
         modifier = modifier

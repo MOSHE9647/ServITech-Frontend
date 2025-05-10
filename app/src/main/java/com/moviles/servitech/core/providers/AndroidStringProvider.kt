@@ -1,4 +1,4 @@
-package com.moviles.servitech.network.services.providers
+package com.moviles.servitech.core.providers
 
 import android.content.Context
 import javax.inject.Inject

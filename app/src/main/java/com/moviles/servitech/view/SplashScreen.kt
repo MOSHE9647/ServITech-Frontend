@@ -6,8 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.moviles.servitech.common.rememberSessionManager
@@ -24,22 +22,19 @@ fun SplashScreen(
     val isSessionValid by sessionManager.isSessionValid.collectAsState(initial = false)
     val hasSession by sessionManager.hasSession.collectAsState(initial = false)
     val sessionMessage by sessionManager.sessionMessage.collectAsState()
-    val tokenChecked = remember { mutableStateOf(false) }
 
-    // Show the Toast message if it exists
-    LaunchedEffect(sessionMessage, hasSession) {
-        if (hasSession && sessionMessage != null) {
-            Toast.makeText(context, sessionMessage, Toast.LENGTH_LONG).show()
-            sessionManager.clearSessionMessage()
+    LaunchedEffect(isSessionValid, hasSession, sessionMessage) {
+        sessionMessage?.let {
+            if (hasSession) {
+                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                sessionManager.clearSessionMessage()
+            }
         }
-    }
 
-    // Manage the navigation based on session validity
-    LaunchedEffect(isSessionValid) {
-        if (!tokenChecked.value) {
-            if (isSessionValid) navigateToHome()
-            else navigateToLogin()
-            tokenChecked.value = true
+        if (isSessionValid) {
+            navigateToHome()
+        } else if (!hasSession) {
+            navigateToLogin()
         }
     }
 

@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="error_null_parameter_msg">El parámetro \'%s\' no puede ser nulo</string>
+    <string name="po_deserealization_error_msg">Error al deserializar los datos de la operación pendiente</string>
+
+    <string name="network_available_msg">Conectado a Internet.</string>
+    <string name="network_unavailable_msg">Sin conexión a Internet.</string>
+
     <string name="email">Correo electrónico</string>
     <string name="email_invalid_error">Ingresa un email válido</string>
     <string name="email_empty_error">El email no puede estar vacío</string>
