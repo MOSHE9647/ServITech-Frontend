@@ -105,7 +105,12 @@ fun CategoryScreen(
                         icon      = { Icon(icon, contentDescription = cat) },
                         label     = { Text(cat.replaceFirstChar { it.uppercase() }) },
                         selected  = cat == selectedCategory,
-                        onClick   = { selectedCategory = cat }
+                        onClick = {
+                            if (selectedCategory != cat) {
+                                selectedCategory = cat
+                            }
+                        }
+
                     )
                 }
             }
