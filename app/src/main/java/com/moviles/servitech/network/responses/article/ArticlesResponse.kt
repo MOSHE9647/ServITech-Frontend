@@ -1,4 +1,4 @@
-package com.moviles.servitech.network.responses
+package com.moviles.servitech.network.responses.article
 
 data class ArticlesResponse(
     val status: Int,

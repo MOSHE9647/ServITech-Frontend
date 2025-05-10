@@ -6,6 +6,10 @@ object Constants {
     const val API_ARTICLES_ROUTE = "api/v1/articles"
 //    const val API_ROUTE = "api/v1"
 
+    const val CAT_TECHNOLOGY = "tecnologia"
+    const val CAT_SUPPORT = "soporte"
+    const val CAT_ANIME = "anime"
+
     const val DATABASE_NAME = "servitech_database.db"
     const val PEND_OP_TABLE = "pending_operations"
     const val SESSION_TABLE = "user_session"

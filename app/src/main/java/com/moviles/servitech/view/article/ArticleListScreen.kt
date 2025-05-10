@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.moviles.servitech.network.responses.ArticleDto
+import com.moviles.servitech.network.responses.article.ArticleDto
 import com.moviles.servitech.viewmodel.ArticleViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

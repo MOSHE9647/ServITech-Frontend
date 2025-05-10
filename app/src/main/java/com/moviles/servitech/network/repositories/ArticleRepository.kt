@@ -1,15 +1,15 @@
 package com.moviles.servitech.network.repositories
 
-import com.moviles.servitech.network.responses.ArticleDto
-import com.moviles.servitech.network.services.ArticleService
+import com.moviles.servitech.network.responses.article.ArticleDto
+import com.moviles.servitech.network.services.ArticleApiService
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class ArticleRepository @Inject constructor(
-    private val service: ArticleService
+    private val service: ArticleApiService
 ) {
-    /** Trae todos los artículos */
+    /** Get all the articles */
     suspend fun fetchAll(): List<ArticleDto> {
         val resp = service.getArticles()
         return if (resp.isSuccessful) {
@@ -17,7 +17,7 @@ class ArticleRepository @Inject constructor(
         } else emptyList()
     }
 
-    /** Trae sólo los artículos de la categoría indicada */
+    /** Gets only the articles by the indicated category */
     suspend fun fetchByCategory(category: String): List<ArticleDto> {
         val resp = service.getArticlesByCategory(category)
         return if (resp.isSuccessful) {

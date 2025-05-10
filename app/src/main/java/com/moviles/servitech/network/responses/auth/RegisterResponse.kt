@@ -1,4 +1,4 @@
-package com.moviles.servitech.network.responses
+package com.moviles.servitech.network.responses.auth
 
 import com.moviles.servitech.model.User
 

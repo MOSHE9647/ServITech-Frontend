@@ -33,53 +33,46 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.moviles.servitech.network.responses.ArticleDto
+import com.moviles.servitech.network.responses.article.ArticleDto
 import com.moviles.servitech.viewmodel.ArticleViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Smartphone
 import androidx.compose.runtime.collectAsState
+import com.moviles.servitech.common.Constants.CAT_ANIME
+import com.moviles.servitech.common.Constants.CAT_SUPPORT
+import com.moviles.servitech.common.Constants.CAT_TECHNOLOGY
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryScreen(
-    category: String,                               // <— renombrado de initialCategory
     navigateToDetail: (Int) -> Unit,
     vm: ArticleViewModel = hiltViewModel()
 ) {
-    // Estado de pestaña y búsqueda
-    var selectedCategory by remember { mutableStateOf(category) }
+    // Tab and search state
+    var selectedCategory by remember { mutableStateOf(CAT_TECHNOLOGY) }
     var searchText by remember { mutableStateOf("") }
 
-    // Definimos las pestañas (route, icono)
+    // Tabs definition (with icons)
     val tabs = listOf(
-        "tecnologia" to Icons.Default.Smartphone,
-        "anime"      to Icons.Default.Info,
-        "soporte"    to Icons.Default.Settings
+        CAT_TECHNOLOGY to Icons.Default.Smartphone,
+        CAT_ANIME      to Icons.Default.Info,
+        CAT_SUPPORT    to Icons.Default.Settings
     )
 
-    // Cuando cambie la pestaña, llamamos al backend
+    // When the selected category changes, we load the articles for that category
     LaunchedEffect(selectedCategory) {
         vm.loadByCategory(selectedCategory)
     }
 
-    // Observamos el flujo de artículos
+    // Observes the articles from the ViewModel
     val allArticles by vm.articles.collectAsState()
 
-    // Filtrado por nombre o subcategoría
+    // Filtered articles based on the search text
     val filtered = remember(allArticles, searchText) {
         allArticles.filter {
             it.name.contains(searchText, ignoreCase = true) ||
@@ -87,18 +80,18 @@ fun CategoryScreen(
         }
     }
 
-    // Agrupamos por subcategoría
+    // Group the filtered articles by subcategory
        val grouped = remember(filtered) {
-              filtered.groupBy { it.subcategory?.name ?: "(Sin subcategoría)" }
+           filtered.groupBy { it.subcategory?.name ?: "(Sin subcategoría)" }
     }
 
     Scaffold(
         topBar = {
-            // Barra de búsqueda
+            // Search bar
             TopAppBar(title = { Text(selectedCategory.replaceFirstChar { it.uppercase() }) })
         },
         bottomBar = {
-            // NavigationBar de Material3
+            // NavigationBar of Material3
             NavigationBar {
                 tabs.forEach { (cat, icon) ->
                     NavigationBarItem(
