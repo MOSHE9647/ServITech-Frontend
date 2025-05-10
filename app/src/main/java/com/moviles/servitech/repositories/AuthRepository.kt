@@ -6,8 +6,8 @@ import com.moviles.servitech.R
 import com.moviles.servitech.network.requests.LoginRequest
 import com.moviles.servitech.network.requests.RegisterRequest
 import com.moviles.servitech.network.responses.ErrorResponse
-import com.moviles.servitech.network.responses.LoginResponse
-import com.moviles.servitech.network.responses.RegisterResponse
+import com.moviles.servitech.network.responses.auth.LoginResponse
+import com.moviles.servitech.network.responses.auth.RegisterResponse
 import com.moviles.servitech.core.providers.StringProvider
 import com.moviles.servitech.network.responses.ApiResponse
 import com.moviles.servitech.network.services.AuthApiService

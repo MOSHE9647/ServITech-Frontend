@@ -5,8 +5,8 @@ import com.moviles.servitech.core.providers.AndroidStringProvider
 import com.moviles.servitech.network.NetworkStatusTracker
 import com.moviles.servitech.network.requests.LoginRequest
 import com.moviles.servitech.network.requests.RegisterRequest
-import com.moviles.servitech.network.responses.LoginResponse
-import com.moviles.servitech.network.responses.RegisterResponse
+import com.moviles.servitech.network.responses.auth.LoginResponse
+import com.moviles.servitech.network.responses.auth.RegisterResponse
 import com.moviles.servitech.repositories.AuthRepository
 import com.moviles.servitech.repositories.AuthResult
 import com.moviles.servitech.repositories.DataSource

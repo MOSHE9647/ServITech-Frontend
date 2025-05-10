@@ -4,8 +4,8 @@ import com.moviles.servitech.common.Constants.API_AUTH_ROUTE
 import com.moviles.servitech.network.requests.LoginRequest
 import com.moviles.servitech.network.requests.RegisterRequest
 import com.moviles.servitech.network.responses.ApiResponse
-import com.moviles.servitech.network.responses.LoginResponse
-import com.moviles.servitech.network.responses.RegisterResponse
+import com.moviles.servitech.network.responses.auth.LoginResponse
+import com.moviles.servitech.network.responses.auth.RegisterResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Header

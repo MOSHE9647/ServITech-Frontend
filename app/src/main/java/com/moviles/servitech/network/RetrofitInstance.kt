@@ -2,6 +2,7 @@ package com.moviles.servitech.network
 
 import android.content.Context
 import com.moviles.servitech.common.Constants.API_BASE_URL
+import com.moviles.servitech.network.services.ArticleApiService
 import com.moviles.servitech.network.services.AuthApiService
 import dagger.Module
 import dagger.Provides
@@ -67,5 +68,10 @@ object RetrofitInstance {
     @Singleton
     fun provideAuthService(retrofit: Retrofit): AuthApiService =
         retrofit.create(AuthApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideArticleService(retrofit: Retrofit): ArticleApiService =
+        retrofit.create(ArticleApiService::class.java)
 
 }

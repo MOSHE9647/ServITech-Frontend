@@ -9,7 +9,7 @@ import com.moviles.servitech.R
 import com.moviles.servitech.common.Constants.GUEST_ROLE
 import com.moviles.servitech.core.session.SessionManager
 import com.moviles.servitech.model.User
-import com.moviles.servitech.network.responses.LoginResponse
+import com.moviles.servitech.network.responses.auth.LoginResponse
 import com.moviles.servitech.core.providers.StringProvider
 import com.moviles.servitech.network.requests.LoginRequest
 import com.moviles.servitech.repositories.AuthResult
