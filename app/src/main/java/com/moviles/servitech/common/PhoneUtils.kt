@@ -25,7 +25,7 @@ object PhoneUtils {
         // Take the last 8 digits to ensure we have a valid phone number
         val last8 = cleaned.takeLast(8)
 
-        return if (last8.length == 8) "+506$last8" else "+506$last8"
+        return "+506$last8"
     }
 
     /**
