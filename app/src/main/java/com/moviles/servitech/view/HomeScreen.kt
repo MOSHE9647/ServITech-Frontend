@@ -1,6 +1,5 @@
 package com.moviles.servitech.view
 
-import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +23,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.moviles.servitech.R
-import com.moviles.servitech.common.rememberSessionManager
+import com.moviles.servitech.common.Utils.formatDate
+import com.moviles.servitech.common.Utils.rememberSessionManager
 import com.moviles.servitech.ui.components.HandleServerError
 import com.moviles.servitech.ui.components.LoadingIndicator
 import com.moviles.servitech.viewmodel.auth.LogoutState
@@ -60,7 +60,7 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = "Token: $token")
-            Text(text = "Expires At: ${formatDate(expiresAt ?: 0L)}")
+            Text(text = "Expires At: ${formatDate(expiresAt ?: 0L, context)}")
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -109,15 +109,5 @@ fun HomeScreen(
             }
             else -> { /* No-op */ }
         }
-    }
-}
-
-@SuppressLint("SimpleDateFormat")
-fun formatDate(epochMillis: Long): String {
-    return if (epochMillis != 0L) {
-        val sdf = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
-        sdf.format(java.util.Date(epochMillis))
-    } else {
-        "Sin fecha"
     }
 }

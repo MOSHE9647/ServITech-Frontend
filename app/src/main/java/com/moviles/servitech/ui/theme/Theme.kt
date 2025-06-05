@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 val LightColorScheme = lightColorScheme(
-    // Main Colors
+    // Home Colors
     primary = AppColors.PrimaryButtonBgLight,
     onPrimary = AppColors.OnPrimaryButtonLight,
     primaryContainer = AppColors.PrimaryButtonBgLight.copy(alpha = 0.8f),
@@ -36,7 +36,7 @@ val LightColorScheme = lightColorScheme(
 )
 
 val DarkColorScheme = darkColorScheme(
-    // Main colors (inverted)
+    // Home colors (inverted)
     primary = AppColors.PrimaryButtonBgDark,
     onPrimary = AppColors.OnPrimaryButtonDark,
     primaryContainer = AppColors.PrimaryButtonBgDark.copy(alpha = 0.8f),

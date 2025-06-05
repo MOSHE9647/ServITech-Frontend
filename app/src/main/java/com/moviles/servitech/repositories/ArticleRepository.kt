@@ -1,4 +1,4 @@
-package com.moviles.servitech.network.repositories
+package com.moviles.servitech.repositories
 
 import com.moviles.servitech.network.responses.article.ArticleDto
 import com.moviles.servitech.network.services.ArticleApiService

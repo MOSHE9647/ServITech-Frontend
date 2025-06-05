@@ -48,14 +48,22 @@ class MainActivity : ComponentActivity() {
 
         // Observe network status changes
         lifecycleScope.launch {
+            /**
+             * Collect the network status updates from the NetworkStatusTracker.
+             * This will trigger whenever the network connectivity changes.
+             */
             networkStatusTracker.isConnected.collect { isConnected ->
+                // Show a Toast message based on the network connectivity status
                 val messageResId = when (isConnected) {
+                    // If connected, sync pending operations and show a success message
                     true -> {
                         pendingOperationService.syncPendingOperations()
                         R.string.network_available_msg
                     }
+                    // If not connected, show a different message
                     false -> R.string.network_unavailable_msg
                 }
+                // Display the Toast message with the appropriate string resource
                 Toast.makeText(this@MainActivity, getString(messageResId), Toast.LENGTH_SHORT).show()
             }
         }
