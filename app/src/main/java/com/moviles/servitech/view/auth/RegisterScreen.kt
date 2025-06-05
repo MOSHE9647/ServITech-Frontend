@@ -22,6 +22,7 @@ import com.moviles.servitech.ui.components.CustomCard
 import com.moviles.servitech.ui.components.CustomInputField
 import com.moviles.servitech.ui.components.ErrorText
 import com.moviles.servitech.ui.components.HeaderImage
+import com.moviles.servitech.ui.components.PhoneNumberField
 import com.moviles.servitech.view.auth.components.AuthNavigationMessage
 import com.moviles.servitech.view.auth.components.AuthViewContainer
 import com.moviles.servitech.view.auth.components.HandleAuthState
@@ -118,13 +119,12 @@ fun RegisterForm(viewModel: RegisterViewModel, isLoading: Boolean) {
             onImeAction = { focusManager.moveFocus(FocusDirection.Down) }
         )
 
-        CustomInputField(
+        PhoneNumberField(
             modifier = inputModifier,
             label = stringResource(R.string.phone),
             placeholder = stringResource(R.string.phone_hint),
-            value = phone,
-            onValueChange = { viewModel.onPhoneChanged(it) },
-            keyboardType = KeyboardType.Phone,
+            phoneValue = phone,
+            onPhoneChanged = { viewModel.onPhoneChanged(it) },
             isError = phoneError,
             enabled = !isLoading,
             supportingText = {

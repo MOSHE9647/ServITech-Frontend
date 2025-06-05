@@ -2,7 +2,7 @@ package com.moviles.servitech.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moviles.servitech.network.repositories.ArticleRepository
+import com.moviles.servitech.repositories.ArticleRepository
 import com.moviles.servitech.network.responses.article.ArticleDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

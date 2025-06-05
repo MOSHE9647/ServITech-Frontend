@@ -35,10 +35,10 @@
     <string name="name_length_error">Name must have at least 2 characters</string>
 
     <string name="phone">Phone Number</string>
-    <string name="phone_hint">E.g.: +506 8888 8888</string>
+    <string name="phone_hint">E.g.: 8888 8888</string>
     <string name="phone_empty_error">Phone number cannot be empty</string>
-    <string name="phone_invalid_error">Enter a valid phone number</string>
-    <string name="phone_length_error">Phone number must have at least 10 digits</string>
+    <string name="phone_invalid_error">Enter a valid phone number (E.g.: 8888 8888)</string>
+    <string name="phone_length_error">Phone number must have at least 8 digits</string>
 
     <string name="confirm_password">Confirm Password</string>
     <string name="confirm_password_empty_error">Password confirmation cannot be empty</string>
@@ -74,4 +74,6 @@
     <string name="success_logout">Successfully logged out</string>
     <string name="session_expired">The session has expired. Please log in again.</string>
     <string name="session_clear_error">An error occurred while clearing the session. Please try again.</string>
+    <string name="no_date">No Date</string>
+    <string name="phone_icon_description">Costa Rica Flag</string>
 </resources>

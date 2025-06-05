@@ -8,9 +8,20 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.moviles.servitech.common.rememberSessionManager
+import com.moviles.servitech.common.Utils.rememberSessionManager
 import com.moviles.servitech.ui.components.LoadingIndicator
 
+/**
+ * SplashScreen is a composable function that serves as the initial screen
+ * when the application starts.
+ *
+ * It checks the validity of the user session and navigates to the appropriate screen
+ * based on the session state.
+ *
+ * If the session is valid, it navigates to the home screen.
+ * If the session is not valid and no session exists,
+ * it navigates to the login screen.
+ */
 @Composable
 fun SplashScreen(
     navigateToHome: () -> Unit = {},
