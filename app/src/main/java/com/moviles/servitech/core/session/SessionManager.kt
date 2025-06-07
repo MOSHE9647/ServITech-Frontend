@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.moviles.servitech.R
 import com.moviles.servitech.database.dao.UserSessionDao
-import com.moviles.servitech.database.entities.UserSessionEntity
+import com.moviles.servitech.database.entities.user.UserSessionEntity
 import com.moviles.servitech.model.User
 import com.moviles.servitech.model.mappers.toEntity
 import com.moviles.servitech.model.mappers.toUser

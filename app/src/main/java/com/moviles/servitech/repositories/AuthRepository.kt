@@ -1,37 +1,37 @@
 package com.moviles.servitech.repositories
 
-import android.util.Log
-import com.google.gson.Gson
 import com.moviles.servitech.R
 import com.moviles.servitech.core.providers.AndroidStringProvider
+import com.moviles.servitech.network.handlers.handleApiCall
 import com.moviles.servitech.network.requests.LoginRequest
 import com.moviles.servitech.network.requests.RegisterRequest
-import com.moviles.servitech.network.responses.ErrorResponse
 import com.moviles.servitech.network.responses.auth.LoginResponse
 import com.moviles.servitech.network.responses.auth.RegisterResponse
-import com.moviles.servitech.network.responses.ApiResponse
 import com.moviles.servitech.network.services.AuthApiService
+import com.moviles.servitech.repositories.helpers.DataSource
+import com.moviles.servitech.repositories.helpers.Result
 import javax.inject.Inject
 
 /**
- * Sealed class representing the status of an authentication operation.
- * It can either be a success with data of type T,
+ * Sealed class representing the result of an authentication operation.
+ *
+ * It implements the [Result] interface and can either be a success with data of type T,
  * or an error with a message and optional field errors.
  *
  * @param T The type of data returned on success.
  */
-sealed class AuthResult<out T> {
+sealed class AuthResult<out T> : Result<T> {
     /**
      * Represents a successful authentication operation.
-     * Contains the data returned from the operation.
+     * Contains the authenticated data.
      *
      * @param T The type of data returned on success.
-     * @property data The data returned from the authentication operation.
+     * @property data The authenticated data.
      */
     data class Success<out T>(val data: T) : AuthResult<T>()
 
     /**
-     * Represents an error that occurred during the authentication operation.
+     * Represents an error that occurred during authentication.
      * Contains an error message and optional field errors.
      *
      * @property message The error message describing the issue.
@@ -68,7 +68,13 @@ class AuthRepository @Inject constructor(
      */
     suspend fun login(loginRequest: LoginRequest, source: DataSource): AuthResult<LoginResponse> {
         return when (source) {
-            DataSource.Remote -> handleApiCall { authApi.login(loginRequest) }
+            DataSource.Remote -> handleApiCall(
+                remoteCall = { authApi.login(loginRequest) },
+                onError = { msg, fields -> AuthResult.Error(msg, fields) },
+                onSuccess = { AuthResult.Success(it) },
+                logClass = className,
+                transform = { it },
+            )
             DataSource.Local -> AuthResult.Error(stringProvider.getString(R.string.connection_error))
         }
     }
@@ -82,7 +88,13 @@ class AuthRepository @Inject constructor(
      */
     suspend fun register(registerRequest: RegisterRequest, source: DataSource): AuthResult<RegisterResponse> {
         return when (source) {
-            DataSource.Remote -> handleApiCall { authApi.register(registerRequest) }
+            DataSource.Remote -> handleApiCall(
+                remoteCall = { authApi.register(registerRequest) },
+                onError = { msg, fields -> AuthResult.Error(msg, fields) },
+                onSuccess = { AuthResult.Success(it) },
+                logClass = className,
+                transform = { it },
+            )
             DataSource.Local -> AuthResult.Error(stringProvider.getString(R.string.connection_error))
         }
     }
@@ -96,53 +108,14 @@ class AuthRepository @Inject constructor(
      */
     suspend fun logout(token: String, source: DataSource): AuthResult<Unit> {
         return when (source) {
-            DataSource.Remote -> handleApiCall { authApi.logout("Bearer $token") }
+            DataSource.Remote -> handleApiCall(
+                remoteCall = { authApi.logout("Bearer $token") },
+                onError = { msg, fields -> AuthResult.Error(msg, fields) },
+                onSuccess = { AuthResult.Success(Unit) },
+                logClass = className,
+                transform = { it }
+            )
             DataSource.Local -> AuthResult.Error(stringProvider.getString(R.string.connection_error))
-        }
-    }
-
-    /**
-     * Handles the API call and processes the response.
-     * If the response is successful, it returns the data.
-     * If the response is an error, it parses the error body
-     * and returns an AuthResult.Error.
-     *
-     * @param T The type of data returned on success.
-     * @param apiCall The API call to execute.
-     * @return An [AuthResult] containing either a successful response or an error.
-     */
-    private inline fun <T> handleApiCall(apiCall: () -> retrofit2.Response<ApiResponse<T>>): AuthResult<T> {
-        return try {
-            val response = apiCall()
-            if (response.isSuccessful) {
-                response.body()?.data?.let {
-                    return AuthResult.Success(it)
-                } ?: return AuthResult.Error(
-                    response.body()?.message ?: stringProvider.getString(R.string.unknown_error),
-                    emptyMap()
-                )
-            } else {
-                parseError(response.errorBody()?.string())
-            }
-        } catch (e: Exception) {
-            Log.e(className, "Error: ${e.message}")
-            AuthResult.Error(stringProvider.getString(R.string.connection_error))
-        }
-    }
-
-    /**
-     * Parses the error body from the API response and returns an AuthResult.Error.
-     * If the error body is null or empty, it returns a generic error message.
-     *
-     * @param errorBody The error body string from the API response.
-     * @return An [AuthResult.Error] containing the parsed error message and field errors.
-     */
-    private fun parseError(errorBody: String?): AuthResult<Nothing> {
-        return if (!errorBody.isNullOrEmpty()) {
-            val errorResponse = Gson().fromJson(errorBody, ErrorResponse::class.java)
-            AuthResult.Error(errorResponse.message, errorResponse.errors)
-        } else {
-            AuthResult.Error(stringProvider.getString(R.string.unknown_error))
         }
     }
 

@@ -1,4 +1,4 @@
-package com.moviles.servitech.database.entities
+package com.moviles.servitech.database.entities.user
 
 import androidx.room.Entity
 import com.moviles.servitech.common.Constants.USER_TABLE

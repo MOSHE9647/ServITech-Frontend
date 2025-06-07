@@ -1,10 +1,9 @@
 package com.moviles.servitech.model.mappers
 
 import com.moviles.servitech.common.Constants.GUEST_ROLE
-import com.moviles.servitech.database.entities.UserEntity
-import com.moviles.servitech.database.entities.UserSessionEntity
+import com.moviles.servitech.database.entities.user.UserEntity
+import com.moviles.servitech.database.entities.user.UserSessionEntity
 import com.moviles.servitech.model.User
-import kotlin.text.ifEmpty
 
 /**
  * Maps a [UserSessionEntity] to a [User].

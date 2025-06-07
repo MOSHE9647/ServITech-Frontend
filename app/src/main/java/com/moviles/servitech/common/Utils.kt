@@ -6,8 +6,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.moviles.servitech.R
 import com.moviles.servitech.core.di.SessionManagerEntryPoint
-import dagger.hilt.android.EntryPointAccessors
 import com.moviles.servitech.core.session.SessionManager
+import dagger.hilt.android.EntryPointAccessors
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 
 /**
  * Utility object for common functions used across the application.
@@ -50,4 +52,10 @@ object Utils {
             context.getString(R.string.no_date)
         }
     }
+
+    val textToRequestBody =
+        { text: String -> text.toRequestBody("text/plain".toMediaTypeOrNull()) }
+
+    val doubleToRequestBody =
+        { number: Double -> number.toString().toRequestBody("text/plain".toMediaTypeOrNull()) }
 }

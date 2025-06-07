@@ -1,4 +1,4 @@
-package com.moviles.servitech.database.entities
+package com.moviles.servitech.database.entities.user
 
 import androidx.room.Embedded
 import androidx.room.Entity

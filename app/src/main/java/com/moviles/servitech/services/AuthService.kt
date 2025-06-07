@@ -9,7 +9,7 @@ import com.moviles.servitech.network.responses.auth.LoginResponse
 import com.moviles.servitech.network.responses.auth.RegisterResponse
 import com.moviles.servitech.repositories.AuthRepository
 import com.moviles.servitech.repositories.AuthResult
-import com.moviles.servitech.repositories.DataSource
+import com.moviles.servitech.repositories.helpers.DataSource
 import javax.inject.Inject
 
 /**
