@@ -2,7 +2,7 @@ package com.moviles.servitech.repositories
 
 import com.moviles.servitech.R
 import com.moviles.servitech.core.providers.AndroidStringProvider
-import com.moviles.servitech.network.handlers.handleApiCall
+import com.moviles.servitech.network.handlers.ApiHandler.handleApiCall
 import com.moviles.servitech.network.requests.LoginRequest
 import com.moviles.servitech.network.requests.RegisterRequest
 import com.moviles.servitech.network.responses.auth.LoginResponse
@@ -70,10 +70,11 @@ class AuthRepository @Inject constructor(
         return when (source) {
             DataSource.Remote -> handleApiCall(
                 remoteCall = { authApi.login(loginRequest) },
-                onError = { msg, fields -> AuthResult.Error(msg, fields) },
-                onSuccess = { AuthResult.Success(it) },
+                onCallError = { msg, fields -> AuthResult.Error(msg, fields) },
+                onRemoteSuccess = { AuthResult.Success(it) },
                 logClass = className,
-                transform = { it },
+                transformTo = { it },
+                errorMessage = stringProvider.getString(R.string.unknown_error)
             )
             DataSource.Local -> AuthResult.Error(stringProvider.getString(R.string.connection_error))
         }
@@ -90,10 +91,11 @@ class AuthRepository @Inject constructor(
         return when (source) {
             DataSource.Remote -> handleApiCall(
                 remoteCall = { authApi.register(registerRequest) },
-                onError = { msg, fields -> AuthResult.Error(msg, fields) },
-                onSuccess = { AuthResult.Success(it) },
+                onCallError = { msg, fields -> AuthResult.Error(msg, fields) },
+                onRemoteSuccess = { AuthResult.Success(it) },
                 logClass = className,
-                transform = { it },
+                transformTo = { it },
+                errorMessage = stringProvider.getString(R.string.unknown_error)
             )
             DataSource.Local -> AuthResult.Error(stringProvider.getString(R.string.connection_error))
         }
@@ -110,10 +112,11 @@ class AuthRepository @Inject constructor(
         return when (source) {
             DataSource.Remote -> handleApiCall(
                 remoteCall = { authApi.logout("Bearer $token") },
-                onError = { msg, fields -> AuthResult.Error(msg, fields) },
-                onSuccess = { AuthResult.Success(Unit) },
+                onCallError = { msg, fields -> AuthResult.Error(msg, fields) },
+                onRemoteSuccess = { AuthResult.Success(Unit) },
                 logClass = className,
-                transform = { it }
+                transformTo = { it },
+                errorMessage = stringProvider.getString(R.string.unknown_error)
             )
             DataSource.Local -> AuthResult.Error(stringProvider.getString(R.string.connection_error))
         }

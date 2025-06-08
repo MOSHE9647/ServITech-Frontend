@@ -62,7 +62,6 @@ interface RepairRequestApiService {
     @Headers("Accept: */*")
     suspend fun updateRepairRequest(
         @Header("Authorization") authToken: String,
-        @Path("receiptNumber") receiptNumber: String,
         @Part("article_serialnumber") articleSerialNumber: RequestBody? = null,
         @Part("article_accesories") articleAccesories: RequestBody? = null,
         @Part("repair_status") repairStatus: RequestBody,

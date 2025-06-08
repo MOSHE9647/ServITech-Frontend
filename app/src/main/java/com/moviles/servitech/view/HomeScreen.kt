@@ -23,7 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.moviles.servitech.R
-import com.moviles.servitech.common.Utils.formatDate
+import com.moviles.servitech.common.Utils.convertMillisInDate
 import com.moviles.servitech.common.Utils.rememberSessionManager
 import com.moviles.servitech.ui.components.HandleServerError
 import com.moviles.servitech.ui.components.LoadingIndicator
@@ -60,7 +60,7 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = "Token: $token")
-            Text(text = "Expires At: ${formatDate(expiresAt ?: 0L, context)}")
+            Text(text = "Expires At: ${convertMillisInDate(expiresAt ?: 0L, context)}")
 
             Spacer(modifier = Modifier.height(8.dp))
 

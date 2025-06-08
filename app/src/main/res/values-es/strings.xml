@@ -66,4 +66,7 @@
     <string name="session_clear_error">Ocurrió un error al cerrar la sesión. Por favor, inténtelo de nuevo.</string>
     <string name="no_date">Sin fecha</string>
     <string name="phone_icon_description">Bandera de Costa Rica</string>
+
+    <string name="invalid_receipt_number_or_id">El Número de recibo o ID de RepairRequest es inválido</string>
+    <string name="request_not_found">No se encontró la solicitud de reparación</string>
 </resources>
