@@ -19,6 +19,7 @@ import com.moviles.servitech.model.mappers.toUpdateRequest
 import com.moviles.servitech.model.mappers.withImagesToModelList
 import com.moviles.servitech.network.handlers.ApiHandler.handleActionSafely
 import com.moviles.servitech.network.handlers.ApiHandler.handleApiCall
+import com.moviles.servitech.network.requests.repairRequest.UpdateRepairRequest
 import com.moviles.servitech.network.services.RepairRequestApiService
 import com.moviles.servitech.repositories.helpers.DataSource
 import com.moviles.servitech.repositories.helpers.Result
@@ -238,16 +239,8 @@ class RepairRequestRepository @Inject constructor(
         return when (source) {
             DataSource.Remote -> handleApiCall(
                 remoteCall = {
-                    val updateRepRequest = repairRequest.toUpdateRequest()
-                    repReqApiService.updateRepairRequest(
-                        authToken,
-                        updateRepRequest.articleSerialNumber,
-                        updateRepRequest.articleAccesories,
-                        updateRepRequest.repairStatus,
-                        updateRepRequest.repairDetails,
-                        updateRepRequest.repairPrice,
-                        updateRepRequest.repairedAt
-                    )
+                    val updateRepRequest: UpdateRepairRequest = repairRequest.toUpdateRequest()
+                    repReqApiService.updateRepairRequest(authToken, updateRepRequest)
                 },
                 localCall = { this.updateRepairRequestInDB(repairRequest) },
                 onCallError = { msg, fields -> RepairRequestResult.Error(msg, fields) },

@@ -69,4 +69,13 @@
 
     <string name="invalid_receipt_number_or_id">El Número de recibo o ID de RepairRequest es inválido</string>
     <string name="request_not_found">No se encontró la solicitud de reparación</string>
+
+    <string name="error_authentication_required">Se requiere autenticación para acceder a esta función</string>
+
+    <string name="repair_status_pending">Pendiente</string>
+    <string name="repair_status_in_progress">En progreso</string>
+    <string name="repair_status_waiting_parts">En espera de repuestos</string>
+    <string name="repair_status_completed">Completado</string>
+    <string name="repair_status_delivered">Entregado</string>
+    <string name="repair_status_cancelled">Cancelado</string>
 </resources>
