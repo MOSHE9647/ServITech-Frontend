@@ -5,11 +5,19 @@ object Constants {
     const val API_BASE_URL = "http://10.0.2.2:8000/"
     const val IMAGES_BASE_URL = API_BASE_URL + "storage/"
 
+
+
+
     // API route for authentication
     const val API_AUTH_ROUTE = "api/v1/auth"
 
     // API routes for
     const val API_ARTICLES_ROUTE = "api/v1/articles"
+
+
+    // API routes for subcategories
+    const val API_SUBCATEGORIES_ROUTE = "api/v1/subcategories"
+
 
     // Endpoints for articles and repair requests images
     const val ARTICLE_IMAGE_PATH = "${IMAGES_BASE_URL}/articles/"

@@ -1,10 +1,15 @@
 package com.moviles.servitech.core.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.moviles.servitech.common.Constants.CAT_TECHNOLOGY
 import com.moviles.servitech.core.navigation.Screen.Home
 import com.moviles.servitech.core.navigation.Screen.Detail
 import com.moviles.servitech.core.navigation.Screen.Login
@@ -28,7 +33,7 @@ sealed class Screen() {
     @Serializable object Login
     @Serializable object Register
     @Serializable object Home
-    @Serializable data class Detail(val articleId: Int)
+    @Serializable data class Detail(val articleId: Int, val categoryName: String)
 }
 
 /**
@@ -99,28 +104,27 @@ fun NavigationGraph() {
          * The `composable` function is used to define the screen and its corresponding UI.
          */
         composable<Home> {
+            // Mueve esto al scope superior
+            var selectedCategory by remember { mutableStateOf(CAT_TECHNOLOGY) }
+
             CategoryScreen(
-                navigateToDetail = { articleId -> navController.navigate(Detail(articleId = articleId)) }
+                selectedCategory = selectedCategory,
+                onCategoryChange = { selectedCategory = it },
+                navigateToDetail = { articleId ->
+                    navController.navigate(Detail(articleId = articleId, categoryName = selectedCategory))
+                }
             )
         }
 
-        /**
-         * This is the Detail screen of the application.
-         * It displays detailed information about a specific article.
-         * Users can navigate back to the `Home` screen after viewing the article details.
-         *
-         * It takes an `articleId` as an argument to fetch the details of the article.
-         *
-         * The `Detail` object is used to define the route for this screen, which includes an article ID.
-         * The `composable` function is used to define the screen and its corresponding UI.
-         */
         composable<Detail> { backStackEntry ->
-            val articleDetail: Detail = backStackEntry.toRoute()
-            ArticleDetailScreen(articleDetail.articleId) {
-                navController.navigate(Home) {
-                    popUpTo<Home> { inclusive = true }
-                }
-            }
+            val args = backStackEntry.toRoute<Detail>()
+
+            ArticleDetailScreen(
+                articleId = args.articleId,
+                currentCategory = args.categoryName,
+                navController = navController,
+                navigateBack = { navController.popBackStack() }
+            )
         }
     }
 }
