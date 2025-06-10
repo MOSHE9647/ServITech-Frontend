@@ -1,11 +1,13 @@
 package com.moviles.servitech.services.helpers
 
+import android.util.Log
 import com.google.gson.Gson
 import com.moviles.servitech.R
 import com.moviles.servitech.common.Utils.logError
 import com.moviles.servitech.core.providers.AndroidStringProvider
 import com.moviles.servitech.core.session.SessionManager
 import com.moviles.servitech.model.enums.OperationType
+import com.moviles.servitech.model.enums.UserRole
 import com.moviles.servitech.network.NetworkStatusTracker
 import com.moviles.servitech.repositories.helpers.DataSource
 import kotlin.reflect.full.callSuspend
@@ -14,12 +16,56 @@ object ServicesHelper {
 
     /**
      * Retrieves the authentication token from the session manager.
-     * If the token is not available, it returns an error message.
+     * If the token is not available, it returns null.
      *
      * @return The authentication token as a String, or null if not available.
      */
     suspend fun getAuthTokenOrError(sessionManager: SessionManager): String? =
         sessionManager.getToken()
+
+    /**
+     * Retrieves the currently logged-in user from the session manager.
+     * If no user is logged in, it returns null.
+     *
+     * @return The User object representing the logged-in user, or null if no user is logged in.
+     */
+    suspend fun getLoggedUser(sessionManager: SessionManager) =
+        sessionManager.getLoggedUser()
+
+
+    /**
+     * Checks if the logged-in user has the specified role.
+     * If the user is not logged in or does not have the role,
+     * it returns false.
+     *
+     * @param sessionManager The SessionManager instance to retrieve the logged user.
+     * @param role The UserRole to check against the logged user's role.
+     * @return True if the user has the specified role, false otherwise.
+     */
+    suspend fun checkRoleOrError(sessionManager: SessionManager, role: UserRole): Boolean {
+        val userRole = getLoggedUser(sessionManager)?.role.orEmpty()
+        return userHaveRole(userRole, role)
+    }
+
+    /**
+     * Checks if the provided role matches the specified user role.
+     * This method compares the roleToCompare with the provided UserRole.
+     *
+     * @param roleToCompare The role to compare, represented as a String.
+     * @param role The UserRole to compare against.
+     */
+    fun userHaveRole(roleToCompare: String, role: UserRole): Boolean {
+        try {
+            val userRole = UserRole.valueOf(roleToCompare.uppercase())
+            return when (userRole) {
+                role -> true
+                else -> false
+            }
+        } catch (e: Exception) {
+            Log.e("ServicesHelper", "Error checking user role: ${e.message}")
+            return false // If an error occurs, assume the user does not have the role
+        }
+    }
 
     /**
      * Determines the current data source based on network connectivity.

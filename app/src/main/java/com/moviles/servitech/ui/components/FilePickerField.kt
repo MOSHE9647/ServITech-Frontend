@@ -1,6 +1,5 @@
 package com.moviles.servitech.ui.components
 
-import android.net.Uri
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
@@ -33,6 +32,7 @@ import kotlinx.collections.immutable.toPersistentList
 @Composable
 fun FilePickerField(
     initialImage: String?,
+    maxSelection: Int = 5,
     isEditing: Boolean = false,
     isError: Boolean = false,
     errorMessage: String? = null,
@@ -41,7 +41,7 @@ fun FilePickerField(
     onImageChange: (List<PickerResult>) -> Unit
 ) {
     // State to manage the image selection
-    var selectedImage by remember { mutableStateOf(initialImage) }
+    var selectedImage by remember { mutableStateOf(initialImage ?: "") }
 
     // State to manage the visibility of the PickerDialog
     var showPicker by remember { mutableStateOf(false) }
@@ -51,7 +51,7 @@ fun FilePickerField(
     var selectedTypes by remember { mutableStateOf(persistentListOf<PickerType>()) }
 
     // Picker Configuration
-    val pickerConfig = PickerConfig(maxSelection = 1)
+    val pickerConfig = PickerConfig(maxSelection = maxSelection)
 
     // Picker Types to show
     val pickerTypes = listOf(PickerType.ImageOnly)
@@ -62,20 +62,22 @@ fun FilePickerField(
     pickerTypes.forEach { type ->
         CustomInputField(
             label = "Image",
-            value = selectedImage ?: "",
-            placeholder = "Select an Image (.jpg, .jpeg, .png)",
-            onValueChange = { onValueChange(it) },
+            value = selectedImage,
+            placeholder = stringResource(R.string.image_hint),
+            onValueChange = { },
             trailingIcon = {
                 Icon(
                     if (isEditing) Icons.Default.Edit else Icons.Default.Add,
-                    contentDescription = "Select the image"
+                    contentDescription = stringResource(R.string.image_hint)
                 )
             },
             isError = isError,
             supportingText = {
-                ErrorText(
-                    errorMessage ?: stringResource(R.string.email_invalid_error),
-                )
+                if (isError) {
+                    ErrorText(
+                        errorMessage ?: stringResource(R.string.image_empty_error),
+                    )
+                }
             },
             readOnly = true,
             modifier = Modifier
@@ -103,10 +105,10 @@ fun FilePickerField(
             selected = { files ->
                 selectedFiles = files.toPersistentList()
 
-                val fileName = getFileNameAndExtension(
-                    selectedFiles.firstOrNull()?.uri ?: Uri.EMPTY, context.contentResolver
-                )
-                selectedImage = fileName
+                selectedImage = selectedFiles.joinToString(separator = "; ") { file ->
+                    getFileNameAndExtension(file.uri, context.contentResolver)
+                }
+                onValueChange(selectedImage)
 
                 onImageChange(selectedFiles)
                 showPicker = false

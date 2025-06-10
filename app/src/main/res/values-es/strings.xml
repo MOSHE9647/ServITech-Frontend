@@ -18,6 +18,8 @@
     <string name="no_pending_operations_msg">No hay operaciones pendientes.</string>
     <string name="pending_operations_synced_successfully_msg">%1$s: Operaciones pendientes sincronizadas correctamente.</string>
 
+    <string name="select_date">Seleccionar Fecha</string>
+
     <string name="email">Correo electrónico</string>
     <string name="email_invalid_error">Ingresa un email válido</string>
     <string name="email_empty_error">El email no puede estar vacío</string>
@@ -79,10 +81,80 @@
     <string name="no_date">Sin fecha</string>
     <string name="phone_icon_description">Bandera de Costa Rica</string>
 
+    <string name="request_repair">Solicitar Reparación</string>
+
+    <string name="customer_name">Nombre del Cliente</string>
+    <string name="customer_phone">N° de Teléfono del Cliente</string>
+
     <string name="invalid_receipt_number_or_id">El Número de recibo o ID de RepairRequest es inválido</string>
     <string name="request_not_found">No se encontró la solicitud de reparación</string>
 
+    <string name="article_name">Nombre del Artículo</string>
+    <string name="article_name_hint">Ej: Laptop, Smartphone, etc.</string>
+    <string name="article_name_required">El nombre del artículo es obligatorio.</string>
+    <string name="article_name_too_short">El nombre del artículo debe tener al menos 3 caracteres.</string>
+
+    <string name="article_type">Tipo de Artículo</string>
+    <string name="article_type_hint">Ej: Laptop, Smartphone, Tablet, etc.</string>
+    <string name="article_type_required">El tipo de artículo es obligatorio.</string>
+    <string name="article_type_too_short">El tipo de artículo debe tener al menos 3 caracteres.</string>
+
+    <string name="article_brand">Marca del Artículo</string>
+    <string name="article_brand_hint">Ej: Apple, Samsung, etc.</string>
+    <string name="article_brand_required">El nombre de la marca es obligatorio.</string>
+    <string name="article_brand_too_short">El nombre de la marca debe tener al menos 2 caracteres.</string>
+
+    <string name="article_model">Modelo del Artículo</string>
+    <string name="article_model_hint">Ej: MacBook Pro, Galaxy S21, etc.</string>
+    <string name="article_model_required">El modelo del artículo es obligatorio.</string>
+    <string name="article_model_too_short">El modelo del artículo debe tener al menos 2 caracteres.</string>
+
+    <string name="article_serial">Número de Serie del Artículo</string>
+    <string name="article_serial_hint">Ej: ABC123456</string>
+    <string name="article_serial_too_short">El número de serie del artículo debe tener al menos 6 caracteres.</string>
+
+    <string name="article_accesories">Accesorios del Artículo</string>
+    <string name="article_accesories_hint">Ej: Cargador, Funda, etc.</string>
+    <string name="article_accessories_too_short">Los accesorios del artículo deben tener al menos 3 caracteres.</string>
+
+    <string name="article_problem">Problema del Artículo</string>
+    <string name="article_problem_hint">Describe el problema del artículo</string>
+    <string name="article_problem_required">El problema del artículo es obligatorio.</string>
+    <string name="article_problem_too_short">El problema del artículo debe tener al menos 3 caracteres.</string>
+
+    <string name="repair_details">Detalles de la Reparación</string>
+    <string name="repair_details_hint">Describe los detalles de la reparación</string>
+    <string name="repair_details_too_short">Los detalles de la reparación deben tener al menos 3 caracteres.</string>
+
+    <string name="repair_status">Estado de Reparación</string>
+    <string name="repair_status_hint">Estado de la reparación</string>
+    <string name="repair_status_required">El estado de reparación es obligatorio.</string>
+    <string name="repair_status_invalid">El estado de reparación ingresado no es válido.</string>
+
+    <string name="repair_price">Precio de Reparación</string>
+    <string name="repair_price_hint">Ej: 15000</string>
+    <string name="repair_price_invalid">El precio debe ser un número válido.</string>
+
+    <string name="received_at">Fecha de Ingreso</string>
+    <string name="received_at_hint">Fecha de ingreso del artículo</string>
+    <string name="received_at_required">La fecha de ingreso es obligatoria.</string>
+    <string name="received_at_future_error">La fecha de ingreso no puede ser en el futuro.</string>
+    <string name="received_at_invalid_format">La fecha de ingreso debe tener el formato: yyyy-MM-dd</string>
+
+    <string name="repaired_at">Fecha de Reparación</string>
+    <string name="repaired_at_hint">Fecha de reparación del artículo</string>
+    <string name="repaired_at_required">La fecha de reparación es obligatoria.</string>
+    <string name="repaired_at_future_error">La fecha de reparación no puede ser en el futuro.</string>
+    <string name="repaired_at_before_received_error">La fecha de reparación no puede ser anterior a la fecha de ingreso.</string>
+    <string name="repaired_at_invalid_format">La fecha de reparación debe tener el formato: yyyy-MM-dd</string>
+
+    <string name="image_hint">Selecciona una imagen</string>
+    <string name="image_empty_error">El campo Imagen no puede estar vacío.</string>
+    <string name="image_format_error">La imagen debe tener uno de los siguientes formatos: .jpg, .jpeg, .png</string>
+
+    <string name="error_user_not_authorized_msg">No tienes permiso para realizar esta acción. Por favor, contacta al administrador del sistema.</string>
     <string name="error_authentication_required">Se requiere autenticación para acceder a esta función</string>
+    <string name="error_invalid_form_fields">Por favor, corrige los campos inválidos antes de continuar.</string>
 
     <string name="repair_status_pending">Pendiente</string>
     <string name="repair_status_in_progress">En progreso</string>

@@ -21,6 +21,8 @@
     <string name="no_pending_operations_msg">There\'s no pending operations.</string>
     <string name="pending_operations_synced_successfully_msg">%1$s pending operations synced successfully.</string>
 
+    <string name="select_date">Select Date</string>
+
     <!--  Login Strings -->
     <string name="email">Email</string>
     <string name="email_invalid_error">Enter a valid email</string>
@@ -90,11 +92,81 @@
     <string name="phone_icon_description">Costa Rica Flag</string>
 
     <!--  Repair Request Strings  -->
+    <string name="request_repair">Request Repair</string>
+
+    <string name="customer_name">Customer Name</string>
+    <string name="customer_phone">Customer Phone</string>
+
     <string name="invalid_receipt_number_or_id">Invalid RepairRequest receipt number or id</string>
     <string name="request_not_found">No Repair Request found with the provided information</string>
 
+    <string name="article_name">Article Name</string>
+    <string name="article_name_hint">E.g.: Laptop, Smartphone, etc.</string>
+    <string name="article_name_required">The article name is required.</string>
+    <string name="article_name_too_short">The article name must have at least 3 characters.</string>
+
+    <string name="article_type">Article Type</string>
+    <string name="article_type_hint">E.g.: Laptop, Smartphone, Tablet, etc.</string>
+    <string name="article_type_required">The article type is required.</string>
+    <string name="article_type_too_short">The article type must have at least 3 characters.</string>
+
+    <string name="article_brand">Article Brand</string>
+    <string name="article_brand_hint">E.g.: Apple, Samsung, etc.</string>
+    <string name="article_brand_required">The brand name is required.</string>
+    <string name="article_brand_too_short">The brand name must have at least 2 characters.</string>
+
+    <string name="article_model">Article Model</string>
+    <string name="article_model_hint">E.g.: MacBook Pro, Galaxy S21, etc.</string>
+    <string name="article_model_required">The article model is required.</string>
+    <string name="article_model_too_short">The article model must have at least 2 characters.</string>
+
+    <string name="article_serial">Article Serial Number</string>
+    <string name="article_serial_hint">E.g.: ABC123456</string>
+    <string name="article_serial_too_short">The article serial number must have at least 6 characters.</string>
+
+    <string name="article_accesories">Article Accessories</string>
+    <string name="article_accesories_hint">E.g.: Charger, Case, etc.</string>
+    <string name="article_accessories_too_short">The article accessories must have at least 3 characters.</string>
+
+    <string name="article_problem">Article Problem</string>
+    <string name="article_problem_hint">Describe the problem with the article</string>
+    <string name="article_problem_required">The article problem is required.</string>
+    <string name="article_problem_too_short">The article problem must have at least 3 characters.</string>
+
+    <string name="repair_details">Repair Details</string>
+    <string name="repair_details_hint">Describe the repair details</string>
+    <string name="repair_details_too_short">The repair details must have at least 3 characters.</string>
+
+    <string name="repair_status">Repair Status</string>
+    <string name="repair_status_hint">Status of the repair</string>
+    <string name="repair_status_required">The repair status is required.</string>
+    <string name="repair_status_invalid">The entered repair status is not valid.</string>
+
+    <string name="repair_price">Repair Price</string>
+    <string name="repair_price_hint">E.g.: 100.00</string>
+    <string name="repair_price_invalid">The price must be a valid number.</string>
+
+    <string name="received_at">Received Date</string>
+    <string name="received_at_hint">Date when the article was received</string>
+    <string name="received_at_required">The received date is required.</string>
+    <string name="received_at_future_error">Received date cannot be in the future.</string>
+    <string name="received_at_invalid_format">The received date must be in the format: yyyy-MM-dd</string>
+
+    <string name="repaired_at">Repaired Date</string>
+    <string name="repaired_at_hint">Date when the article was repaired</string>
+    <string name="repaired_at_required">The repaired date is required.</string>
+    <string name="repaired_at_future_error">Repaired date cannot be in the future.</string>
+    <string name="repaired_at_before_received_error">The repaired date cannot be before the received date.</string>
+    <string name="repaired_at_invalid_format">The repaired date must be in the format: yyyy-MM-dd</string>
+
+    <string name="image_hint">Select 1 or more images</string>
+    <string name="image_empty_error">Image field cannot be empty.</string>
+    <string name="image_format_error">Images must have one of the following formats: .jpg, .jpeg, .png</string>
+
     <!-- Error Strings  -->
+    <string name="error_user_not_authorized_msg">You are not authorized to perform this action. Please contact the administrator.</string>
     <string name="error_authentication_required">Authentication is required to access this feature</string>
+    <string name="error_invalid_form_fields">Please correct the invalid fields in the form</string>
 
     <!-- Repair Status Strings -->
     <string name="repair_status_pending">Pending</string>

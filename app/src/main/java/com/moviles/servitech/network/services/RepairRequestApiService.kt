@@ -1,10 +1,15 @@
 package com.moviles.servitech.network.services
 
 import com.moviles.servitech.common.Constants.API_REPAIR_REQUESTS_ROUTE
+import com.moviles.servitech.common.Constants.HEADER_ACCEPT_JSON
 import com.moviles.servitech.network.requests.repairRequest.CreateRepairRequest
 import com.moviles.servitech.network.requests.repairRequest.UpdateRepairRequest
 import com.moviles.servitech.network.responses.ApiResponse
+import com.moviles.servitech.network.responses.repairRequest.CreateRepairRequestResponse
+import com.moviles.servitech.network.responses.repairRequest.GetAllRepairRequestsResponse
+import com.moviles.servitech.network.responses.repairRequest.GetRepairRequestByReceiptNumberResponse
 import com.moviles.servitech.network.responses.repairRequest.RepairRequestResponse
+import com.moviles.servitech.network.responses.repairRequest.UpdateRepairRequestResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -40,13 +45,14 @@ interface RepairRequestApiService {
      * Fetches all repair requests.
      *
      * @param authToken The authorization token for the request.
-     * @return A [Response] containing an [ApiResponse] with a list of [RepairRequestResponse].
+     * @return A [Response] containing an [ApiResponse] with a [GetAllRepairRequestsResponse]
+     *                      containing a list of all repair requests.
      */
     @GET(API_REPAIR_REQUESTS_ROUTE)
-    @Headers("Accept: */*")
+    @Headers(HEADER_ACCEPT_JSON)
     suspend fun getAllRepairRequests(
         @Header("Authorization") authToken: String
-    ): Response<ApiResponse<List<RepairRequestResponse>>>
+    ): Response<ApiResponse<GetAllRepairRequestsResponse>>
 
     /**
      * Fetches a specific repair request by its receipt number.
@@ -56,22 +62,22 @@ interface RepairRequestApiService {
      * @return A [Response] containing an [ApiResponse] with the [RepairRequestResponse].
      */
     @GET("$API_REPAIR_REQUESTS_ROUTE/{receiptNumber}")
-    @Headers("Accept: */*")
+    @Headers(HEADER_ACCEPT_JSON)
     suspend fun getRepairRequestByReceiptNumber(
         @Header("Authorization") authToken: String,
         @Path("receiptNumber") receiptNumber: String
-    ): Response<ApiResponse<RepairRequestResponse>>
+    ): Response<ApiResponse<GetRepairRequestByReceiptNumberResponse>>
 
     /**
      * Creates a new repair request using the data contained in [CreateRepairRequest]
      * and passed as multipart form data in function parameters.
      *
      * @param authToken The authorization token for the request.
-     * @return A [Response] containing an [ApiResponse] with a [RepairRequestResponse].
+     * @return A [Response] containing an [ApiResponse] with the [RepairRequestResponse].
      */
     @Multipart
     @POST(API_REPAIR_REQUESTS_ROUTE)
-    @Headers("Accept: */*")
+    @Headers(HEADER_ACCEPT_JSON)
     suspend fun createRepairRequest(
         @Header("Authorization") authToken: String,
         @Part("customer_name") customerName: RequestBody,
@@ -90,7 +96,7 @@ interface RepairRequestApiService {
         @Part("received_at") receivedAt: RequestBody,
         @Part("repaired_at") repairedAt: RequestBody?,
         @Part images: List<MultipartBody.Part>? = emptyList<MultipartBody.Part>()
-    ): Response<ApiResponse<RepairRequestResponse>>
+    ): Response<ApiResponse<CreateRepairRequestResponse>>
 
     /**
      * Updates an existing repair request identified by its receipt number.
@@ -98,14 +104,14 @@ interface RepairRequestApiService {
      */
     @Multipart
     @PUT("$API_REPAIR_REQUESTS_ROUTE/{receiptNumber}")
-    @Headers("Accept: */*")
+    @Headers(HEADER_ACCEPT_JSON)
     suspend fun updateRepairRequest(
         @Header("Authorization") authToken: String,
         @Body request: UpdateRepairRequest
-    ): Response<ApiResponse<RepairRequestResponse>>
+    ): Response<ApiResponse<UpdateRepairRequestResponse>>
 
     @DELETE("$API_REPAIR_REQUESTS_ROUTE/{receiptNumber}")
-    @Headers("Accept: */*")
+    @Headers(HEADER_ACCEPT_JSON)
     suspend fun deleteRepairRequest(
         @Header("Authorization") authToken: String,
         @Path("receiptNumber") receiptNumber: String

@@ -136,7 +136,7 @@ class RepairRequestRepository @Inject constructor(
                     )
                 },
                 // Transform the API response to a list of RepairRequest models
-                transformTo = { it.responseToModelList() },
+                transformTo = { it.repairRequests.responseToModelList() },
                 // Log class name for debugging purposes
                 logClass = className,
                 // Error message to return in case of an unknown error
@@ -177,7 +177,7 @@ class RepairRequestRepository @Inject constructor(
                     this.createRepairRequestInDB(it as RepairRequest)
                     RepairRequestResult.Success(it)
                 },
-                transformTo = { it.toModel() },
+                transformTo = { it.repairRequest.toModel() },
                 logClass = className,
                 errorMessage = stringProvider.getString(R.string.unknown_error)
             )
@@ -231,7 +231,7 @@ class RepairRequestRepository @Inject constructor(
                     this.createRepairRequestInDB(it as RepairRequest)
                     RepairRequestResult.Success(it)
                 },
-                transformTo = { it.toModel() },
+                transformTo = { it.repairRequest.toModel() },
                 logClass = className,
                 errorMessage = stringProvider.getString(R.string.unknown_error)
             )
@@ -265,7 +265,7 @@ class RepairRequestRepository @Inject constructor(
                     this.updateRepairRequestInDB(repairRequest)
                     RepairRequestResult.Success(it)
                 },
-                transformTo = { it.toModel() },
+                transformTo = { it.repairRequest.toModel() },
                 logClass = className,
                 errorMessage = stringProvider.getString(R.string.unknown_error)
             )

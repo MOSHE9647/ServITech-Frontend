@@ -63,7 +63,7 @@ fun CustomInputField(
 
         OutlinedTextField(
             value = value,
-            onValueChange = onValueChange,
+            onValueChange = { onValueChange(it) },
             modifier = Modifier.fillMaxWidth(),
             placeholder = {
                 Text(

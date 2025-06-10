@@ -1,9 +1,9 @@
 package com.moviles.servitech.model.mappers
 
-import com.moviles.servitech.common.Constants.GUEST_ROLE
 import com.moviles.servitech.database.entities.user.UserEntity
 import com.moviles.servitech.database.entities.user.UserSessionEntity
 import com.moviles.servitech.model.User
+import com.moviles.servitech.model.enums.UserRole
 
 /**
  * Maps a [UserSessionEntity] to a [User].
@@ -16,7 +16,7 @@ fun UserSessionEntity.toUser(): User {
         name = this.user.name,
         email = this.user.email,
         phone = this.user.phone,
-        role = this.user.role.ifEmpty { GUEST_ROLE })
+        role = this.user.role.ifEmpty { UserRole.GUEST.name })
 }
 
 /**

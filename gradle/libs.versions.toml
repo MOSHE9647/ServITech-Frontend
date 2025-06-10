@@ -46,6 +46,9 @@ kotlinxCoroutines = "1.10.2"
 # --- File Picker ---
 composeFilePicker = "1.0.6"
 
+# --- Sheets Compose Dialogs ---
+calendar = "1.3.0"
+
 # --- Kotlin Reflect ---
 kotlinReflect = "2.2.0-RC2"
 
@@ -105,6 +108,9 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 
 # --- File Picker ---
 composefilepicker = { module = "io.github.mahdiasd:ComposeFilePicker", version.ref = "composeFilePicker" }
+
+# --- Sheets Compose Dialogs ---
+calendar = { module = "com.maxkeppeler.sheets-compose-dialogs:calendar", version.ref = "calendar" }
 
 # --- Kotlin Reflect ---
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", name = "kotlin-reflect", version.ref = "kotlinReflect" }

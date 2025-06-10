@@ -6,16 +6,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moviles.servitech.R
-import com.moviles.servitech.common.Constants.GUEST_ROLE
 import com.moviles.servitech.core.providers.AndroidStringProvider
 import com.moviles.servitech.core.session.SessionManager
 import com.moviles.servitech.model.User
-import com.moviles.servitech.network.responses.auth.LoginResponse
+import com.moviles.servitech.model.enums.UserRole
 import com.moviles.servitech.network.requests.LoginRequest
+import com.moviles.servitech.network.responses.auth.LoginResponse
 import com.moviles.servitech.repositories.AuthResult
 import com.moviles.servitech.services.AuthService
-import com.moviles.servitech.services.validation.LoginValidation
-import com.moviles.servitech.viewmodel.FieldState
+import com.moviles.servitech.services.validation.auth.LoginValidation
+import com.moviles.servitech.viewmodel.utils.FieldState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -154,7 +154,7 @@ class LoginViewModel @Inject constructor(
     fun onGuestSelected() {
         val guestUser = User(
             id = -1,
-            role = GUEST_ROLE,
+            role = UserRole.GUEST.name,
             name = stringProvider.getString(R.string.guest_name),
             email = stringProvider.getString(R.string.guest_email),
             phone = "+000 0000 0000"

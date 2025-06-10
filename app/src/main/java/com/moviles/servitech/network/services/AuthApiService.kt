@@ -1,6 +1,7 @@
 package com.moviles.servitech.network.services
 
 import com.moviles.servitech.common.Constants.API_AUTH_ROUTE
+import com.moviles.servitech.common.Constants.HEADER_ACCEPT_JSON
 import com.moviles.servitech.network.requests.LoginRequest
 import com.moviles.servitech.network.requests.RegisterRequest
 import com.moviles.servitech.network.responses.ApiResponse
@@ -25,7 +26,7 @@ interface AuthApiService {
      * @return A [Response] containing an [ApiResponse] with [LoginResponse] data.
      */
     @POST("$API_AUTH_ROUTE/login")
-    @Headers("Accept: */*")
+    @Headers(HEADER_ACCEPT_JSON)
     suspend fun login(@Body request: LoginRequest): Response< ApiResponse<LoginResponse> >
 
     /**
@@ -35,7 +36,7 @@ interface AuthApiService {
      * @return A [Response] containing an [ApiResponse] with [RegisterResponse] data.
      */
     @POST("$API_AUTH_ROUTE/register")
-    @Headers("Accept: */*")
+    @Headers(HEADER_ACCEPT_JSON)
     suspend fun register(@Body request: RegisterRequest): Response< ApiResponse<RegisterResponse> >
 
     /**
@@ -45,6 +46,6 @@ interface AuthApiService {
      * @return A [Response] containing an [ApiResponse] with no content.
      */
     @POST("$API_AUTH_ROUTE/logout")
-    @Headers("Accept: */*")
+    @Headers(HEADER_ACCEPT_JSON)
     suspend fun logout(@Header("Authorization") token: String): Response< ApiResponse<Unit> >
 }

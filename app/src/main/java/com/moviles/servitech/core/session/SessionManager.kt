@@ -128,6 +128,16 @@ class SessionManager @Inject constructor (
     }
 
     /**
+     * Retrieves the currently logged-in user from the session.
+     * If no session exists, it returns null.
+     *
+     * @return The User object representing the logged-in user, or null if no session exists.
+     */
+    suspend fun getLoggedUser(): User? {
+        return userSessionDao.getSession()?.toUser()
+    }
+
+    /**
      * Clears the current user session from the database.
      * If an error occurs during the clearing process,
      * it logs the error and sets a session message indicating the error.

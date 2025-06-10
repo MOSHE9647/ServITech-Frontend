@@ -4,9 +4,11 @@ import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.provider.OpenableColumns
 import android.util.Log
 import android.webkit.MimeTypeMap
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.moviles.servitech.R
@@ -19,6 +21,9 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
+import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.Locale
 
 /**
  * Utility object for common functions used across the application.
@@ -60,6 +65,75 @@ object Utils {
         } else {
             context.getString(R.string.no_date)
         }
+    }
+
+    /**
+     * Formats a given date string in ISO 8601 format (yyyy-MM-dd) to a human-readable string.
+     * The output format depends on the specified language.
+     *
+     * @param dateString The date string in ISO 8601 format.
+     * @param language The language code for formatting (default is "es" for Spanish).
+     * @return A formatted date string in the specified language.
+     */
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun formatLocalDateForDisplay(dateString: String, language: String = "es"): String {
+        if (dateString.isEmpty()) return dateString
+
+        try {
+            val locale = when (language.lowercase()) {
+                "en" -> Locale.ENGLISH
+                "es" -> Locale("es", "ES")
+                else -> Locale.getDefault()
+            }
+
+            val date = LocalDate.parse(dateString) // ISO 8601 format: yyyy-MM-dd
+
+            val dayOfWeek = date.dayOfWeek.getDisplayName(TextStyle.FULL, locale)
+            val dayOfMonth = date.dayOfMonth
+            val month = date.month.getDisplayName(TextStyle.FULL, locale)
+            val year = date.year
+
+            return when (locale.language) {
+                "en" -> "$dayOfWeek $dayOfMonth${getDaySuffix(dayOfMonth)}, $year"
+                "es" -> "$dayOfWeek, $dayOfMonth de $month del $year"
+                else -> "$dayOfWeek, $dayOfMonth $month $year"
+            }
+        } catch (e: Exception) {
+            Log.e("Utils", "Error parsing date: $dateString", e)
+            return dateString // Return the original string if parsing fails
+        }
+    }
+
+    /**
+     * Returns the appropriate suffix for a given day of the month.
+     * This is used to format dates correctly in English.
+     *
+     * @param day The day of the month (1-31).
+     * @return A string representing the suffix for the day (e.g., "st", "nd", "rd", "th").
+     */
+    private fun getDaySuffix(day: Int): String {
+        return if (day in 11..13) {
+            "th"
+        } else {
+            when (day % 10) {
+                1 -> "st"
+                2 -> "nd"
+                3 -> "rd"
+                else -> "th"
+            }
+        }
+    }
+
+    /**
+     * Gets the display language of the device.
+     * This function retrieves the primary language
+     * set on the device's configuration.
+     *
+     * @param context The context used to access resources.
+     * @return A string representing the display language (e.g., "en", "es").
+     */
+    fun getDisplayLanguage(context: Context): String {
+        return context.resources.configuration.locales[0].language
     }
 
     /**

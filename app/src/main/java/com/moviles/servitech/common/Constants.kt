@@ -6,6 +6,9 @@ object Constants {
     const val API_AUTH_ROUTE = "api/v1/auth"
     const val API_BASE_ROUTE = "api/v1"
 
+    // API Headers
+    const val HEADER_ACCEPT_JSON = "Accept: application/json"
+
     // API endpoints routes
     const val API_ARTICLES_ROUTE = "${API_BASE_ROUTE}/articles"
     const val API_REPAIR_REQUESTS_ROUTE = "${API_BASE_ROUTE}/repair-request"
@@ -22,7 +25,4 @@ object Constants {
     const val REPAIR_REQ_TABLE = "repair_requests"
     const val SESSION_TABLE = "user_session"
     const val USER_TABLE = "users"
-
-    // User roles
-    const val GUEST_ROLE = "guest"
 }
