@@ -4,6 +4,7 @@ import android.content.Context
 import com.moviles.servitech.common.Constants.API_BASE_URL
 import com.moviles.servitech.network.services.ArticleApiService
 import com.moviles.servitech.network.services.AuthApiService
+import com.moviles.servitech.network.services.RepairRequestApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -130,5 +131,20 @@ object RetrofitInstance {
     @Singleton
     fun provideArticleService(retrofit: Retrofit): ArticleApiService =
         retrofit.create(ArticleApiService::class.java)
+
+    /**
+     * Provides the RepairRequestApiService for repair request-related API calls.
+     * This service is created using the Retrofit instance.
+     *
+     * This service handles operations such as fetching, creating, updating,
+     * and deleting repair requests.
+     *
+     * @param retrofit [Retrofit] instance for creating API services.
+     * @return [RepairRequestApiService] instance for repair request API calls.
+     */
+    @Provides
+    @Singleton
+    fun provideRepairRequestService(retrofit: Retrofit): RepairRequestApiService =
+        retrofit.create(RepairRequestApiService::class.java)
 
 }

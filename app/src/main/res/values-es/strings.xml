@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="error_null_parameter_msg">El parámetro \'%s\' no puede ser nulo</string>
-    <string name="po_deserealization_error_msg">Error al deserializar los datos de la operación pendiente</string>
+    <string name="po_deserialization_error_msg">Error al deserializar los datos de la operación pendiente</string>
 
     <string name="network_available_msg">Conectado a Internet.</string>
     <string name="network_unavailable_msg">Sin conexión a Internet.</string>
+
+    <string name="syncing_data_with_server_msg">Sincronizando datos con el servidor…</string>
+    <string name="syncing_pending_operations_msg">Sincronizando operaciones pendientes (%1$s)…</string>
+    <string name="syncing_pending_operation_for_msg">Sincronizando operación pendiente \'%1$s\' para el %2$s: \'%3$s\'.</string>
+    <string name="success_syncing_operation_msg">Operación \'%1$s\' sincronizada correctamente para el %2$s \'%3$s\'.</string>
+
+    <string name="exception_syncing_pending_operations_msg">Ocurrió un error mientras se sincronizaban las operaciones pendientes.</string>
+    <string name="error_syncing_operation_for_msg">Ocurrió un error al sincronizar la operación \'%1$s\' para el %2$s \'%3$s\'.</string>
+    <string name="error_syncing_operation_msg">Error al sincronizar la operación \'%1$s\' para el %2$s: \'%3$s\'.</string>
+
+    <string name="no_pending_operations_msg">No hay operaciones pendientes.</string>
+    <string name="pending_operations_synced_successfully_msg">%1$s: Operaciones pendientes sincronizadas correctamente.</string>
 
     <string name="email">Correo electrónico</string>
     <string name="email_invalid_error">Ingresa un email válido</string>

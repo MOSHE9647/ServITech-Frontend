@@ -4,10 +4,22 @@
     <string name="app_name" translatable="false">ServITech</string>
 
     <string name="error_null_parameter_msg">The parameter \'%s\' can\'t be null</string>
-    <string name="po_deserealization_error_msg">An error occurred while trying to deserialize the pending operation</string>
+    <string name="po_deserialization_error_msg">An error occurred while trying to deserialize the pending operation</string>
 
     <string name="network_available_msg">Connected to the Internet</string>
     <string name="network_unavailable_msg">No Internet connection</string>
+
+    <string name="syncing_data_with_server_msg">Syncing data with server…</string>
+    <string name="syncing_pending_operations_msg">Syncing pending operations (%1$s)…</string>
+    <string name="syncing_pending_operation_for_msg">Syncing pending operation \'%1$s\' for %2$s: \'%3$s\'.</string>
+    <string name="success_syncing_operation_msg">Successfully synced pending operation \'%1$s\' for %2$s: \'%3$s\'.</string>
+
+    <string name="exception_syncing_pending_operations_msg">An exception occurred while syncing pending operations.</string>
+    <string name="error_syncing_operation_for_msg">Error syncing operation \'%1$s\' for %2$s \'%3$s\'</string>
+    <string name="error_syncing_operation_msg">Error syncing operation \'%1$s\' for %2$s: \'%3$s\'.</string>
+
+    <string name="no_pending_operations_msg">There\'s no pending operations.</string>
+    <string name="pending_operations_synced_successfully_msg">%1$s pending operations synced successfully.</string>
 
     <!--  Login Strings -->
     <string name="email">Email</string>

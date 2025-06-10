@@ -35,6 +35,7 @@ import com.moviles.servitech.ui.theme.AppColors
 fun CustomInputField(
     label: String,
     placeholder: String,
+    trailingIcon: @Composable (() -> Unit)? = null,
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -44,7 +45,8 @@ fun CustomInputField(
     isPassword: Boolean = false,
     isError: Boolean = false,
     supportingText: @Composable (() -> Unit)? = null,
-    enabled: Boolean
+    enabled: Boolean,
+    readOnly: Boolean = false,
 ) {
     var isPasswordVisible by remember { mutableStateOf<Boolean>(value = !isPassword) }
 
@@ -88,18 +90,22 @@ fun CustomInputField(
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
             keyboardActions = KeyboardActions(onAny = { onImeAction() }),
             trailingIcon = {
-                if (isPassword && value.isNotEmpty()) {
-                    val iconImage =
-                        if (isPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                    val iconDescription =
-                        if (isPasswordVisible) R.string.hide_password else R.string.show_password
-                    IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
-                        Icon(
-                            imageVector = iconImage,
-                            contentDescription = stringResource(iconDescription),
-                            tint = if (isSystemInDarkTheme()) AppColors.PlaceholderDark else AppColors.PlaceholderLight
-                        )
+                when {
+                    isPassword && value.isNotEmpty() -> {
+                        val iconImage =
+                            if (isPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                        val iconDescription =
+                            if (isPasswordVisible) R.string.hide_password else R.string.show_password
+                        IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                            Icon(
+                                imageVector = iconImage,
+                                contentDescription = stringResource(iconDescription),
+                                tint = if (isSystemInDarkTheme()) AppColors.PlaceholderDark else AppColors.PlaceholderLight
+                            )
+                        }
                     }
+
+                    trailingIcon != null -> trailingIcon()
                 }
             },
             visualTransformation = if (!isPassword) VisualTransformation.None else {
@@ -112,7 +118,8 @@ fun CustomInputField(
             textStyle = MaterialTheme.typography.bodyLarge,
             isError = isError,
             supportingText = supportingText,
-            enabled = enabled
+            enabled = enabled,
+            readOnly = readOnly,
         )
     }
 }

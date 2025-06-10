@@ -3,16 +3,24 @@ package com.moviles.servitech.services
 import android.content.Context
 import com.google.gson.Gson
 import com.moviles.servitech.R
+import com.moviles.servitech.common.Utils.logError
+import com.moviles.servitech.common.Utils.logInfo
 import com.moviles.servitech.core.providers.AndroidStringProvider
 import com.moviles.servitech.core.session.SessionManager
 import com.moviles.servitech.database.entities.PendingOperationEntity
+import com.moviles.servitech.database.entities.repairRequest.RepairRequestWithImagesEntity
 import com.moviles.servitech.model.RepairRequest
 import com.moviles.servitech.model.enums.OperationType
 import com.moviles.servitech.model.mappers.toEntity
+import com.moviles.servitech.model.mappers.toModel
 import com.moviles.servitech.network.NetworkStatusTracker
 import com.moviles.servitech.repositories.RepairRequestRepository
 import com.moviles.servitech.repositories.RepairRequestResult
 import com.moviles.servitech.repositories.helpers.DataSource
+import com.moviles.servitech.services.helpers.ServicesHelper.currentDataSource
+import com.moviles.servitech.services.helpers.ServicesHelper.getAuthTokenOrError
+import com.moviles.servitech.services.helpers.ServicesHelper.retrieveEntityFromJson
+import com.moviles.servitech.services.helpers.ServicesHelper.syncOperation
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Provider
@@ -49,22 +57,10 @@ class RepairRequestService @Inject constructor(
     private val pendingOperationService get() = pendingOperationServiceProvider.get()
 
     // The class name of the object being managed by this service.
-    private val objectClass = RepairRequest::class.java.simpleName
+    val objectClass: String = RepairRequest::class.java.simpleName
 
-    /**
-     * Retrieves the authentication token from the session manager.
-     * If the token is not available, it returns an error message.
-     *
-     * @return The authentication token as a String, or null if not available.
-     */
-    private suspend fun getAuthTokenOrError(): String? =
-        sessionManager.getToken()
-
-    /**
-     * Determines the current data source based on network connectivity.
-     */
-    private fun currentDataSource(): DataSource =
-        if (networkStatusTracker.isConnected.value) DataSource.Remote else DataSource.Local
+    // The class name of the service, used for logging and debugging purposes.
+    private val className = RepairRequestService::class.java.simpleName
 
     /**
      * Creates an error result with a message from the string provider.
@@ -96,8 +92,12 @@ class RepairRequestService @Inject constructor(
      * @return A [RepairRequestResult] containing a list of [RepairRequest] objects
      */
     suspend fun getAllRepairRequests(): RepairRequestResult<List<RepairRequest>> {
-        val token = getAuthTokenOrError() ?: return error(R.string.error_authentication_required)
-        return repairRequestRepo.getAllRepairRequests(currentDataSource(), token)
+        val token = getAuthTokenOrError(sessionManager)
+            ?: return error(R.string.error_authentication_required)
+        return repairRequestRepo.getAllRepairRequests(
+            currentDataSource(networkStatusTracker),
+            token
+        )
     }
 
     /**
@@ -112,12 +112,14 @@ class RepairRequestService @Inject constructor(
         receiptNumber: String?,
         repairRequestID: Long?
     ): RepairRequestResult<RepairRequest?> {
-        val token = getAuthTokenOrError() ?: return error(R.string.error_authentication_required)
-        if (receiptNumber == null) return error(R.string.error_null_parameter_msg, "receiptNumber")
-        if (repairRequestID == null) return error(R.string.error_null_parameter_msg, "id")
+        val token = getAuthTokenOrError(sessionManager)
+            ?: return error(R.string.error_authentication_required)
+        if (receiptNumber == null && repairRequestID == null) {
+            return error(R.string.error_null_parameter_msg, "[receiptNumber, id]")
+        }
 
         return repairRequestRepo.getRepairRequestByReceiptNumberOrID(
-            currentDataSource(), token, receiptNumber, repairRequestID
+            currentDataSource(networkStatusTracker), token, receiptNumber, repairRequestID
         )
     }
 
@@ -130,11 +132,12 @@ class RepairRequestService @Inject constructor(
      * @return A [RepairRequestResult] indicating success or failure of the operation.
      */
     suspend fun createRepairRequest(repairRequest: RepairRequest): RepairRequestResult<Any> {
-        val token = getAuthTokenOrError() ?: return error(R.string.error_authentication_required)
+        val token = getAuthTokenOrError(sessionManager)
+            ?: return error(R.string.error_authentication_required)
 
-        val result =
-            repairRequestRepo.createRepairRequest(currentDataSource(), token, repairRequest)
-        if (currentDataSource() == DataSource.Local && result is RepairRequestResult.Success) {
+        val dataSource = currentDataSource(networkStatusTracker)
+        val result = repairRequestRepo.createRepairRequest(dataSource, token, repairRequest)
+        if (dataSource == DataSource.Local && result is RepairRequestResult.Success) {
             handleOfflineOperation(OperationType.INSERT, repairRequest.toEntity())
         }
         return result
@@ -149,11 +152,12 @@ class RepairRequestService @Inject constructor(
      * @return A [RepairRequestResult] indicating success or failure of the operation.
      */
     suspend fun updateRepairRequest(repairRequest: RepairRequest): RepairRequestResult<Any> {
-        val token = getAuthTokenOrError() ?: return error(R.string.error_authentication_required)
+        val token = getAuthTokenOrError(sessionManager)
+            ?: return error(R.string.error_authentication_required)
 
-        val result =
-            repairRequestRepo.updateRepairRequest(currentDataSource(), token, repairRequest)
-        if (currentDataSource() == DataSource.Local && result is RepairRequestResult.Success) {
+        val dataSource = currentDataSource(networkStatusTracker)
+        val result = repairRequestRepo.updateRepairRequest(dataSource, token, repairRequest)
+        if (dataSource == DataSource.Local && result is RepairRequestResult.Success) {
             handleOfflineOperation(OperationType.UPDATE, repairRequest.toEntity())
         }
         return result
@@ -164,27 +168,114 @@ class RepairRequestService @Inject constructor(
      * If the user is not authenticated or the parameters are null, it returns an error.
      * If the operation is performed while offline, it queues the operation for later synchronization.
      *
-     * @param receiptNumber The receipt number of the repair request.
-     * @param repairRequestID The ID of the repair request.
+     * @param repairRequest The [RepairRequest] object to be deleted and which contains
+     *                      either a receipt number or an ID.
      * @return A [RepairRequestResult] indicating success or failure of the operation.
      */
-    suspend fun deleteRepairRequestByReceiptNumberOrID(
-        receiptNumber: String?,
-        repairRequestID: Long?
-    ): RepairRequestResult<Unit> {
-        val token = getAuthTokenOrError() ?: return error(R.string.error_authentication_required)
-        if (receiptNumber == null) return error(R.string.error_null_parameter_msg, "receiptNumber")
-        if (repairRequestID == null) return error(R.string.error_null_parameter_msg, "id")
+    suspend fun deleteRepairRequest(repairRequest: RepairRequest): RepairRequestResult<Unit> {
+        val token = getAuthTokenOrError(sessionManager)
+            ?: return error(R.string.error_authentication_required)
 
+        val dataSource = currentDataSource(networkStatusTracker)
         val result = repairRequestRepo.deleteRepairRequestByReceiptNumberOrID(
-            currentDataSource(), token, receiptNumber, repairRequestID
+            dataSource, token, repairRequest.receiptNumber, repairRequest.id?.toLong()
         )
 
-        if (currentDataSource() == DataSource.Local && result is RepairRequestResult.Success) {
-            val identifier = receiptNumber.ifEmpty { repairRequestID }
+        if (dataSource == DataSource.Local && result is RepairRequestResult.Success) {
+            val identifier = repairRequest.receiptNumber ?: repairRequest.id ?: return error(
+                R.string.error_null_parameter_msg, "[receiptNumber, id]"
+            )
             handleOfflineOperation(OperationType.DELETE, identifier)
         }
 
         return result
+    }
+
+    /**
+     * Synchronizes all pending operations for the current object class.
+     * This method retrieves all pending operations from the database and attempts to sync them with the server.
+     * If the device is offline or the authentication token is not available, it logs an error.
+     *
+     * It processes each pending operation by calling the appropriate syncOperation method
+     * based on the operation type (insert, update, delete).
+     */
+    suspend fun syncPendingOperations() {
+        // Check if the current data source is Remote, if not, return early
+        if (currentDataSource(networkStatusTracker) != DataSource.Remote) return
+
+        // Ensure the user is authenticated and has a valid token
+        val token = getAuthTokenOrError(sessionManager)
+        if (token.isNullOrEmpty()) {
+            logError(
+                messageResId = R.string.error_authentication_required,
+                stringProvider = stringProvider,
+                className = className
+            )
+            return
+        }
+        // Retrieve all pending operations for the current object class
+        val pendOperations = pendingOperationService.getPendingOperationsByEntity(objectClass)
+        if (pendOperations.isEmpty()) {
+            logInfo(
+                messageResId = R.string.no_pending_operations_msg,
+                stringProvider = stringProvider,
+                className = className
+            )
+            return
+        }
+
+        // Log the start of the synchronization process
+        logInfo(
+            stringProvider = stringProvider,
+            className = className,
+            messageResId = R.string.syncing_pending_operations_msg,
+            objectClass
+        )
+
+        // Iterate through each pending operation and attempt to sync it
+        pendOperations.forEach { operation ->
+            // Deserialize the operation data into a RepairRequest object
+            val repairRequest: RepairRequest =
+                retrieveEntityFromJson<RepairRequestWithImagesEntity, RepairRequest>(
+                    data = operation.data,
+                    stringProvider = stringProvider,
+                    className = className,
+                    transform = { repReqWithImages -> repReqWithImages.toModel() }
+                ) ?: return@forEach
+
+            // Try to synchronize the operation using the syncOperation method
+            val syncResult: RepairRequestResult<Any> =
+                syncOperation(
+                    stringProvider = stringProvider,
+                    className = className,
+                    operationType = OperationType.valueOf(operation.type),
+                    operationData = repairRequest,
+                    targetClass = this,
+                    repairRequest //<- Parameter to be passed to the method
+                ) ?: return@forEach
+
+            // Handle the result of the synchronization
+            when (syncResult) {
+                is RepairRequestResult.Success<*> -> {
+                    logInfo(
+                        stringProvider = stringProvider,
+                        className = className,
+                        messageResId = R.string.success_syncing_operation_msg,
+                        operation.type, objectClass, repairRequest
+                    )
+                    pendingOperationService.removePendingOperation(operation)
+                }
+
+                is RepairRequestResult.Error -> {
+                    logError(
+                        stringProvider = stringProvider,
+                        className = className,
+                        throwable = null,
+                        messageResId = R.string.error_syncing_operation_msg,
+                        operation.type, objectClass, repairRequest, syncResult.message
+                    )
+                }
+            }
+        }
     }
 }

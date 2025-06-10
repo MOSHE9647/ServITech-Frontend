@@ -5,14 +5,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.moviles.servitech.core.navigation.Screen.Home
 import com.moviles.servitech.core.navigation.Screen.Detail
+import com.moviles.servitech.core.navigation.Screen.Home
 import com.moviles.servitech.core.navigation.Screen.Login
 import com.moviles.servitech.core.navigation.Screen.Register
 import com.moviles.servitech.core.navigation.Screen.Splash
+import com.moviles.servitech.view.HomeScreen
 import com.moviles.servitech.view.SplashScreen
 import com.moviles.servitech.view.article.ArticleDetailScreen
-import com.moviles.servitech.view.article.CategoryScreen
 import com.moviles.servitech.view.auth.LoginScreen
 import com.moviles.servitech.view.auth.RegisterScreen
 import kotlinx.serialization.Serializable
@@ -99,9 +99,12 @@ fun NavigationGraph() {
          * The `composable` function is used to define the screen and its corresponding UI.
          */
         composable<Home> {
-            CategoryScreen(
-                navigateToDetail = { articleId -> navController.navigate(Detail(articleId = articleId)) }
-            )
+//            CategoryScreen(
+//                navigateToDetail = { articleId -> navController.navigate(Detail(articleId = articleId)) }
+//            )
+            HomeScreen {
+                navController.navigate(Login) { popUpTo(0) }
+            }
         }
 
         /**

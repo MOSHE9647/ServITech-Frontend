@@ -54,7 +54,24 @@ sealed class RepairRequestResult<out T> : Result<T> {
     data class Error(
         val message: String,
         val fieldErrors: Map<String, String> = emptyMap()
-    ) : RepairRequestResult<Nothing>()
+    ) : RepairRequestResult<Nothing>() {
+        /**
+         * Converts the error to a user-friendly string representation.
+         *
+         * @return A string containing the error message and field errors.
+         */
+        fun log(): String {
+            val fieldErrorsString = if (fieldErrors.isNotEmpty()) {
+                fieldErrors.entries.joinToString(
+                    prefix = "\nField Errors:\n",
+                    separator = "\n"
+                ) { (field, error) -> "  - $field: $error" }
+            } else {
+                ""
+            }
+            return "Error: $message$fieldErrorsString"
+        }
+    }
 }
 
 /**
