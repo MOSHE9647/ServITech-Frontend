@@ -14,11 +14,14 @@ import com.moviles.servitech.core.providers.AndroidStringProvider
 import com.moviles.servitech.model.Image
 import com.moviles.servitech.model.RepairRequest
 import com.moviles.servitech.repositories.RepairRequestResult
+import com.moviles.servitech.repositories.helpers.DataSource
 import com.moviles.servitech.services.RepairRequestService
 import com.moviles.servitech.services.validation.RepairRequestValidation
 import com.moviles.servitech.viewmodel.utils.FieldState
 import com.moviles.servitech.viewmodel.utils.ViewModelState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,6 +31,10 @@ class RepairRequestViewModel @Inject constructor(
     private val repairRequestService: RepairRequestService,
     private val stringProvider: AndroidStringProvider,
 ) : ViewModel() {
+
+    // StateFlow for the list of Repair Requests.
+    private val _repairRequests = MutableStateFlow<List<RepairRequest>>(emptyList())
+    val repairRequests: StateFlow<List<RepairRequest>> = _repairRequests
 
     // LiveData for the Repair Request input fields and their error states.
     private val customerNameState = FieldState<String>()
@@ -402,6 +409,46 @@ class RepairRequestViewModel @Inject constructor(
         imagesNamesState.errorMessage.value = validation.errorMessage
     }
 
+    fun getAllRepairRequests() {
+        viewModelScope.launch {
+            // Resetting the viewModelState to Loading
+            _viewModelState.value = ViewModelState.Loading
+
+            // Attempt to fetch all repair requests using the service
+            when (val result = repairRequestService.getAllRepairRequests()) {
+                is RepairRequestResult.Success -> {
+                    // If the request is successful, update the list of repair requests
+                    _repairRequests.value = result.data
+                    _viewModelState.value = ViewModelState.Success(result.data)
+                }
+
+                is RepairRequestResult.Error -> {
+                    // If there is an error, set the ViewModel state to Error
+                    // and update the repair requests list using the local data source
+                    // if available.
+                    val localResult = repairRequestService.getAllRepairRequests(DataSource.Local)
+                    _repairRequests.value = when {
+                        localResult is RepairRequestResult.Success -> localResult.data
+                        else -> emptyList()
+                    }
+                    _viewModelState.value = ViewModelState.Error(result.message)
+                }
+            }
+        }
+    }
+
+    /**
+     * Creates a new repair request using the provided [RepairRequest] object.
+     * It formats the phone number, and sends the request to the service.
+     *
+     * If the request is successful, it updates the ViewModel state to Success
+     * and refreshes the list of repair requests.
+     *
+     * If there are validation errors, it updates the error states and messages
+     * for each field based on the error list returned by the service.
+     *
+     * @param rawRepairRequest The RepairRequest object containing the data to be sent.
+     */
     @RequiresApi(Build.VERSION_CODES.O)
     fun createRepairRequest(rawRepairRequest: RepairRequest) {
         viewModelScope.launch {
@@ -421,6 +468,7 @@ class RepairRequestViewModel @Inject constructor(
             when (val result = repairRequestService.createRepairRequest(repairRequest)) {
                 is RepairRequestResult.Success -> {
                     // If the request is successful, update the ViewModel state to Success
+                    getAllRepairRequests() // Refresh the list of repair requests
                     _viewModelState.value = ViewModelState.Success<Any>(result.data)
                 }
 

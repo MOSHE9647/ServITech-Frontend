@@ -77,6 +77,7 @@ fun HomeScreen(
     val user by sessionManager.user.collectAsState(initial = null)
     val token by sessionManager.token.collectAsState(initial = "")
     val expiresAt by sessionManager.expiresAt.collectAsState(initial = 0L)
+
     val viewModelState by repReqViewModel.viewModelState.observeAsState()
 
     Box(
@@ -123,6 +124,10 @@ fun HomeScreen(
                 ) {
                     Text("Cerrar sesión")
                 }
+
+                Button(
+                    onClick = { repReqViewModel.getAllRepairRequests() }
+                ) { Text("Obtener solicitudes de reparación") }
 
                 CreateUpdateRepairRequestForm(
                     repairRequest = null,

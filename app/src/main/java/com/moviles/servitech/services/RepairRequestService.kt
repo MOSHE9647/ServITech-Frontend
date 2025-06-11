@@ -93,9 +93,16 @@ class RepairRequestService @Inject constructor(
      *
      * @return A [RepairRequestResult] containing a list of [RepairRequest] objects
      */
-    suspend fun getAllRepairRequests(): RepairRequestResult<List<RepairRequest>> {
+    suspend fun getAllRepairRequests(dataSource: DataSource? = null): RepairRequestResult<List<RepairRequest>> {
+        // If the data source is Local, return the local repair requests
+        if (dataSource != null && dataSource is DataSource.Local) {
+            return repairRequestRepo.getAllRepairRequests(DataSource.Local, "")
+        }
+
+        // Get the authentication token from the session manager
         val token = getAuthTokenOrError(sessionManager)
             ?: return error(R.string.error_authentication_required)
+        val authToken = "Bearer $token"
 
         // Check if the user has admin role before proceeding
         if (!checkRoleOrError(sessionManager, UserRole.ADMIN)) {
@@ -105,7 +112,7 @@ class RepairRequestService @Inject constructor(
         // Call the repository method to get all repair requests
         return repairRequestRepo.getAllRepairRequests(
             currentDataSource(networkStatusTracker),
-            token
+            authToken
         )
     }
 
@@ -123,6 +130,7 @@ class RepairRequestService @Inject constructor(
     ): RepairRequestResult<RepairRequest?> {
         val token = getAuthTokenOrError(sessionManager)
             ?: return error(R.string.error_authentication_required)
+        val authToken = "Bearer $token"
 
         // Check if the user has admin role before proceeding
         if (!checkRoleOrError(sessionManager, UserRole.ADMIN)) {
@@ -136,7 +144,7 @@ class RepairRequestService @Inject constructor(
 
         // Call the repository method to get the repair request by receipt number or ID
         return repairRequestRepo.getRepairRequestByReceiptNumberOrID(
-            currentDataSource(networkStatusTracker), token, receiptNumber, repairRequestID
+            currentDataSource(networkStatusTracker), authToken, receiptNumber, repairRequestID
         )
     }
 
@@ -177,6 +185,7 @@ class RepairRequestService @Inject constructor(
     suspend fun updateRepairRequest(repairRequest: RepairRequest): RepairRequestResult<Any> {
         val token = getAuthTokenOrError(sessionManager)
             ?: return error(R.string.error_authentication_required)
+        val authToken = "Bearer $token"
 
         // Check if the user has admin role before proceeding
         if (!checkRoleOrError(sessionManager, UserRole.ADMIN)) {
@@ -184,7 +193,7 @@ class RepairRequestService @Inject constructor(
         }
 
         val dataSource = currentDataSource(networkStatusTracker)
-        val result = repairRequestRepo.updateRepairRequest(dataSource, token, repairRequest)
+        val result = repairRequestRepo.updateRepairRequest(dataSource, authToken, repairRequest)
         if (dataSource == DataSource.Local && result is RepairRequestResult.Success) {
             handleOfflineOperation(OperationType.UPDATE, repairRequest.toEntity())
         }
@@ -203,6 +212,7 @@ class RepairRequestService @Inject constructor(
     suspend fun deleteRepairRequest(repairRequest: RepairRequest): RepairRequestResult<Unit> {
         val token = getAuthTokenOrError(sessionManager)
             ?: return error(R.string.error_authentication_required)
+        val authToken = "Bearer $token"
 
         // Check if the user has admin role before proceeding
         if (!checkRoleOrError(sessionManager, UserRole.ADMIN)) {
@@ -212,7 +222,7 @@ class RepairRequestService @Inject constructor(
         // Validate that at least one of receiptNumber or id is provided
         val dataSource = currentDataSource(networkStatusTracker)
         val result = repairRequestRepo.deleteRepairRequestByReceiptNumberOrID(
-            dataSource, token, repairRequest.receiptNumber, repairRequest.id?.toLong()
+            dataSource, authToken, repairRequest.receiptNumber, repairRequest.id?.toLong()
         )
 
         // If the operation is successful and performed offline, handle the offline operation
@@ -237,27 +247,6 @@ class RepairRequestService @Inject constructor(
     suspend fun syncPendingOperations() {
         // Check if the current data source is Remote, if not, return early
         if (currentDataSource(networkStatusTracker) != DataSource.Remote) return
-
-        // Ensure the user is authenticated and has a valid token
-        val token = getAuthTokenOrError(sessionManager)
-        if (token.isNullOrEmpty()) {
-            logError(
-                messageResId = R.string.error_authentication_required,
-                stringProvider = stringProvider,
-                className = className
-            )
-            return
-        }
-
-        // Check if the user has admin role before proceeding
-        if (!checkRoleOrError(sessionManager, UserRole.ADMIN)) {
-            logError(
-                messageResId = R.string.error_user_not_authorized_msg,
-                stringProvider = stringProvider,
-                className = className
-            )
-            return
-        }
 
         // Retrieve all pending operations for the current object class
         val pendOperations = pendingOperationService.getPendingOperationsByEntity(objectClass)
