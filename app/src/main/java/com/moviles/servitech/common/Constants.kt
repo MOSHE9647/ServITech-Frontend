@@ -13,6 +13,9 @@ object Constants {
     const val API_ARTICLES_ROUTE = "${API_BASE_ROUTE}/articles"
     const val API_REPAIR_REQUESTS_ROUTE = "${API_BASE_ROUTE}/repair-request"
 
+    // API routes for subcategories
+    const val API_SUBCATEGORIES_ROUTE = "api/v1/subcategories"
+
     // Home constants
     const val CAT_TECHNOLOGY = "tecnologia"
     const val CAT_SUPPORT = "soporte"

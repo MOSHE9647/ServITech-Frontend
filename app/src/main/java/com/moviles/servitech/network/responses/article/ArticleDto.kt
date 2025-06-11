@@ -2,7 +2,7 @@ package com.moviles.servitech.network.responses.article
 
 import com.moviles.servitech.network.responses.CategoryDto
 import com.moviles.servitech.network.responses.ImageDto
-import com.moviles.servitech.network.responses.SubcategoryDto
+import com.moviles.servitech.network.responses.subcategory.SubcategoryDto
 
 data class ArticleDto(
     val id: Int,

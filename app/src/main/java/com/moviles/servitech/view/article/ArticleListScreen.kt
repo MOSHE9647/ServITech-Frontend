@@ -30,6 +30,7 @@ import coil.compose.AsyncImage
 import com.moviles.servitech.network.responses.article.ArticleDto
 import com.moviles.servitech.viewmodel.ArticleViewModel
 
+// muestra una lista de artículos con una interfaz de usuario que permite navegar a los detalles de cada artículo
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
