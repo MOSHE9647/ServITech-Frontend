@@ -574,6 +574,27 @@ class RepairRequestViewModel @Inject constructor(
         }
     }
 
+    fun deleteUpdateRequest(repairRequest: RepairRequest) {
+        viewModelScope.launch {
+            // Resetting the viewModelState to Loading
+            _viewModelState.value = ViewModelState.Loading
+
+            // Attempt to delete the repair request using the service
+            when (val result = repairRequestService.deleteRepairRequest(repairRequest)) {
+                is RepairRequestResult.Success -> {
+                    // If the request is successful, update the ViewModel state to Success
+                    getAllRepairRequests() // Refresh the list of repair requests
+                    _viewModelState.value = ViewModelState.Success<Any>(result.data)
+                }
+
+                is RepairRequestResult.Error -> {
+                    // If there is an error, set the ViewModel state to Error
+                    _viewModelState.value = ViewModelState.Error(result.message)
+                }
+            }
+        }
+    }
+
     /**
      * Updates the error states and messages for each field based on the provided error list.
      * This function iterates through the error list and sets the corresponding error state

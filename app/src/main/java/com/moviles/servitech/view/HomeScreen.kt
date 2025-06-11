@@ -156,6 +156,9 @@ fun HomeScreen(
                             true -> repReqViewModel.updateRepairRequest(repairRequest)
                             false -> repReqViewModel.createRepairRequest(repairRequest)
                         }
+                    },
+                    onDelete = {
+                        repReqViewModel.deleteUpdateRequest(it)
                     }
                 )
             }
@@ -204,7 +207,8 @@ fun CreateUpdateRepairRequestForm(
     repairRequest: RepairRequest? = null,
     viewModel: RepairRequestViewModel,
     isLoading: Boolean = false,
-    onSubmit: (RepairRequest) -> Unit = { }
+    onSubmit: (RepairRequest) -> Unit = { },
+    onDelete: (RepairRequest) -> Unit
 ) {
     // Observe the state from the ViewModel of the RepairRequest input form
     val customerName: String by viewModel.customerName.observeAsState(
@@ -668,7 +672,6 @@ fun CreateUpdateRepairRequestForm(
                 CustomButton(
                     text = "Update Repair Request",
                     enabled = !isLoading,
-//            enabled = repairRequestSendEnable && !isLoading,
                     onClick = {
                         val repairRequest = RepairRequest(
                             id = repairRequest?.id ?: 1,
@@ -691,6 +694,34 @@ fun CreateUpdateRepairRequestForm(
                             images = imagesList
                         )
                         onSubmit(repairRequest)
+                    }
+                )
+
+                CustomButton(
+                    text = "Delete Repair Request",
+                    enabled = !isLoading,
+                    onClick = {
+                        val request = RepairRequest(
+                            id = 2,
+                            receiptNumber = "RR-000000000002",
+                            customerName = customerName,
+                            customerPhone = customerPhone,
+                            customerEmail = customerEmail,
+                            articleName = articleName,
+                            articleType = articleType,
+                            articleBrand = articleBrand,
+                            articleModel = articleModel,
+                            articleSerialNumber = articleSerial,
+                            articleAccesories = articleAccesories,
+                            articleProblem = articleProblem,
+                            repairStatus = repairStatus,
+                            repairDetails = repairDetails,
+                            repairPrice = repairPrice,
+                            receivedAt = receivedAt,
+                            repairedAt = repairedAt,
+                            images = imagesList
+                        )
+                        onDelete(request)
                     }
                 )
             }
