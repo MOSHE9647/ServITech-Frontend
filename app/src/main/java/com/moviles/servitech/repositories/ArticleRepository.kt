@@ -4,19 +4,17 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import com.moviles.servitech.model.CreateArticleRequest
-import com.moviles.servitech.model.ImageRequest
 import com.moviles.servitech.network.responses.article.ArticleDto
 import com.moviles.servitech.network.services.ArticleApiService
 import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
-import java.io.File
-import java.io.InputStream
-import java.io.OutputStream
-import okhttp3.RequestBody.Companion.asRequestBody
 
 @Singleton
 class ArticleRepository @Inject constructor(
@@ -119,5 +117,5 @@ class ArticleRepository @Inject constructor(
 
     // Helper extension
     private fun String.toRequestBody(): RequestBody =
-        RequestBody.create("text/plain".toMediaTypeOrNull(), this)
+        toRequestBody("text/plain".toMediaTypeOrNull())
 }
