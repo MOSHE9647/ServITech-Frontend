@@ -409,6 +409,16 @@ class RepairRequestViewModel @Inject constructor(
         imagesNamesState.errorMessage.value = validation.errorMessage
     }
 
+    /**
+     * Fetches all repair requests from the service.
+     * It updates the ViewModel state to Loading, then attempts to retrieve the data.
+     *
+     * If the request is successful, it updates the list of repair requests
+     * and sets the ViewModel state to Success.
+     *
+     * If there is an error, it sets the ViewModel state to Error
+     * and attempts to retrieve the data from the local data source
+     */
     fun getAllRepairRequests() {
         viewModelScope.launch {
             // Resetting the viewModelState to Loading
@@ -431,6 +441,31 @@ class RepairRequestViewModel @Inject constructor(
                         localResult is RepairRequestResult.Success -> localResult.data
                         else -> emptyList()
                     }
+                    _viewModelState.value = ViewModelState.Error(result.message)
+                }
+            }
+        }
+    }
+
+    fun getRepairRequestByReceiptNumberOrID(
+        receiptNumber: String,
+        id: Long? = null
+    ) {
+        viewModelScope.launch {
+            // Resetting the viewModelState to Loading
+            _viewModelState.value = ViewModelState.Loading
+
+            // Attempt to fetch a specific repair request by receipt number or ID using the service
+            when (val result =
+                repairRequestService.getRepairRequestByReceiptNumberOrID(receiptNumber, id)) {
+                is RepairRequestResult.Success -> {
+                    // If the request is successful, update the ViewModel state to Success
+                    _viewModelState.value = ViewModelState.Success(result.data)
+                }
+
+                is RepairRequestResult.Error -> {
+                    // If there is an error, set the ViewModel state to Error
+                    updateErrorStatesAndMessages(result.fieldErrors)
                     _viewModelState.value = ViewModelState.Error(result.message)
                 }
             }

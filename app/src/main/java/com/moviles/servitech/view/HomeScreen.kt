@@ -79,6 +79,7 @@ fun HomeScreen(
     val expiresAt by sessionManager.expiresAt.collectAsState(initial = 0L)
 
     val viewModelState by repReqViewModel.viewModelState.observeAsState()
+    val repairRequests by repReqViewModel.repairRequests.collectAsState(initial = emptyList())
 
     Box(
         modifier = Modifier
@@ -128,6 +129,13 @@ fun HomeScreen(
                 Button(
                     onClick = { repReqViewModel.getAllRepairRequests() }
                 ) { Text("Obtener solicitudes de reparación") }
+
+                Button(
+                    onClick = {
+                        val receiptNumber = repairRequests.first().receiptNumber
+                        repReqViewModel.getRepairRequestByReceiptNumberOrID(receiptNumber.orEmpty())
+                    }
+                ) { Text("Obtener solicitud de reparación") }
 
                 CreateUpdateRepairRequestForm(
                     repairRequest = null,
