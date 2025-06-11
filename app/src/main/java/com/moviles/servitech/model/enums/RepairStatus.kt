@@ -2,7 +2,6 @@ package com.moviles.servitech.model.enums
 
 import android.content.Context
 import com.moviles.servitech.R
-import dagger.hilt.android.qualifiers.ApplicationContext
 
 /**
  * Enum class representing the status of a repair request.
@@ -24,13 +23,21 @@ enum class RepairStatus(val value: String) {
     DELIVERED("delivered"),
     CANCELLED("cancelled");
 
+    companion object {
+        fun fromLabel(context: Context, label: String): RepairStatus {
+            return entries.firstOrNull {
+                it.label(context) == label
+            } ?: PENDING
+        }
+    }
+
     /**
      * Returns a user-friendly label for the repair status.
      *
      * @param context The application context used to retrieve string resources.
      * @return A string representing the repair status label.
      */
-    fun label(@ApplicationContext context: Context): String {
+    fun label(context: Context): String {
         return when (this) {
             PENDING -> context.getString(R.string.repair_status_pending)
             IN_PROGRESS -> context.getString(R.string.repair_status_in_progress)

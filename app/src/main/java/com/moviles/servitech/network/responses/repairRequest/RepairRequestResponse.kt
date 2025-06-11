@@ -8,6 +8,7 @@ import com.moviles.servitech.network.responses.ImageResponse
  * Contains details about the repair request, including customer information,
  * article details, repair status, and timestamps.
  *
+ * @property id The unique identifier for the repair request (optional).
  * @property receiptNumber The unique receipt number for the repair request.
  * @property customerName The name of the customer who submitted the request.
  * @property customerPhone The phone number of the customer.
@@ -27,6 +28,7 @@ import com.moviles.servitech.network.responses.ImageResponse
  * @property images List of images related to the repair request (optional).
  */
 data class RepairRequestResponse(
+    @SerializedName("id") val id: Int? = null,
     @SerializedName("receipt_number") val receiptNumber: String,
     @SerializedName("customer_name") val customerName: String,
     @SerializedName("customer_phone") val customerPhone: String,

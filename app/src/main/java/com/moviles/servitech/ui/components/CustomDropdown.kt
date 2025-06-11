@@ -21,6 +21,7 @@ import com.moviles.servitech.R
 @Composable
 fun CustomDropdown(
     label: String,
+    value: String,
     placeholder: String,
     selected: String,
     options: List<String>,
@@ -41,8 +42,8 @@ fun CustomDropdown(
             trailingIcon = {
                 TrailingIcon(expanded = expanded)
             },
-            value = selected,
-            onValueChange = {},
+            value = value,
+            onValueChange = { },
             readOnly = true,
             enabled = isEnabled,
             isError = isError,

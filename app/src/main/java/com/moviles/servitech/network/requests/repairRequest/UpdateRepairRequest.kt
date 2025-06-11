@@ -1,13 +1,14 @@
 package com.moviles.servitech.network.requests.repairRequest
 
 import com.google.gson.annotations.SerializedName
-import okhttp3.RequestBody
 
 data class UpdateRepairRequest(
-    @SerializedName("article_serialnumber") val articleSerialNumber: RequestBody? = null,
-    @SerializedName("article_accesories") val articleAccesories: RequestBody? = null,
-    @SerializedName("repair_status") val repairStatus: RequestBody,
-    @SerializedName("repair_details") val repairDetails: RequestBody? = null,
-    @SerializedName("repair_price") val repairPrice: RequestBody? = null,
-    @SerializedName("repaired_at") val repairedAt: RequestBody? = null
+    @SerializedName("id") val id: Int? = null,
+    @SerializedName("receipt_number") val receiptNumber: String,
+    @SerializedName("article_serialnumber") val articleSerialNumber: String? = null,
+    @SerializedName("article_accesories") val articleAccesories: String? = null,
+    @SerializedName("repair_status") val repairStatus: String,
+    @SerializedName("repair_details") val repairDetails: String? = null,
+    @SerializedName("repair_price") val repairPrice: Double? = null,
+    @SerializedName("repaired_at") val repairedAt: String? = null
 )

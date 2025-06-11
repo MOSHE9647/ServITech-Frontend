@@ -257,7 +257,11 @@ class RepairRequestRepository @Inject constructor(
             DataSource.Remote -> handleApiCall(
                 remoteCall = {
                     val updateRepRequest: UpdateRepairRequest = repairRequest.toUpdateRequest()
-                    repReqApiService.updateRepairRequest(authToken, updateRepRequest)
+                    repReqApiService.updateRepairRequest(
+                        authToken,
+                        updateRepRequest.receiptNumber,
+                        updateRepRequest
+                    )
                 },
                 localCall = { this.updateRepairRequestInDB(repairRequest) },
                 onCallError = { msg, fields -> RepairRequestResult.Error(msg, fields) },

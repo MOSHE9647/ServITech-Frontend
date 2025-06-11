@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moviles.servitech.common.PhoneUtils.formatPhoneForDisplay
 import com.moviles.servitech.common.PhoneUtils.normalizePhoneInput
-import com.moviles.servitech.core.providers.AndroidStringProvider
 import com.moviles.servitech.model.Image
 import com.moviles.servitech.model.RepairRequest
 import com.moviles.servitech.repositories.RepairRequestResult
@@ -29,12 +28,14 @@ import javax.inject.Inject
 class RepairRequestViewModel @Inject constructor(
     private val repairRequestValidation: RepairRequestValidation,
     private val repairRequestService: RepairRequestService,
-    private val stringProvider: AndroidStringProvider,
 ) : ViewModel() {
 
     // StateFlow for the list of Repair Requests.
     private val _repairRequests = MutableStateFlow<List<RepairRequest>>(emptyList())
     val repairRequests: StateFlow<List<RepairRequest>> = _repairRequests
+
+    private val _repairRequest = MutableStateFlow<RepairRequest?>(null)
+    val repairRequest: StateFlow<RepairRequest?> = _repairRequest
 
     // LiveData for the Repair Request input fields and their error states.
     private val customerNameState = FieldState<String>()
@@ -447,8 +448,21 @@ class RepairRequestViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Fetches a specific repair request by its receipt number or ID.
+     * It updates the ViewModel state to Loading, then attempts to retrieve the data.
+     *
+     * If the request is successful, it updates the ViewModel state to Success
+     * with the retrieved repair request data.
+     *
+     * If there is an error, it sets the ViewModel state to Error
+     * and updates the error states and messages for each field based on the error list.
+     *
+     * @param receiptNumber The receipt number of the repair request to fetch.
+     * @param id Optional ID of the repair request to fetch.
+     */
     fun getRepairRequestByReceiptNumberOrID(
-        receiptNumber: String,
+        receiptNumber: String?,
         id: Long? = null
     ) {
         viewModelScope.launch {
@@ -460,6 +474,7 @@ class RepairRequestViewModel @Inject constructor(
                 repairRequestService.getRepairRequestByReceiptNumberOrID(receiptNumber, id)) {
                 is RepairRequestResult.Success -> {
                     // If the request is successful, update the ViewModel state to Success
+                    _repairRequest.value = result.data
                     _viewModelState.value = ViewModelState.Success(result.data)
                 }
 
@@ -482,7 +497,7 @@ class RepairRequestViewModel @Inject constructor(
      * If there are validation errors, it updates the error states and messages
      * for each field based on the error list returned by the service.
      *
-     * @param rawRepairRequest The RepairRequest object containing the data to be sent.
+     * @param rawRepairRequest The [RepairRequest] object containing the data to be sent.
      */
     @RequiresApi(Build.VERSION_CODES.O)
     fun createRepairRequest(rawRepairRequest: RepairRequest) {
@@ -501,6 +516,46 @@ class RepairRequestViewModel @Inject constructor(
 
             // Attempt to create the repair request using the service
             when (val result = repairRequestService.createRepairRequest(repairRequest)) {
+                is RepairRequestResult.Success -> {
+                    // If the request is successful, update the ViewModel state to Success
+                    getAllRepairRequests() // Refresh the list of repair requests
+                    _viewModelState.value = ViewModelState.Success<Any>(result.data)
+                }
+
+                is RepairRequestResult.Error -> {
+                    // If there is an error, update the error state and message for each field
+                    // using the first error message from the fieldErrors list of the result.
+                    updateErrorStatesAndMessages(result.fieldErrors)
+
+                    // Sets the viewModelState to Error
+                    _viewModelState.value = ViewModelState.Error(result.message)
+                }
+            }
+        }
+    }
+
+    /**
+     * Updates an existing repair request using the provided [RepairRequest] object.
+     * It formats the phone number, and sends the request to the service.
+     *
+     * If the request is successful, it updates the ViewModel state to Success
+     * and refreshes the list of repair requests.
+     *
+     * If there are validation errors, it updates the error states and messages
+     * for each field based on the error list returned by the service.
+     *
+     * @param repairRequest The [RepairRequest] object containing the data to be updated.
+     */
+    fun updateRepairRequest(repairRequest: RepairRequest) {
+        viewModelScope.launch {
+            // Resetting the viewModelState to Loading
+            _viewModelState.value = ViewModelState.Loading
+
+            // Resetting error states and messages
+            resetErrors()
+
+            // Attempt to update the repair request using the service
+            when (val result = repairRequestService.updateRepairRequest(repairRequest)) {
                 is RepairRequestResult.Success -> {
                     // If the request is successful, update the ViewModel state to Success
                     getAllRepairRequests() // Refresh the list of repair requests

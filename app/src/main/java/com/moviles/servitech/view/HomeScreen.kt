@@ -8,6 +8,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -80,6 +81,7 @@ fun HomeScreen(
 
     val viewModelState by repReqViewModel.viewModelState.observeAsState()
     val repairRequests by repReqViewModel.repairRequests.collectAsState(initial = emptyList())
+    val repairRequest by repReqViewModel.repairRequest.collectAsState(initial = null)
 
     Box(
         modifier = Modifier
@@ -132,17 +134,28 @@ fun HomeScreen(
 
                 Button(
                     onClick = {
-                        val receiptNumber = repairRequests.first().receiptNumber
-                        repReqViewModel.getRepairRequestByReceiptNumberOrID(receiptNumber.orEmpty())
+                        val receiptNumber = when (repairRequests.isEmpty()) {
+                            false -> repairRequests.first().receiptNumber
+                            true -> ""
+                        }
+                        repReqViewModel.getRepairRequestByReceiptNumberOrID(receiptNumber)
                     }
                 ) { Text("Obtener solicitud de reparación") }
 
                 CreateUpdateRepairRequestForm(
-                    repairRequest = null,
+                    repairRequest = repairRequest,
                     viewModel = repReqViewModel,
                     isLoading = false,
                     onSubmit = { repairRequest ->
-                        repReqViewModel.createRepairRequest(repairRequest)
+                        val isUpdate: Boolean = when {
+                            !repairRequest.receiptNumber.isNullOrEmpty() -> true
+                            repairRequest.id != null -> true
+                            else -> false
+                        }
+                        when (isUpdate) {
+                            true -> repReqViewModel.updateRepairRequest(repairRequest)
+                            false -> repReqViewModel.createRepairRequest(repairRequest)
+                        }
                     }
                 )
             }
@@ -500,6 +513,7 @@ fun CreateUpdateRepairRequestForm(
 
         CustomDropdown(
             label = stringResource(R.string.repair_status),
+            value = RepairStatus.valueOf(repairStatus.uppercase()).label(context),
             placeholder = stringResource(R.string.repair_status_hint),
             selected = repairStatus,
             options = RepairStatus.entries.map { it.label(context) },
@@ -507,10 +521,8 @@ fun CreateUpdateRepairRequestForm(
             isError = repairStatusError,
             errorMessage = repairStatusErrorMsg ?: stringResource(R.string.repair_status_required),
             onSelectedChange = {
-                val repairStatus = RepairStatus.entries.find { status ->
-                    status.label(context) == it
-                } ?: RepairStatus.PENDING
-                viewModel.onRepairStatusChanged(repairStatus.toApiString())
+                val status = RepairStatus.fromLabel(context, it)
+                viewModel.onRepairStatusChanged(status.toApiString())
             }
         )
 
@@ -540,7 +552,7 @@ fun CreateUpdateRepairRequestForm(
             placeholder = stringResource(R.string.repair_price_hint),
             value = repairPrice.toString(),
             onValueChange = { viewModel.onRepairPriceChanged(it.toDouble()) },
-            keyboardType = KeyboardType.Number,
+            keyboardType = KeyboardType.Text,
             isError = repairPriceError,
             enabled = !isLoading,
             supportingText = {
@@ -622,32 +634,66 @@ fun CreateUpdateRepairRequestForm(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        CustomButton(
-            text = stringResource(R.string.request_repair),
-            enabled = !isLoading,
+        Row {
+            Column {
+                CustomButton(
+                    text = stringResource(R.string.request_repair),
+                    enabled = !isLoading,
 //            enabled = repairRequestSendEnable && !isLoading,
-            onClick = {
-                val repairRequest = RepairRequest(
-                    id = repairRequest?.id ?: 0,
-                    customerName = customerName,
-                    customerPhone = customerPhone,
-                    customerEmail = customerEmail,
-                    articleName = articleName,
-                    articleType = articleType,
-                    articleBrand = articleBrand,
-                    articleModel = articleModel,
-                    articleSerialNumber = articleSerial,
-                    articleAccesories = articleAccesories,
-                    articleProblem = articleProblem,
-                    repairStatus = repairStatus,
-                    repairDetails = repairDetails,
-                    repairPrice = repairPrice,
-                    receivedAt = receivedAt,
-                    repairedAt = repairedAt,
-                    images = imagesList
+                    onClick = {
+                        val repairRequest = RepairRequest(
+                            id = null,
+                            receiptNumber = null,
+                            customerName = customerName,
+                            customerPhone = customerPhone,
+                            customerEmail = customerEmail,
+                            articleName = articleName,
+                            articleType = articleType,
+                            articleBrand = articleBrand,
+                            articleModel = articleModel,
+                            articleSerialNumber = articleSerial,
+                            articleAccesories = articleAccesories,
+                            articleProblem = articleProblem,
+                            repairStatus = repairStatus,
+                            repairDetails = repairDetails,
+                            repairPrice = repairPrice,
+                            receivedAt = receivedAt,
+                            repairedAt = repairedAt,
+                            images = imagesList
+                        )
+                        onSubmit(repairRequest)
+                    }
                 )
-                onSubmit(repairRequest)
+
+                CustomButton(
+                    text = "Update Repair Request",
+                    enabled = !isLoading,
+//            enabled = repairRequestSendEnable && !isLoading,
+                    onClick = {
+                        val repairRequest = RepairRequest(
+                            id = repairRequest?.id ?: 1,
+                            receiptNumber = repairRequest?.receiptNumber ?: "RR-000000000001",
+                            customerName = customerName,
+                            customerPhone = customerPhone,
+                            customerEmail = customerEmail,
+                            articleName = articleName,
+                            articleType = articleType,
+                            articleBrand = articleBrand,
+                            articleModel = articleModel,
+                            articleSerialNumber = articleSerial,
+                            articleAccesories = articleAccesories,
+                            articleProblem = articleProblem,
+                            repairStatus = repairStatus,
+                            repairDetails = repairDetails,
+                            repairPrice = repairPrice,
+                            receivedAt = receivedAt,
+                            repairedAt = repairedAt,
+                            images = imagesList
+                        )
+                        onSubmit(repairRequest)
+                    }
+                )
             }
-        )
+        }
     }
 }

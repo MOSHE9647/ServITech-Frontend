@@ -102,11 +102,11 @@ interface RepairRequestApiService {
      * Updates an existing repair request identified by its receipt number.
      *
      */
-    @Multipart
     @PUT("$API_REPAIR_REQUESTS_ROUTE/{receiptNumber}")
     @Headers(HEADER_ACCEPT_JSON)
     suspend fun updateRepairRequest(
         @Header("Authorization") authToken: String,
+        @Path("receiptNumber") receiptNumber: String,
         @Body request: UpdateRepairRequest
     ): Response<ApiResponse<UpdateRepairRequestResponse>>
 

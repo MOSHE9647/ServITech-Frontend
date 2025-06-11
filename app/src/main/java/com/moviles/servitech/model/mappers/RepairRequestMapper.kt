@@ -55,12 +55,14 @@ fun RepairRequest.toCreateRequest(): CreateRepairRequest {
 
 fun RepairRequest.toUpdateRequest(): UpdateRepairRequest {
     return UpdateRepairRequest(
-        articleSerialNumber = textToRequestBody(this.articleSerialNumber ?: ""),
-        articleAccesories = textToRequestBody(this.articleAccesories ?: ""),
-        repairStatus = textToRequestBody(this.repairStatus),
-        repairDetails = textToRequestBody(this.repairDetails ?: ""),
-        repairPrice = doubleToRequestBody(this.repairPrice ?: 0.0),
-        repairedAt = textToRequestBody(this.repairedAt ?: ""),
+        id = this.id,
+        receiptNumber = this.receiptNumber.orEmpty(),
+        articleSerialNumber = this.articleSerialNumber,
+        articleAccesories = this.articleAccesories,
+        repairStatus = this.repairStatus,
+        repairDetails = this.repairDetails,
+        repairPrice = this.repairPrice,
+        repairedAt = this.repairedAt,
     )
 }
 
@@ -111,6 +113,7 @@ fun RepairRequestWithImagesEntity.toEntity(): RepairRequestEntity {
 
 fun RepairRequestResponse.toModel(): RepairRequest {
     return RepairRequest(
+        id = this.id,
         receiptNumber = this.receiptNumber,
         customerName = this.customerName,
         customerPhone = this.customerPhone,
