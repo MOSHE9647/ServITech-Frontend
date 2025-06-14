@@ -1,9 +1,16 @@
 package com.moviles.servitech.services
 
+import android.content.Context
+import android.widget.Toast
+import com.moviles.servitech.R
 import com.moviles.servitech.database.entities.PendingOperationEntity
 import com.moviles.servitech.network.NetworkStatusTracker
 import com.moviles.servitech.repositories.PendingOperationRepository
+import com.moviles.servitech.repositories.helpers.DataSource
+import com.moviles.servitech.services.helpers.ServicesHelper.currentDataSource
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import javax.inject.Provider
 
 /**
  * Service for managing pending operations.
@@ -15,9 +22,20 @@ import javax.inject.Inject
  * @property networkStatusTracker Tracks the network status to determine connectivity.
  */
 class PendingOperationService @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val repairRequestServiceProvider: Provider<RepairRequestService>,
     private val pendingOperationRepo: PendingOperationRepository,
     private val networkStatusTracker: NetworkStatusTracker,
 ) {
+
+    /**
+     * Provides access to the each entity service in the app.
+     * Each of this services is used to handle offline synchronization of pending operations.
+     *
+     * For example, the RepairRequestService is used to handle
+     * synchronization of pending operations related to repair requests.
+     */
+    private val repairRequestService get() = repairRequestServiceProvider.get()
 
     /**
      * Retrieves all pending operations.
@@ -54,12 +72,18 @@ class PendingOperationService @Inject constructor(
      * This method checks the network status and calls the syncPendingOperations function
      * in the service of each entity if connected.
      */
-    fun syncPendingOperations() {
-        // TODO: Implement the logic to sync pending operations with the server
-//        if (networkStatusTracker.isConnected.value) {
-//            // Calls the syncPendingOperations function in the service of each entity
-//            courseService.syncPendingOperations()
-//        }
+    suspend fun syncPendingOperations() {
+        if (currentDataSource(networkStatusTracker) == DataSource.Remote) {
+            // Show a Toast message indicating that data is being synced with the server
+            Toast.makeText(
+                context,
+                context.getString(R.string.syncing_data_with_server_msg),
+                Toast.LENGTH_SHORT
+            ).show()
+
+            // Calls the syncPendingOperations function in the service of each entity
+            repairRequestService.syncPendingOperations()
+        }
     }
 
 }

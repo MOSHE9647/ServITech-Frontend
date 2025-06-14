@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.moviles.servitech.common.Constants.SESSION_TABLE
-import com.moviles.servitech.database.entities.UserSessionEntity
+import com.moviles.servitech.database.entities.user.UserSessionEntity
 
 @Dao
 interface UserSessionDao {

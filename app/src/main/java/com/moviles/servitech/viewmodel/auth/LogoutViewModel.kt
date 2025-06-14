@@ -4,10 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moviles.servitech.common.Constants.GUEST_ROLE
 import com.moviles.servitech.core.session.SessionManager
+import com.moviles.servitech.model.enums.UserRole
 import com.moviles.servitech.repositories.AuthResult
 import com.moviles.servitech.services.AuthService
+import com.moviles.servitech.services.helpers.ServicesHelper.userHaveRole
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -56,7 +57,7 @@ class LogoutViewModel @Inject constructor(
             _logoutState.value = LogoutState.Loading
 
             val user = sessionManager.user.firstOrNull()
-            if (user?.role == GUEST_ROLE) {
+            if (userHaveRole(user?.role.orEmpty(), UserRole.GUEST)) {
                 sessionManager.clearSession()
                 _logoutState.value = LogoutState.Success
                 return@launch

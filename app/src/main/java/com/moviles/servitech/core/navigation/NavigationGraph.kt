@@ -1,12 +1,19 @@
 package com.moviles.servitech.core.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.moviles.servitech.core.navigation.Screen.Home
+import com.moviles.servitech.common.Constants.CAT_TECHNOLOGY
 import com.moviles.servitech.core.navigation.Screen.Detail
+import com.moviles.servitech.core.navigation.Screen.Home
 import com.moviles.servitech.core.navigation.Screen.Login
 import com.moviles.servitech.core.navigation.Screen.Register
 import com.moviles.servitech.core.navigation.Screen.Splash
@@ -28,7 +35,7 @@ sealed class Screen() {
     @Serializable object Login
     @Serializable object Register
     @Serializable object Home
-    @Serializable data class Detail(val articleId: Int)
+    @Serializable data class Detail(val articleId: Int, val categoryName: String)
 }
 
 /**
@@ -36,6 +43,7 @@ sealed class Screen() {
  * It defines the different screens and their corresponding routes.
  * The `NavHost` is used to manage the navigation within the app.
  */
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavigationGraph() {
     // NavController instance that will be used to manage navigation within the app.
@@ -99,9 +107,23 @@ fun NavigationGraph() {
          * The `composable` function is used to define the screen and its corresponding UI.
          */
         composable<Home> {
+            var selectedCategory by remember { mutableStateOf(CAT_TECHNOLOGY) }
+
             CategoryScreen(
-                navigateToDetail = { articleId -> navController.navigate(Detail(articleId = articleId)) }
+                selectedCategory = selectedCategory,
+                onCategoryChange = { selectedCategory = it },
+                navigateToDetail = { articleId ->
+                    navController.navigate(
+                        Detail(
+                            articleId = articleId,
+                            categoryName = selectedCategory
+                        )
+                    )
+                }
             )
+//            HomeScreen {
+//                navController.navigate(Login) { popUpTo(0) }
+//            }
         }
 
         /**
@@ -115,12 +137,14 @@ fun NavigationGraph() {
          * The `composable` function is used to define the screen and its corresponding UI.
          */
         composable<Detail> { backStackEntry ->
-            val articleDetail: Detail = backStackEntry.toRoute()
-            ArticleDetailScreen(articleDetail.articleId) {
-                navController.navigate(Home) {
-                    popUpTo<Home> { inclusive = true }
-                }
-            }
+            val args = backStackEntry.toRoute<Detail>()
+
+            ArticleDetailScreen(
+                articleId = args.articleId,
+                currentCategory = args.categoryName,
+                navController = navController,
+                navigateBack = { navController.popBackStack() }
+            )
         }
     }
 }

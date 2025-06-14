@@ -1,4 +1,4 @@
-package com.moviles.servitech.viewmodel
+package com.moviles.servitech.viewmodel.utils
 
 import androidx.lifecycle.MutableLiveData
 
@@ -7,9 +7,9 @@ import androidx.lifecycle.MutableLiveData
  * It holds the data, error state, and an optional error message.
  *
  * @param T The type of data held by this field state.
- * @property data A [MutableLiveData] object that holds the data for the field.
- * @param error A [MutableLiveData] object that indicates whether there is an error in the field.
- * @property errorMessage A [MutableLiveData] object that holds an optional error message for the field.
+ * @property data A [androidx.lifecycle.MutableLiveData] object that holds the data for the field.
+ * @param error A [androidx.lifecycle.MutableLiveData] object that indicates whether there is an error in the field.
+ * @property errorMessage A [androidx.lifecycle.MutableLiveData] object that holds an optional error message for the field.
  */
 data class FieldState<T>(
     val data: MutableLiveData<T> = MutableLiveData(),

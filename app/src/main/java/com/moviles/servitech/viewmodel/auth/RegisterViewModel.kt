@@ -13,8 +13,8 @@ import com.moviles.servitech.model.User
 import com.moviles.servitech.network.requests.RegisterRequest
 import com.moviles.servitech.repositories.AuthResult
 import com.moviles.servitech.services.AuthService
-import com.moviles.servitech.services.validation.RegisterValidation
-import com.moviles.servitech.viewmodel.FieldState
+import com.moviles.servitech.services.validation.auth.RegisterValidation
+import com.moviles.servitech.viewmodel.utils.FieldState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

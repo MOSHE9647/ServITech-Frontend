@@ -1,4 +1,4 @@
-package com.moviles.servitech.repositories
+package com.moviles.servitech.repositories.helpers
 
 /**
  * Represents the source of data in the application.

@@ -2,10 +2,14 @@ package com.moviles.servitech.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.moviles.servitech.database.dao.ImageDao
 import com.moviles.servitech.database.dao.PendingOperationDao
+import com.moviles.servitech.database.dao.RepairRequestDao
 import com.moviles.servitech.database.dao.UserSessionDao
+import com.moviles.servitech.database.entities.ImageEntity
 import com.moviles.servitech.database.entities.PendingOperationEntity
-import com.moviles.servitech.database.entities.UserSessionEntity
+import com.moviles.servitech.database.entities.repairRequest.RepairRequestEntity
+import com.moviles.servitech.database.entities.user.UserSessionEntity
 
 /**
  * Main database class for the ServITech application.
@@ -18,19 +22,23 @@ import com.moviles.servitech.database.entities.UserSessionEntity
  * The DAOs (Data Access Objects) are defined as abstract methods,
  * allowing Room to generate the necessary code for database operations.
  *
- * @Database version is set to 1, indicating the initial version of the database.
+ * @Database version is set to 2, indicating the initial version of the database.
  * The exportSchema is set to false, meaning the schema will not be exported
  * to a file, which is useful for development purposes.
  */
 @Database(
     entities = [
+        ImageEntity::class,
         PendingOperationEntity::class,
+        RepairRequestEntity::class,
         UserSessionEntity::class
     ],
     version = 1,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
+    abstract fun imageDao(): ImageDao
     abstract fun pendingOperationDao(): PendingOperationDao
+    abstract fun repairRequestDao(): RepairRequestDao
     abstract fun userSessionDao(): UserSessionDao
 }
