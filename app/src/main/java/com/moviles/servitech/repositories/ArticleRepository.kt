@@ -3,9 +3,14 @@ package com.moviles.servitech.repositories
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import com.moviles.servitech.R
+import com.moviles.servitech.core.session.SessionManager
 import com.moviles.servitech.model.CreateArticleRequest
+import com.moviles.servitech.model.enums.UserRole
 import com.moviles.servitech.network.responses.article.ArticleDto
 import com.moviles.servitech.network.services.ArticleApiService
+import com.moviles.servitech.services.helpers.ServicesHelper.checkRoleOrError
+import com.moviles.servitech.services.helpers.ServicesHelper.getAuthTokenOrError
 import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -19,7 +24,8 @@ import javax.inject.Singleton
 @Singleton
 class ArticleRepository @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val service: ArticleApiService
+    private val service: ArticleApiService,
+    private val sessionManager: SessionManager
 ) {
     /** Get all the articles */
     suspend fun fetchAll(): List<ArticleDto> {
@@ -61,9 +67,17 @@ class ArticleRepository @Inject constructor(
                 val reqFile = tempFile.asRequestBody("image/*".toMediaTypeOrNull())
                 MultipartBody.Part.createFormData("image", tempFile.name, reqFile)
             }
+            val token = getAuthTokenOrError(sessionManager)
+                ?: return error(R.string.error_authentication_required)
+            val authToken = "Bearer $token"
+
+            // Check if the user has admin role before proceeding
+            if (!checkRoleOrError(sessionManager, UserRole.ADMIN)) {
+                return error(R.string.error_user_not_authorized_msg)
+            }
 
             val response = service.createArticle(
-                name, description, price, categoryId, subcategoryId, imagePart
+                authToken, name, description, price, categoryId, subcategoryId, imagePart
             )
 
             Log.d("ArticleRepository", "Código de respuesta: ${response.code()}")
