@@ -22,7 +22,7 @@ import com.moviles.servitech.database.entities.user.UserSessionEntity
  * The DAOs (Data Access Objects) are defined as abstract methods,
  * allowing Room to generate the necessary code for database operations.
  *
- * @Database version is set to 2, indicating the initial version of the database.
+ * @Database version is set to 1, indicating the initial version of the database.
  * The exportSchema is set to false, meaning the schema will not be exported
  * to a file, which is useful for development purposes.
  */

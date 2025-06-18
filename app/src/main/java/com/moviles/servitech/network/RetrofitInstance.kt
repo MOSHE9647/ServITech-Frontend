@@ -16,6 +16,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.Locale
 import javax.inject.Singleton
 
 /**
@@ -85,9 +86,18 @@ object RetrofitInstance {
                 .build()
         }
 
+        // This interceptor adds the Accept-Language header to requests
+        val languageInterceptor = Interceptor { chain ->
+            val request = chain.request().newBuilder()
+                .addHeader("Accept-Language", Locale.getDefault().language)
+                .build()
+            chain.proceed(request)
+        }
+
         return OkHttpClient.Builder()
             .cache(cache) // Set the cache for OkHttpClient
             .addInterceptor(offlineInterceptor) // Add the offline interceptor
+            .addInterceptor(languageInterceptor) // Add the language interceptor
             .addNetworkInterceptor(onlineInterceptor) // Add the online interceptor
             .build() // Build the OkHttpClient
     }

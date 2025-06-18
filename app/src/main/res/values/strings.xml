@@ -35,7 +35,12 @@
     <string name="password_hint">Enter your password</string>
 
     <string name="login">Log In</string>
+    <string name="send_link">Reset Password</string>
+    <string name="back_to_login">Go Back</string>
+
     <string name="forgot_password">Forgot your password?</string>
+    <string name="forgot_password_success">A password reset link has been sent to your email.</string>
+    <string name="forgot_password_success_title">Reset Password Link Sent</string>
 
     <string name="no_account">Don’t have an account?</string>
     <string name="sign_up">Sign up</string>

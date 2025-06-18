@@ -13,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.moviles.servitech.common.Constants.CAT_TECHNOLOGY
 import com.moviles.servitech.core.navigation.Screen.Detail
+import com.moviles.servitech.core.navigation.Screen.ForgotPassword
 import com.moviles.servitech.core.navigation.Screen.Home
 import com.moviles.servitech.core.navigation.Screen.Login
 import com.moviles.servitech.core.navigation.Screen.Register
@@ -20,6 +21,7 @@ import com.moviles.servitech.core.navigation.Screen.Splash
 import com.moviles.servitech.view.SplashScreen
 import com.moviles.servitech.view.article.ArticleDetailScreen
 import com.moviles.servitech.view.article.CategoryScreen
+import com.moviles.servitech.view.auth.ForgotPasswordScreen
 import com.moviles.servitech.view.auth.LoginScreen
 import com.moviles.servitech.view.auth.RegisterScreen
 import kotlinx.serialization.Serializable
@@ -36,6 +38,8 @@ sealed class Screen() {
     @Serializable object Register
     @Serializable object Home
     @Serializable data class Detail(val articleId: Int, val categoryName: String)
+    @Serializable
+    object ForgotPassword
 }
 
 /**
@@ -80,7 +84,8 @@ fun NavigationGraph() {
         composable<Login> {
             LoginScreen (
                 navigateToSignUp = { navController.navigate(Register) },
-                navigateToHome = { navController.navigate(Home) { popUpTo(0) } }
+                navigateToHome = { navController.navigate(Home) { popUpTo(0) } },
+                navigateToForgotPassword = { navController.navigate(ForgotPassword) }
             )
         }
 
@@ -94,6 +99,20 @@ fun NavigationGraph() {
          */
         composable<Register> {
             RegisterScreen(
+                navigateToLogin = { navController.navigate(Login) { popUpTo(0) } }
+            )
+        }
+
+        /**
+         * This is the forgot password screen of the application.
+         * It allows users to reset their password if they have forgotten it.
+         * After resetting the password, users can navigate back to the `Login` screen.
+         *
+         * The `ForgotPassword` object is used to define the route for this screen.
+         * The `composable` function is used to define the screen and its corresponding UI.
+         */
+        composable<ForgotPassword> {
+            ForgotPasswordScreen(
                 navigateToLogin = { navController.navigate(Login) { popUpTo(0) } }
             )
         }

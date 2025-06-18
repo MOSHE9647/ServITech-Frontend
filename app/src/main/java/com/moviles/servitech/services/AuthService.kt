@@ -83,4 +83,22 @@ class AuthService @Inject constructor(
         }
     }
 
+    /**
+     * Resets the password for the user with the provided email.
+     * This method checks the network connectivity status and
+     * calls the appropriate repository method to perform the password reset operation.
+     *
+     * @param email The email address of the user requesting a password reset.
+     * @return An [AuthResult] indicating the success or failure of the password reset operation.
+     */
+    suspend fun resetPassword(email: String): AuthResult<Unit> {
+        requireNotNull(email) {
+            stringProvider.getString(R.string.error_null_parameter_msg, "email")
+        }
+        return when (networkStatusTracker.isConnected.value) {
+            true -> authRepo.resetPassword(email, DataSource.Remote)
+            false -> authRepo.resetPassword(email, DataSource.Local)
+        }
+    }
+
 }

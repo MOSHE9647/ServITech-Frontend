@@ -13,7 +13,7 @@ import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
 
-/** TODO: Add a more explicative description for this file.
+/**
  * Service interface for authentication-related API calls.
  * Defines methods for user login, registration, and logout.
  * Uses Retrofit annotations to specify HTTP methods and endpoints.
@@ -48,4 +48,16 @@ interface AuthApiService {
     @POST("$API_AUTH_ROUTE/logout")
     @Headers(HEADER_ACCEPT_JSON)
     suspend fun logout(@Header("Authorization") token: String): Response< ApiResponse<Unit> >
+
+    /**
+     * Resets the user's password by sending a reset link to their email.
+     *
+     * @param email The email address of the user requesting a password reset.
+     *              This should be a map with a single key "email" and the user's
+     *              email as the value.
+     * @return A [Response] containing an [ApiResponse] with no content.
+     */
+    @POST("$API_AUTH_ROUTE/reset-password")
+    @Headers(HEADER_ACCEPT_JSON)
+    suspend fun resetPassword(@Body email: Map<String, String>): Response<ApiResponse<Unit>>
 }

@@ -122,4 +122,29 @@ class AuthRepository @Inject constructor(
         }
     }
 
+    /**
+     * Resets the password for the user with the provided email.
+     *
+     * @param email The email address of the user requesting a password reset.
+     * @param source The data source to use (Remote or Local).
+     * @return An [AuthResult] containing either a successful operation or an error.
+     */
+    suspend fun resetPassword(email: String, source: DataSource): AuthResult<Unit> {
+        return when (source) {
+            DataSource.Remote -> handleApiCall(
+                remoteCall = {
+                    val emailMap = mapOf("email" to email)
+                    authApi.resetPassword(emailMap)
+                },
+                onCallError = { msg, fields -> AuthResult.Error(msg, fields) },
+                onRemoteSuccess = { AuthResult.Success(Unit) },
+                logClass = className,
+                transformTo = { it },
+                errorMessage = stringProvider.getString(R.string.unknown_error)
+            )
+
+            DataSource.Local -> AuthResult.Error(stringProvider.getString(R.string.connection_error))
+        }
+    }
+
 }
