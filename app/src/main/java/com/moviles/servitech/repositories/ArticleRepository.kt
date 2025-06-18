@@ -147,9 +147,7 @@ class ArticleRepository @Inject constructor(
         }
     }
 
-
-
-
+  // Helper function to log and return an error message
     // Helper extension
     private fun String.toRequestBody(): RequestBody =
         toRequestBody("text/plain".toMediaTypeOrNull())
