@@ -67,6 +67,7 @@ class ArticleRepository @Inject constructor(
                 val reqFile = tempFile.asRequestBody("image/*".toMediaTypeOrNull())
                 MultipartBody.Part.createFormData("image", tempFile.name, reqFile)
             }
+
             val token = getAuthTokenOrError(sessionManager)
                 ?: return error(R.string.error_authentication_required)
             val authToken = "Bearer $token"
@@ -104,9 +105,20 @@ class ArticleRepository @Inject constructor(
         }
     }
     // deletes an article by its ID.
+
     suspend fun deleteById(id: Int): Boolean {
         return try {
-            val response = service.deleteArticle(id)
+
+            val token = getAuthTokenOrError(sessionManager)
+                ?: return error(R.string.error_authentication_required)
+            val authToken = "Bearer $token"
+
+            // Check if the user has admin role before proceeding
+            if (!checkRoleOrError(sessionManager, UserRole.ADMIN)) {
+                return error(R.string.error_user_not_authorized_msg)
+            }
+
+            val response = service.deleteArticle(authToken,id)
             response.isSuccessful
         } catch (e: Exception) {
             Log.e("ArticleRepository", "Error al eliminar artículo: ${e.message}")
@@ -117,7 +129,16 @@ class ArticleRepository @Inject constructor(
     // Updates an existing article with the given ID and request.
     suspend fun update(id: Int, request: CreateArticleRequest): Boolean {
         return try {
-            val response = service.updateArticle(id, request)
+
+            val token = getAuthTokenOrError(sessionManager)
+                ?: return error(R.string.error_authentication_required)
+            val authToken = "Bearer $token"
+
+            // Check if the user has admin role before proceeding
+            if (!checkRoleOrError(sessionManager, UserRole.ADMIN)) {
+                return error(R.string.error_user_not_authorized_msg)
+            }
+            val response = service.updateArticle(authToken,id, request)
             Log.d("ArticleRepository", "Update status: ${response.code()}")
             response.isSuccessful
         } catch (e: Exception) {
