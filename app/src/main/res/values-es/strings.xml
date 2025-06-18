@@ -31,7 +31,12 @@
     <string name="password_hint">Ingrese su contraseña</string>
 
     <string name="login">Iniciar Sesión</string>
+    <string name="send_link">Restablecer contraseña</string>
+    <string name="back_to_login">Volver</string>
+
     <string name="forgot_password">¿Olvidó su contraseña?</string>
+    <string name="forgot_password_success">Le hemos enviado por correo electrónico el enlace para restablecer su contraseña.</string>
+    <string name="forgot_password_success_title">Restablecimiento de contraseña exitoso</string>
 
     <string name="no_account">¿No tenés una cuenta?</string>
     <string name="sign_up">Regístrate</string>
