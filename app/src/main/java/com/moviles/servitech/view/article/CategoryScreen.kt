@@ -207,7 +207,7 @@ fun ArticleCard(article: ArticleDto, onClick: () -> Unit) {
     ) {
         Column {
             AsyncImage(
-                model = article.images.firstOrNull()?.url,
+                model = article.images.firstOrNull()?.path,
                 contentDescription = article.name,
                 modifier = Modifier
                     .fillMaxWidth()

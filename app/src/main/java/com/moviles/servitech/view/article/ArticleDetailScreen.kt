@@ -1,6 +1,8 @@
 package com.moviles.servitech.view.article
 
 
+import android.annotation.SuppressLint
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -25,9 +27,11 @@ import com.moviles.servitech.viewmodel.SubcategoryViewModel
 
 import androidx.compose.ui.text.input.KeyboardType
 import com.moviles.servitech.model.CreateArticleRequest
+import com.moviles.servitech.network.responses.article.ImageDto
 
 
 // muestra el detalle de un artículo específico con una interfaz de usuario que permite editar y eliminar el artículo
+@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 
@@ -100,9 +104,23 @@ fun ArticleDetailScreen(
                 .padding(padding)
                 .padding(16.dp)
                 .fillMaxWidth()
-        ) {
-            article?.let { art ->
-                val fieldColors = OutlinedTextFieldDefaults.colors(
+        )
+        {article?.let { art ->
+            Log.d("IMAGEN_ARTICULO", art.images.firstOrNull()?.path ?: "Sin imagen")
+
+            art.images.firstOrNull()?.let { image ->
+                AsyncImage(
+                    model = image.path,
+                    contentDescription = image.alt ?: "Imagen del artículo",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .padding(bottom = 16.dp)
+                )
+            }
+
+
+            val fieldColors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFF005F73),
                     unfocusedBorderColor = Color.LightGray,
                     disabledContainerColor = Color(0xFFFAFAFA),

@@ -102,7 +102,7 @@ private fun ArticleListItem(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             AsyncImage(
-                model               = article.images.firstOrNull()?.url,
+                model               = article.images.firstOrNull()?.path,
                 contentDescription  = article.name,
                 modifier            = Modifier
                     .fillMaxWidth()
