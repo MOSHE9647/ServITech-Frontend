@@ -7,13 +7,17 @@ import androidx.lifecycle.viewModelScope
 import com.moviles.servitech.network.requests.supportRequest.CreateSupportRequest
 import com.moviles.servitech.network.services.SupportRequestApiService
 import com.moviles.servitech.model.SupportRequest
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.moviles.servitech.core.session.SessionManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class SupportRequestViewModel @Inject constructor(
-    private val api: SupportRequestApiService
+    private val api: SupportRequestApiService,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
     // Estados para los campos del formulario
@@ -115,7 +119,16 @@ class SupportRequestViewModel @Inject constructor(
                         detail = _detail.value!!
                     )
 
-                    val response = api.createSupportRequest(request)
+                    // Obtener el token JWT del usuario autenticado
+                    val token = withContext(Dispatchers.IO) { sessionManager.getToken() }
+                    if (token.isNullOrBlank()) {
+                        _errorMessage.value = "No se encontró el token de autenticación. Por favor, inicia sesión nuevamente."
+                        _isLoading.value = false
+                        return@launch
+                    }
+                    val authHeader = "Bearer $token"
+
+                    val response = api.createSupportRequest(authHeader, request)
 
                     // Si llegamos aquí, la solicitud fue exitosa
                     _isSuccess.value = true

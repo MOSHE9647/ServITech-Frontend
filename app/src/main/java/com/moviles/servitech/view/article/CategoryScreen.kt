@@ -109,20 +109,11 @@ fun CategoryScreen(
                         label = { Text(cat.replaceFirstChar { it.uppercase() }) },
                         selected = cat == selectedCategory,
                         onClick = {
-                            if (selectedCategory != cat) {
+                            if (cat == CAT_SUPPORT) {
+                                navController.navigate("SupportRequest")
+                            } else if (selectedCategory != cat) {
                                 onCategoryChange(cat)
                             }
-                        }
-                    )
-                }
-                // Solo mostrar el botón de soporte si el usuario no es admin
-                if (user?.role != "admin") {
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.SupportAgent, contentDescription = "Soporte") },
-                        label = { Text("Soporte") },
-                        selected = false,
-                        onClick = {
-                            navController.navigate("SupportRequest")
                         }
                     )
                 }
