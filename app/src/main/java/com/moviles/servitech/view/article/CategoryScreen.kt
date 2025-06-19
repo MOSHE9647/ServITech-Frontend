@@ -27,6 +27,7 @@ import com.moviles.servitech.network.responses.article.ArticleDto
 import com.moviles.servitech.viewmodel.ArticleViewModel
 import com.moviles.servitech.viewmodel.SubcategoryViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.moviles.servitech.network.responses.article.fixedUrl
 import kotlinx.coroutines.delay
 
 
@@ -198,6 +199,9 @@ fun CategoryScreen(
 
 @Composable
 fun ArticleCard(article: ArticleDto, onClick: () -> Unit) {
+    val imageUrl = article.images.firstOrNull()?.fixedUrl
+   //import com.moviles.servitech.network.responses.article.fixedUrl
+
     Card(
         modifier = Modifier
             .width(140.dp)
@@ -207,7 +211,7 @@ fun ArticleCard(article: ArticleDto, onClick: () -> Unit) {
     ) {
         Column {
             AsyncImage(
-                model = article.images.firstOrNull()?.path,
+                model = imageUrl,
                 contentDescription = article.name,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -229,4 +233,5 @@ fun ArticleCard(article: ArticleDto, onClick: () -> Unit) {
         }
     }
 }
+
 

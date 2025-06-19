@@ -19,4 +19,8 @@ data class ImageDto(
     val title: String,
     val path: String,
     val alt: String
+
+
 )
+val ImageDto.fixedUrl: String
+    get() = path.replace("localhost", "10.0.2.2")

@@ -59,14 +59,15 @@ class ArticleRepository @Inject constructor(
             val categoryId = request.category_id.toString().toRequestBody()
             val subcategoryId = request.subcategory_id.toString().toRequestBody()
 
-            val imagePart = imageUri?.let {
+            val imageParts = imageUri?.let {
                 val inputStream = context.contentResolver.openInputStream(it)
                 val tempFile = File.createTempFile("upload_", ".jpg", context.cacheDir)
                 inputStream?.use { input -> tempFile.outputStream().use { input.copyTo(it) } }
 
                 val reqFile = tempFile.asRequestBody("image/*".toMediaTypeOrNull())
-                MultipartBody.Part.createFormData("image", tempFile.name, reqFile)
-            }
+                listOf(MultipartBody.Part.createFormData("images[]", tempFile.name, reqFile))
+            } ?: emptyList()
+
 
             val token = getAuthTokenOrError(sessionManager)
                 ?: return error(R.string.error_authentication_required)
@@ -78,7 +79,7 @@ class ArticleRepository @Inject constructor(
             }
 
             val response = service.createArticle(
-                authToken, name, description, price, categoryId, subcategoryId, imagePart
+                authToken, name, description, price, categoryId, subcategoryId, imageParts
             )
 
             Log.d("ArticleRepository", "Código de respuesta: ${response.code()}")

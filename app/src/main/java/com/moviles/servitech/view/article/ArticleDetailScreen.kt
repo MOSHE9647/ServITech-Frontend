@@ -28,6 +28,7 @@ import com.moviles.servitech.viewmodel.SubcategoryViewModel
 import androidx.compose.ui.text.input.KeyboardType
 import com.moviles.servitech.model.CreateArticleRequest
 import com.moviles.servitech.network.responses.article.ImageDto
+import com.moviles.servitech.network.responses.article.fixedUrl
 
 
 // muestra el detalle de un artículo específico con una interfaz de usuario que permite editar y eliminar el artículo
@@ -105,22 +106,33 @@ fun ArticleDetailScreen(
                 .padding(16.dp)
                 .fillMaxWidth()
         )
-        {article?.let { art ->
-            Log.d("IMAGEN_ARTICULO", art.images.firstOrNull()?.path ?: "Sin imagen")
 
-            art.images.firstOrNull()?.let { image ->
-                AsyncImage(
-                    model = image.path,
-                    contentDescription = image.alt ?: "Imagen del artículo",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .padding(bottom = 16.dp)
-                )
-            }
+        {
+            Log.d("IMAGEN_ARTICULO", "article: $article")
+            val imageUrl = article?.images?.firstOrNull()?.fixedUrl
+            //import com.moviles.servitech.network.responses.article.fixedUrl
+            article?.let { art ->
+                art.images.firstOrNull()?.let { image ->
+
+                    Log.d("IMAGEN_ARTICULO", "URL IMAGEN COMPLETA: $imageUrl")
+
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = image.alt ?: "Imagen del artículo",
+                       // modifier = Modifier
+                         //   .fillMaxWidth()
+                          //  .height(235.dp)
+                          // .padding(bottom = 16.dp)
+
+                                modifier = Modifier
+                                .fillMaxWidth()
+                            .height(180.dp)
+                    )
+                }
 
 
-            val fieldColors = OutlinedTextFieldDefaults.colors(
+
+                val fieldColors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFF005F73),
                     unfocusedBorderColor = Color.LightGray,
                     disabledContainerColor = Color(0xFFFAFAFA),

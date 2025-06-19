@@ -73,8 +73,8 @@ interface ArticleApiService {
         @Part("price") price: RequestBody,
         @Part("category_id") categoryId: RequestBody,
         @Part("subcategory_id") subcategoryId: RequestBody,
-        @Part image: MultipartBody.Part?
-    ): Response<Unit>
+        @Part images: List<MultipartBody.Part>
+  ): Response<Unit>
 
     /**
      * Fetches a specific article by its ID.
