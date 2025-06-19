@@ -24,6 +24,7 @@ import com.moviles.servitech.view.article.CategoryScreen
 import com.moviles.servitech.view.auth.ForgotPasswordScreen
 import com.moviles.servitech.view.auth.LoginScreen
 import com.moviles.servitech.view.auth.RegisterScreen
+import com.moviles.servitech.view.support.SupportRequestScreen
 import kotlinx.serialization.Serializable
 
 /**
@@ -40,6 +41,7 @@ sealed class Screen() {
     @Serializable data class Detail(val articleId: Int, val categoryName: String)
     @Serializable
     object ForgotPassword
+    object SupportRequest
 }
 
 /**
@@ -138,7 +140,8 @@ fun NavigationGraph() {
                             categoryName = selectedCategory
                         )
                     )
-                }
+                },
+                navController = navController
             )
 //            HomeScreen {
 //                navController.navigate(Login) { popUpTo(0) }
@@ -163,6 +166,13 @@ fun NavigationGraph() {
                 currentCategory = args.categoryName,
                 navController = navController,
                 navigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable("SupportRequest") {
+            SupportRequestScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onSuccess = { navController.popBackStack() }
             )
         }
     }

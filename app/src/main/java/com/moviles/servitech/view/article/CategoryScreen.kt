@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Smartphone
+import androidx.compose.material.icons.filled.SupportAgent
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -29,6 +30,10 @@ import com.moviles.servitech.viewmodel.SubcategoryViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.delay
 
+import com.moviles.servitech.common.Utils.rememberSessionManager
+import androidx.compose.runtime.collectAsState
+import androidx.navigation.NavController
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,7 +43,8 @@ fun CategoryScreen(
     onCategoryChange: (String) -> Unit,
     navigateToDetail: (Int) -> Unit,
     vm: ArticleViewModel = hiltViewModel(),
-    subcategoryVm: SubcategoryViewModel = hiltViewModel()
+    subcategoryVm: SubcategoryViewModel = hiltViewModel(),
+    navController: NavController
 ) {
     var searchText by remember { mutableStateOf("") }
     var selectedSubcategoryId by remember { mutableStateOf<Int?>(null) }
@@ -50,6 +56,8 @@ fun CategoryScreen(
     val context = LocalContext.current
 
     val isCategoryValid = selectedCategory == CAT_ANIME || selectedCategory == CAT_TECHNOLOGY
+    val sessionManager = rememberSessionManager(context)
+    val user by sessionManager.user.collectAsState(initial = null)
 
     // Carga artículos cuando cambia la categoría
     LaunchedEffect(selectedCategory) {
@@ -85,15 +93,17 @@ fun CategoryScreen(
                 FloatingActionButton(onClick = { showDialog = true }) {
                     Icon(Icons.Default.Add, contentDescription = "Añadir artículo")
                 }
+
             }
         },
         bottomBar = {
             NavigationBar {
-                listOf(
+                val items = listOf(
                     CAT_TECHNOLOGY to Icons.Default.Smartphone,
                     CAT_ANIME to Icons.Default.Info,
                     CAT_SUPPORT to Icons.Default.Settings
-                ).forEach { (cat, icon) ->
+                )
+                items.forEach { (cat, icon) ->
                     NavigationBarItem(
                         icon = { Icon(icon, contentDescription = cat) },
                         label = { Text(cat.replaceFirstChar { it.uppercase() }) },
@@ -102,6 +112,17 @@ fun CategoryScreen(
                             if (selectedCategory != cat) {
                                 onCategoryChange(cat)
                             }
+                        }
+                    )
+                }
+                // Solo mostrar el botón de soporte si el usuario no es admin
+                if (user?.role != "admin") {
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.SupportAgent, contentDescription = "Soporte") },
+                        label = { Text("Soporte") },
+                        selected = false,
+                        onClick = {
+                            navController.navigate("SupportRequest")
                         }
                     )
                 }
