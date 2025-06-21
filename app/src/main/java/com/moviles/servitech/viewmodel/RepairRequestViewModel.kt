@@ -19,6 +19,7 @@ import com.moviles.servitech.services.validation.RepairRequestValidation
 import com.moviles.servitech.viewmodel.utils.FieldState
 import com.moviles.servitech.viewmodel.utils.ViewModelState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -430,6 +431,7 @@ class RepairRequestViewModel @Inject constructor(
                 is RepairRequestResult.Success -> {
                     // If the request is successful, update the list of repair requests
                     _repairRequests.value = result.data
+                    delay(3000) // Simulate a delay for UI update
                     _viewModelState.value = ViewModelState.Success(result.data)
                 }
 
@@ -559,6 +561,7 @@ class RepairRequestViewModel @Inject constructor(
                 is RepairRequestResult.Success -> {
                     // If the request is successful, update the ViewModel state to Success
                     getAllRepairRequests() // Refresh the list of repair requests
+                    delay(3000) // Simulate a delay for UI update
                     _viewModelState.value = ViewModelState.Success<Any>(result.data)
                 }
 
@@ -584,6 +587,7 @@ class RepairRequestViewModel @Inject constructor(
                 is RepairRequestResult.Success -> {
                     // If the request is successful, update the ViewModel state to Success
                     getAllRepairRequests() // Refresh the list of repair requests
+                    delay(3000) // Simulate a delay for UI update
                     _viewModelState.value = ViewModelState.Success<Any>(result.data)
                 }
 

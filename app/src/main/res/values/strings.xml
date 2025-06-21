@@ -180,4 +180,5 @@
     <string name="repair_status_completed">Completed</string>
     <string name="repair_status_delivered">Delivered</string>
     <string name="repair_status_cancelled">Cancelled</string>
+    <string name="update_repair_request">Update Repair Request</string>
 </resources>

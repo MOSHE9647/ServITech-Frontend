@@ -5,12 +5,19 @@ import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.os.Build
+import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.moviles.servitech.R
 import com.moviles.servitech.core.di.SessionManagerEntryPoint
 import com.moviles.servitech.core.providers.AndroidStringProvider
@@ -31,6 +38,26 @@ import java.util.Locale
  * dates, among other utilities.
  */
 object Utils {
+    /**
+     * Displays a remote image using Coil's AsyncImage composable.
+     * The image is loaded from the provided URL and displayed
+     * with a fixed height and width, cropping to fit the box.
+     *
+     * @param imageUrl The URL of the image to be displayed.
+     */
+    @Composable
+    fun RemoteImage(imageUrl: String) {
+//        val imagePath = imageUrl.replace("localhost", "10.0.2.2")
+        AsyncImage(
+            model = imageUrl,
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp), // Set fixed height
+            contentScale = ContentScale.Fit // Crop to fit the box
+        )
+    }
+
     /**
      * Creates a [SessionManager] instance using Hilt's EntryPointAccessors.
      * This function is used to access the SessionManager
@@ -152,6 +179,41 @@ object Utils {
      */
     val doubleToRequestBody =
         { number: Double -> number.toString().toRequestBody("text/plain".toMediaTypeOrNull()) }
+
+    /**
+     * Retrieves the file path from a URI.
+     * This function checks if the URI is a content URI or a file URI,
+     * and retrieves the file path accordingly.
+     *
+     * @param uri The URI of the file.
+     * @param context The context used to access the content resolver.
+     */
+    fun getFilePathFromUri(uri: Uri, context: Context): String? {
+        var filePath: String? = null
+        val cursor = context.contentResolver.query(uri, null, null, null, null)
+
+        cursor?.use {
+            val columnIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (cursor.moveToFirst()) {
+                val fileName = cursor.getString(columnIndex)
+            }
+        }
+
+        if (uri.scheme == "content") {
+            val projection = arrayOf(MediaStore.Images.Media.DATA)
+            val cursor = context.contentResolver.query(uri, projection, null, null, null)
+            cursor?.use {
+                val columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+                if (cursor.moveToFirst()) {
+                    filePath = cursor.getString(columnIndex)
+                }
+            }
+        } else if (uri.scheme == "file") {
+            filePath = uri.path
+        }
+
+        return filePath
+    }
 
     /**
      * Converts a URI to a MultipartBody.Part for file uploads.

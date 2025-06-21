@@ -18,6 +18,7 @@ import com.moviles.servitech.core.navigation.Screen.Home
 import com.moviles.servitech.core.navigation.Screen.Login
 import com.moviles.servitech.core.navigation.Screen.Register
 import com.moviles.servitech.core.navigation.Screen.Splash
+import com.moviles.servitech.view.RepairRequestScreen
 import com.moviles.servitech.view.SplashScreen
 import com.moviles.servitech.view.article.ArticleDetailScreen
 import com.moviles.servitech.view.article.CategoryScreen
@@ -37,6 +38,8 @@ sealed class Screen() {
     @Serializable object Login
     @Serializable object Register
     @Serializable object Home
+    @Serializable
+    object RepairRequest
     @Serializable data class Detail(val articleId: Int, val categoryName: String)
     @Serializable
     object ForgotPassword
@@ -131,6 +134,11 @@ fun NavigationGraph() {
             CategoryScreen(
                 selectedCategory = selectedCategory,
                 onCategoryChange = { selectedCategory = it },
+                navigateToRepairRequests = {
+                    navController.navigate(Screen.RepairRequest) {
+                        popUpTo(0)
+                    }
+                },
                 navigateToDetail = { articleId ->
                     navController.navigate(
                         Detail(
@@ -140,9 +148,20 @@ fun NavigationGraph() {
                     )
                 }
             )
-//            HomeScreen {
-//                navController.navigate(Login) { popUpTo(0) }
-//            }
+        }
+
+        /**
+         * This is the Repair Request screen of the application.
+         * It allows users to create and manage repair requests.
+         * Users can navigate back to the `Home` screen after managing their repair requests.
+         *
+         * The `RepairRequest` object is used to define the route for this screen.
+         * The `composable` function is used to define the screen and its corresponding UI.
+         */
+        composable<Screen.RepairRequest> {
+            RepairRequestScreen(
+                navigateBack = { navController.navigate(Home) }
+            )
         }
 
         /**

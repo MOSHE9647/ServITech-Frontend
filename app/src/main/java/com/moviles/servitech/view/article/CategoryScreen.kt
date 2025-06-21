@@ -2,34 +2,60 @@ package com.moviles.servitech.view.article
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Smartphone
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.moviles.servitech.common.Constants.CAT_ANIME
+import com.moviles.servitech.common.Constants.CAT_REPAIR_REQUESTS
 import com.moviles.servitech.common.Constants.CAT_SUPPORT
 import com.moviles.servitech.common.Constants.CAT_TECHNOLOGY
 import com.moviles.servitech.network.responses.article.ArticleDto
+import com.moviles.servitech.network.responses.article.fixedUrl
 import com.moviles.servitech.viewmodel.ArticleViewModel
 import com.moviles.servitech.viewmodel.SubcategoryViewModel
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.moviles.servitech.network.responses.article.fixedUrl
-import kotlinx.coroutines.delay
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,6 +65,7 @@ fun CategoryScreen(
     onCategoryChange: (String) -> Unit,
     navigateToDetail: (Int) -> Unit,
     vm: ArticleViewModel = hiltViewModel(),
+    navigateToRepairRequests: () -> Unit,
     subcategoryVm: SubcategoryViewModel = hiltViewModel()
 ) {
     var searchText by remember { mutableStateOf("") }
@@ -93,13 +120,17 @@ fun CategoryScreen(
                 listOf(
                     CAT_TECHNOLOGY to Icons.Default.Smartphone,
                     CAT_ANIME to Icons.Default.Info,
-                    CAT_SUPPORT to Icons.Default.Settings
+                    CAT_SUPPORT to Icons.Default.Settings,
+                    CAT_REPAIR_REQUESTS to Icons.Default.Build
                 ).forEach { (cat, icon) ->
                     NavigationBarItem(
                         icon = { Icon(icon, contentDescription = cat) },
                         label = { Text(cat.replaceFirstChar { it.uppercase() }) },
                         selected = cat == selectedCategory,
                         onClick = {
+                            if (cat == CAT_REPAIR_REQUESTS) {
+                                navigateToRepairRequests()
+                            }
                             if (selectedCategory != cat) {
                                 onCategoryChange(cat)
                             }
