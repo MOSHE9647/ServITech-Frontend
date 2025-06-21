@@ -11,7 +11,9 @@ import com.moviles.servitech.network.responses.article.ArticleDto
 import com.moviles.servitech.network.services.ArticleApiService
 import com.moviles.servitech.services.helpers.ServicesHelper.checkRoleOrError
 import com.moviles.servitech.services.helpers.ServicesHelper.getAuthTokenOrError
+import com.moviles.servitech.viewmodel.utils.FileHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -25,7 +27,9 @@ import javax.inject.Singleton
 class ArticleRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val service: ArticleApiService,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val fileHelper: FileHelper
+
 ) {
     /** Get all the articles */
     suspend fun fetchAll(): List<ArticleDto> {
@@ -126,7 +130,7 @@ class ArticleRepository @Inject constructor(
             false
         }
     }
-
+/*
     // Updates an existing article with the given ID and request.
     suspend fun update(id: Int, request: CreateArticleRequest): Boolean {
         return try {
@@ -146,9 +150,54 @@ class ArticleRepository @Inject constructor(
             Log.e("ArticleRepository", "Error al actualizar artículo", e)
             false
         }
+    }*/
+
+    suspend fun updateWithImage(
+        id: Int,
+        request: CreateArticleRequest,
+        imageUri: Uri?
+    ): Boolean {
+        return try {
+            val token = getAuthTokenOrError(sessionManager) ?: return false
+            val authToken = "Bearer $token"
+
+            val name = request.name.toRequestBody("text/plain".toMediaType())
+            val description = request.description.toRequestBody("text/plain".toMediaType())
+            val price = request.price.toString().toRequestBody("text/plain".toMediaType())
+            val categoryId = request.category_id.toString().toRequestBody("text/plain".toMediaType())
+            val subcategoryId = request.subcategory_id.toString().toRequestBody("text/plain".toMediaType())
+            val methodOverride = "PUT".toRequestBody("text/plain".toMediaType()) // 👈 AQUI
+
+            val imageParts = mutableListOf<MultipartBody.Part>()
+            imageUri?.let {
+                val file = fileHelper.getFileFromUri(it)
+                val requestFile = file.asRequestBody("image/*".toMediaType())
+                val part = MultipartBody.Part.createFormData("images[]", file.name, requestFile)
+                imageParts.add(part)
+            }
+
+            //  Call ENDPOINT COMO POST CON override PUT
+            val response = service.updateArticle(
+                authToken,
+                id,
+                name,
+                description,
+                price,
+                categoryId,
+                subcategoryId,
+                imageParts,
+                methodOverride
+            )
+
+            Log.d("ArticleRepository", "Update with image status: ${response.code()}")
+            response.isSuccessful
+        } catch (e: Exception) {
+            Log.e("ArticleRepository", "Error al actualizar con imagen", e)
+            false
+        }
     }
 
-  // Helper function to log and return an error message
+    // Helper function to log and return an error message
     // Helper extension
     private fun String.toRequestBody(): RequestBody =
         toRequestBody("text/plain".toMediaTypeOrNull())

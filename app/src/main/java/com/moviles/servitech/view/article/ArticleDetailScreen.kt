@@ -2,8 +2,11 @@ package com.moviles.servitech.view.article
 
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,16 +22,19 @@ import com.moviles.servitech.viewmodel.ArticleViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
-import com.moviles.servitech.common.Constants
-import kotlin.text.removePrefix
 import com.moviles.servitech.viewmodel.SubcategoryViewModel
-
 import androidx.compose.ui.text.input.KeyboardType
 import com.moviles.servitech.model.CreateArticleRequest
-import com.moviles.servitech.network.responses.article.ImageDto
 import com.moviles.servitech.network.responses.article.fixedUrl
+import com.moviles.servitech.viewmodel.utils.FileHelper
+
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+
 
 
 // muestra el detalle de un artículo específico con una interfaz de usuario que permite editar y eliminar el artículo
@@ -42,13 +48,16 @@ fun ArticleDetailScreen(
     navController: NavHostController,
     navigateBack: () -> Unit,
     viewModel: ArticleViewModel = hiltViewModel(),
-    subcategoryVm: SubcategoryViewModel = hiltViewModel()
+    subcategoryVm: SubcategoryViewModel = hiltViewModel(),
+
 
 ) {
     val context = LocalContext.current
     var isEditing by remember { mutableStateOf(false) }
     val article by viewModel.articleById.collectAsState()
     val subcategories by subcategoryVm.subcategories.collectAsState()
+
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
 
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -77,6 +86,12 @@ fun ArticleDetailScreen(
         it.category.name.equals(currentCategory, ignoreCase = true)
     }
 
+    // Launcher to pick an image from the gallery
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        imageUri = uri
+    }
 
 // Handle the update success state to show a toast message
     LaunchedEffect(updateSuccess) {
@@ -112,25 +127,37 @@ fun ArticleDetailScreen(
             val imageUrl = article?.images?.firstOrNull()?.fixedUrl
             //import com.moviles.servitech.network.responses.article.fixedUrl
             article?.let { art ->
-                art.images.firstOrNull()?.let { image ->
-
-                    Log.d("IMAGEN_ARTICULO", "URL IMAGEN COMPLETA: $imageUrl")
-
-                    AsyncImage(
-                        model = imageUrl,
-                        contentDescription = image.alt ?: "Imagen del artículo",
-                       // modifier = Modifier
-                         //   .fillMaxWidth()
-                          //  .height(235.dp)
-                          // .padding(bottom = 16.dp)
-
-                                modifier = Modifier
-                                .fillMaxWidth()
-                            .height(180.dp)
-                    )
+                if (isEditing) {
+                    Button(
+                        onClick = { imagePickerLauncher.launch("image/*") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    ) {
+                        Text("Seleccionar imagen")
+                    }
                 }
 
 
+                Log.d("IMAGEN_ARTICULO", "URL IMAGEN COMPLETA: $imageUrl")
+
+
+
+                    // show the image if available
+                    val displayImage = imageUri ?: imageUrl
+
+                    displayImage?.let {
+                        AsyncImage(
+                            model = it,
+                            contentDescription = "Imagen del artículo",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(180.dp)
+                                .padding(bottom = 16.dp),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                // Input fields for article details
 
                 val fieldColors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFF005F73),
@@ -174,6 +201,7 @@ fun ArticleDetailScreen(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
                 )
 
+
                 if (isEditing) {
                     val selectedSubcatName = filteredSubcategories.find { it.id == selectedSubcategoryId }?.name ?: "Seleccionar"
                     Box(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
@@ -185,6 +213,8 @@ fun ArticleDetailScreen(
                             readOnly = true,
                             colors = fieldColors,
                             modifier = Modifier.fillMaxWidth().clickable { subcategoryExpanded = true }
+
+
                         )
                         DropdownMenu(
                             expanded = subcategoryExpanded,
@@ -220,7 +250,9 @@ fun ArticleDetailScreen(
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Button(
-                        onClick = {
+
+
+                    onClick = {
                             if (isEditing) {
                                 val request = CreateArticleRequest(
                                     name = name,
@@ -228,12 +260,20 @@ fun ArticleDetailScreen(
                                     price = price.toDoubleOrNull() ?: 0.0,
                                     category_id = art.category.id,
                                     subcategory_id = selectedSubcategoryId ?: art.subcategory_id,
-                                    images = emptyList()
+                                    images = emptyList() // o una lista vacía si ya estás manejando la imagen por separado
                                 )
-                                viewModel.updateArticle(art.id, request) {
-                                    Toast.makeText(context, "Artículo actualizado correctamente", Toast.LENGTH_SHORT).show()
-                                    navController.popBackStack()
-                                }
+
+                                viewModel.updateArticleWithImage(
+                                    id = art.id,
+                                    request = request,
+                                    imageUri = imageUri, // image URI from the picker
+                                    category = currentCategory,
+                                    onSuccess = {
+                                        Toast.makeText(context, "Artículo actualizado correctamente", Toast.LENGTH_SHORT).show()
+                                        navController.popBackStack()
+                                    }
+                                )
+
                             } else {
                                 isEditing = true
                             }

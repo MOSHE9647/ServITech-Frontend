@@ -111,16 +111,19 @@ fun deleteArticle(id: Int, categoryName: String, onSuccess: () -> Unit) {
     private val _updateSuccess = MutableStateFlow(false)
     val updateSuccess: StateFlow<Boolean> = _updateSuccess
 
-    fun updateArticle(id: Int, request: CreateArticleRequest, onSuccess: () -> Unit = {}) {
+    fun updateArticleWithImage(id: Int, request: CreateArticleRequest, imageUri: Uri?, category: String, onSuccess: () -> Unit = {}) {
         viewModelScope.launch {
-            val result = repo.update(id, request)
+            val result = repo.updateWithImage(id, request, imageUri)
+            Log.d("UPDATE_ARTICLE", "Resultado: $result")
+            Log.d("UPDATE_ARTICLE", "Image URI: $imageUri")
             if (result) {
                 _updateSuccess.value = true
-                loadByCategory(request.category_id.toString())
+                loadByCategory(category)
                 onSuccess()
             }
         }
     }
+
 
     fun resetUpdateSuccess() {
         _updateSuccess.value = false
