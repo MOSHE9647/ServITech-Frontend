@@ -100,13 +100,40 @@ class ArticleRepository @Inject constructor(
     }
     // Fetches an article by its ID.
     suspend fun fetchById(id: Int): ArticleDto {
-        val response = service.getArticleById(id)
-        return if (response.isSuccessful) {
-            response.body()?.data?.article ?: throw Exception("Artículo vacío")
-        } else {
-            val error = response.errorBody()?.string()
-            Log.e("ArticleRepository", "Error al obtener artículo: $error")
-            throw Exception("Error HTTP ${response.code()}")
+        return try {
+            val response = service.getArticleById(id)
+            Log.d("ArticleRepository", "Response code: ${response.code()}")
+            Log.d("ArticleRepository", "Response headers: ${response.headers()}")
+            
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+                if (responseBody != null) {
+                    Log.d("ArticleRepository", "Response body received successfully")
+                    responseBody.data?.article ?: throw Exception("Article data is null")
+                } else {
+                    Log.e("ArticleRepository", "Response body is null")
+                    throw Exception("Empty response body")
+                }
+            } else {
+                val errorBody = response.errorBody()?.string()
+                Log.e("ArticleRepository", "HTTP Error ${response.code()}: $errorBody")
+                throw Exception("HTTP Error ${response.code()}: ${errorBody ?: "Unknown error"}")
+            }
+        } catch (e: Exception) {
+            when (e) {
+                is java.io.EOFException -> {
+                    Log.e("ArticleRepository", "JSON parsing error - incomplete response for article $id", e)
+                    throw Exception("Server response is incomplete. Please try again.")
+                }
+                is com.google.gson.JsonSyntaxException -> {
+                    Log.e("ArticleRepository", "JSON syntax error for article $id", e)
+                    throw Exception("Invalid response format from server.")
+                }
+                else -> {
+                    Log.e("ArticleRepository", "Error fetching article $id", e)
+                    throw Exception("Failed to load article: ${e.message}")
+                }
+            }
         }
     }
     // deletes an article by its ID.

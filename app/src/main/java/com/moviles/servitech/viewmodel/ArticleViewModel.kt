@@ -27,6 +27,11 @@ class ArticleViewModel @Inject constructor(
     private val _articleById = MutableStateFlow<ArticleDto?>(null)
     val articleById: StateFlow<ArticleDto?> = _articleById
 
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
 
     private val _deleteSuccess = mutableStateOf<Boolean?>(null)
     val deleteSuccess: State<Boolean?> = _deleteSuccess
@@ -82,8 +87,18 @@ class ArticleViewModel @Inject constructor(
 
 
     suspend fun loadArticleById(id: Int) {
-        val article = repo.fetchById(id)
-        _articleById.value = article
+        try {
+            _isLoading.value = true
+            _errorMessage.value = null
+            val article = repo.fetchById(id)
+            _articleById.value = article
+        } catch (e: Exception) {
+            Log.e("ArticleViewModel", "Error loading article $id", e)
+            _errorMessage.value = e.message ?: "Unknown error occurred"
+            _articleById.value = null
+        } finally {
+            _isLoading.value = false
+        }
     }
 
 
@@ -127,6 +142,16 @@ fun deleteArticle(id: Int, categoryName: String, onSuccess: () -> Unit) {
 
     fun resetUpdateSuccess() {
         _updateSuccess.value = false
+    }
+
+    fun clearError() {
+        _errorMessage.value = null
+    }
+
+    fun reloadArticleById(id: Int) {
+        viewModelScope.launch {
+            loadArticleById(id)
+        }
     }
 
 }
