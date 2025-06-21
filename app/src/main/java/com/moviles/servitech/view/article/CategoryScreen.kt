@@ -22,62 +22,49 @@ import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Smartphone
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.material.icons.filled.SupportAgent
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.compose.ui.zIndex
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.moviles.servitech.R
 import com.moviles.servitech.common.Constants.CAT_ANIME
 import com.moviles.servitech.common.Constants.CAT_REPAIR_REQUESTS
 import com.moviles.servitech.common.Constants.CAT_SUPPORT
 import com.moviles.servitech.common.Constants.CAT_TECHNOLOGY
+import com.moviles.servitech.common.Utils.rememberSessionManager
 import com.moviles.servitech.network.responses.article.ArticleDto
 import com.moviles.servitech.network.responses.article.fixedUrl
 import com.moviles.servitech.viewmodel.ArticleViewModel
 import com.moviles.servitech.viewmodel.SubcategoryViewModel
-
-import com.moviles.servitech.ui.components.HandleServerError
-import com.moviles.servitech.ui.components.LoadingIndicator
-import com.moviles.servitech.viewmodel.ArticleViewModel
-import com.moviles.servitech.viewmodel.SubcategoryViewModel
 import com.moviles.servitech.viewmodel.auth.LogoutState
 import com.moviles.servitech.viewmodel.auth.LogoutViewModel
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.moviles.servitech.network.responses.article.fixedUrl
-import kotlinx.coroutines.delay
-
-import com.moviles.servitech.common.Utils.rememberSessionManager
-import androidx.compose.runtime.collectAsState
-import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -208,16 +195,14 @@ fun CategoryScreen(
             NavigationBar {
                 val baseItems = listOf(
                     CAT_TECHNOLOGY to Icons.Default.Smartphone,
-                    CAT_ANIME to Icons.Default.Info,
-                    CAT_SUPPORT to Icons.Default.Settings,
-                    CAT_REPAIR_REQUESTS to Icons.Default.Build
-                ).forEach { (cat, icon) ->
                     CAT_ANIME to Icons.Default.Info
                 )
 
                 // Only add the support button if the user is NOT admin.
                 val items = if (user?.role?.lowercase() != "admin") {
                     baseItems + (CAT_SUPPORT to Icons.Default.Settings)
+                } else if (user?.role?.lowercase() == "admin") {
+                    baseItems + (CAT_REPAIR_REQUESTS to Icons.Default.Build)
                 } else {
                     baseItems
                 }
@@ -230,9 +215,7 @@ fun CategoryScreen(
                         onClick = {
                             if (cat == CAT_REPAIR_REQUESTS) {
                                 navigateToRepairRequests()
-                            }
-                            if (selectedCategory != cat) {
-                            if (cat == CAT_SUPPORT) {
+                            } else if (cat == CAT_SUPPORT) {
                                 navController.navigate("SupportRequest")
                             } else if (selectedCategory != cat) {
                                 onCategoryChange(cat)
@@ -242,7 +225,7 @@ fun CategoryScreen(
                 }
             }
         }
-    ) { innerPadding ->
+    ) { innerPadding: PaddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -302,7 +285,6 @@ fun CategoryScreen(
                     }
                 }
             }
-
         }
     }
 
@@ -325,7 +307,7 @@ fun CategoryScreen(
 @Composable
 fun ArticleCard(article: ArticleDto, onClick: () -> Unit) {
     val imageUrl = article.images.firstOrNull()?.fixedUrl
-   //import com.moviles.servitech.network.responses.article.fixedUrl
+    //import com.moviles.servitech.network.responses.article.fixedUrl
 
     Card(
         modifier = Modifier
@@ -358,5 +340,3 @@ fun ArticleCard(article: ArticleDto, onClick: () -> Unit) {
         }
     }
 }
-
-
