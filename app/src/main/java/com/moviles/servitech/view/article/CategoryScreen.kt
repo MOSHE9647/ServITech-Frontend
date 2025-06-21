@@ -95,14 +95,14 @@ fun CategoryScreen(
         filteredArticles.groupBy { it.subcategory?.name ?: "" }
     }
 
-    // Estado local para mostrar el Toast de logout
+    // Local state to show logout Toast
     var showLogoutToast by remember { mutableStateOf(false) }
     var logoutError by remember { mutableStateOf<String?>(null) }
 
-    // Manejo del estado de logout
+    // Handle logout state
     LaunchedEffect(logoutState) {
         when (val state = logoutState) {
-            is LogoutState.Loading -> { /* Puedes mostrar un indicador de carga si lo deseas */ }
+            is LogoutState.Loading -> { /* You can show a loading indicator if desired */ }
             is LogoutState.Success -> {
                 showLogoutToast = true
                 navigateToLogin()
@@ -115,7 +115,7 @@ fun CategoryScreen(
     }
 
     if (showLogoutToast) {
-        Toast.makeText(context, "Sesión cerrada correctamente", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, "Session closed successfully", Toast.LENGTH_LONG).show()
         showLogoutToast = false
     }
     if (logoutError != null) {
@@ -132,7 +132,7 @@ fun CategoryScreen(
     LaunchedEffect(createSuccess) {
         if (createSuccess) {
             vm.loadByCategory(selectedCategory)
-            Toast.makeText(context, "Artículo agregado correctamente", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Article added successfully", Toast.LENGTH_SHORT).show()
             showDialog = false
             vm.resetCreateSuccess()
         }
@@ -154,7 +154,7 @@ fun CategoryScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Logout,
-                            contentDescription = "Cerrar sesión"
+                            contentDescription = "Logout"
                         )
                     }
                 }
@@ -163,7 +163,7 @@ fun CategoryScreen(
         floatingActionButton = {
             if (isCategoryValid) {
                 FloatingActionButton(onClick = { showDialog = true }) {
-                    Icon(Icons.Default.Add, contentDescription = "Añadir artículo")
+                    Icon(Icons.Default.Add, contentDescription = "Add article")
                 }
             }
         },
@@ -209,7 +209,7 @@ fun CategoryScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                placeholder = { Text("Buscar por nombre o subcategoría…") },
+                placeholder = { Text("Search by name or subcategory...") },
                 leadingIcon = { Icon(Icons.Default.Search, null) },
                 singleLine = true
             )
@@ -268,7 +268,7 @@ fun CategoryScreen(
             onDismiss = { showDialog = false },
             onSubmit = { request, imageUri ->
                 if (request.description.length < 10) {
-                    Toast.makeText(context, "La descripción debe tener al menos 10 caracteres", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Description must have at least 10 characters", Toast.LENGTH_SHORT).show()
                 } else {
                     vm.createArticle(request, imageUri, selectedCategory)
                 }
