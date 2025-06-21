@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.moviles.servitech.R
 import com.moviles.servitech.database.dao.UserSessionDao
-import com.moviles.servitech.database.entities.UserSessionEntity
+import com.moviles.servitech.database.entities.user.UserSessionEntity
 import com.moviles.servitech.model.User
 import com.moviles.servitech.model.mappers.toEntity
 import com.moviles.servitech.model.mappers.toUser
@@ -53,45 +53,6 @@ class SessionManager @Inject constructor (
     val sessionMessage: StateFlow<String?> = _sessionMessage.asStateFlow()
 
     /**
-     * Saves the user session information, including the access token,
-     * expiration time, and user details.
-     *
-     * @param token The access token for the user session.
-     * @param expiresIn The duration in seconds for which the session is valid.
-     * @param user The User object containing user details.
-     */
-    suspend fun saveSession(token: String, expiresIn: Long, user: User) {
-        val expiresAt = System.currentTimeMillis() + (expiresIn * 1000)
-        val userSession = UserSessionEntity(
-            id = 1, // Only one session is allowed
-            user = user.toEntity(), token = token, expiresIn = expiresAt
-        )
-        userSessionDao.saveSession(userSession)
-    }
-
-    /**
-     * Clears the current user session from the database.
-     * If an error occurs during the clearing process,
-     * it logs the error and sets a session message indicating the error.
-     */
-    suspend fun clearSession() {
-        try {
-            userSessionDao.clearSession()
-        } catch (e: Exception) {
-            Log.e("SessionManager", "Error clearing session: ${e.message}")
-            _sessionMessage.value = context.getString(R.string.session_clear_error)
-        }
-    }
-
-    /**
-     * Clears the session message, setting it to null.
-     * This can be used to reset the session message after it has been displayed.
-     */
-    fun clearSessionMessage() {
-        _sessionMessage.value = null
-    }
-
-    /**
      * Retrieves the current user session as a Flow.
      * This Flow emits the User object if a session exists,
      * or null if no session is found.
@@ -137,6 +98,65 @@ class SessionManager @Inject constructor (
             _sessionMessage.value = context.getString(R.string.session_expired)
         }
         isValid
+    }
+
+    /**
+     * Saves the user session information, including the access token,
+     * expiration time, and user details.
+     *
+     * @param token The access token for the user session.
+     * @param expiresIn The duration in seconds for which the session is valid.
+     * @param user The User object containing user details.
+     */
+    suspend fun saveSession(token: String, expiresIn: Long, user: User) {
+        val expiresAt = System.currentTimeMillis() + (expiresIn * 1000)
+        val userSession = UserSessionEntity(
+            id = 1, // Only one session is allowed
+            user = user.toEntity(), token = token, expiresIn = expiresAt
+        )
+        userSessionDao.saveSession(userSession)
+    }
+
+    /**
+     * Retrieves the current token from the user session.
+     * If no session exists, it returns null.
+     *
+     * @return The access token as a String, or null if no session exists.
+     */
+    suspend fun getToken(): String? {
+        return userSessionDao.getSession()?.token
+    }
+
+    /**
+     * Retrieves the currently logged-in user from the session.
+     * If no session exists, it returns null.
+     *
+     * @return The User object representing the logged-in user, or null if no session exists.
+     */
+    suspend fun getLoggedUser(): User? {
+        return userSessionDao.getSession()?.toUser()
+    }
+
+    /**
+     * Clears the current user session from the database.
+     * If an error occurs during the clearing process,
+     * it logs the error and sets a session message indicating the error.
+     */
+    suspend fun clearSession() {
+        try {
+            userSessionDao.clearSession()
+        } catch (e: Exception) {
+            Log.e("SessionManager", "Error clearing session: ${e.message}")
+            _sessionMessage.value = context.getString(R.string.session_clear_error)
+        }
+    }
+
+    /**
+     * Clears the session message, setting it to null.
+     * This can be used to reset the session message after it has been displayed.
+     */
+    fun clearSessionMessage() {
+        _sessionMessage.value = null
     }
 
 }

@@ -23,12 +23,12 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.moviles.servitech.R
-import com.moviles.servitech.view.auth.components.AuthNavigationMessage
 import com.moviles.servitech.ui.components.CustomButton
 import com.moviles.servitech.ui.components.CustomCard
 import com.moviles.servitech.ui.components.CustomInputField
 import com.moviles.servitech.ui.components.ErrorText
 import com.moviles.servitech.ui.components.HeaderImage
+import com.moviles.servitech.view.auth.components.AuthNavigationMessage
 import com.moviles.servitech.view.auth.components.AuthViewContainer
 import com.moviles.servitech.view.auth.components.HandleAuthState
 import com.moviles.servitech.viewmodel.auth.LoginState
@@ -38,6 +38,7 @@ import com.moviles.servitech.viewmodel.auth.LoginViewModel
 fun LoginScreen(
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),
+    navigateToForgotPassword: () -> Unit = { },
     navigateToSignUp: () -> Unit = { },
     navigateToHome: () -> Unit = { }
 ) {
@@ -63,7 +64,10 @@ fun LoginScreen(
                 .padding(top = 10.dp)
         )
 
-        LoginForm(viewModel = viewModel, isLoading = isLoading)
+        LoginForm(viewModel = viewModel, isLoading = isLoading, onForgotPassword = {
+            Log.d("LoginScreen", "Forgot Password clicked")
+            navigateToForgotPassword()
+        })
 
         AuthNavigationMessage(
             message = stringResource(R.string.no_account),
@@ -83,9 +87,6 @@ fun LoginScreen(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(horizontal = 44.dp, vertical = 24.dp),
-            containerColor = MaterialTheme.colorScheme.secondary,
-            contentColor = MaterialTheme.colorScheme.onSecondary,
-            borderColor = MaterialTheme.colorScheme.outlineVariant,
             enabled = !isLoading
         )
     }
@@ -93,7 +94,7 @@ fun LoginScreen(
 }
 
 @Composable
-fun LoginForm(viewModel: LoginViewModel, isLoading: Boolean) {
+fun LoginForm(viewModel: LoginViewModel, isLoading: Boolean, onForgotPassword: () -> Unit) {
     val email: String by viewModel.email.observeAsState(initial = "")
     val password: String by viewModel.password.observeAsState(initial = "")
 
@@ -154,9 +155,11 @@ fun LoginForm(viewModel: LoginViewModel, isLoading: Boolean) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        ForgotPassword(Modifier.align(Alignment.CenterHorizontally), !isLoading) {
-            Log.d("LoginScreen", "Forgot Password clicked")
-        }
+        ForgotPassword(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            onActionClick = { onForgotPassword() },
+            isClickable = !isLoading
+        )
     }
 }
 

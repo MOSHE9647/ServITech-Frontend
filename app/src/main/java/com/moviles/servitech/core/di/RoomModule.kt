@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import com.moviles.servitech.common.Constants.DATABASE_NAME
 import com.moviles.servitech.database.AppDatabase
+import com.moviles.servitech.database.dao.ImageDao
 import com.moviles.servitech.database.dao.PendingOperationDao
+import com.moviles.servitech.database.dao.RepairRequestDao
 import com.moviles.servitech.database.dao.UserSessionDao
 import dagger.Module
 import dagger.Provides
@@ -50,5 +52,20 @@ object RoomModule {
      */
     @Provides
     fun provideUserSessionDao(database: AppDatabase): UserSessionDao = database.userSessionDao()
+
+    /**
+     * Provides the RepairRequestDao instance.
+     * This DAO is used to interact with the repair requests table in the database.
+     */
+    @Provides
+    fun provideRepairRequestDao(database: AppDatabase): RepairRequestDao =
+        database.repairRequestDao()
+
+    /**
+     * Provides the ImageDao instance.
+     * This DAO is used to interact with the images table in the database.
+     */
+    @Provides
+    fun provideImageDao(database: AppDatabase): ImageDao = database.imageDao()
 
 }

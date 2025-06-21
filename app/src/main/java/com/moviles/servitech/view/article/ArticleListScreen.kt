@@ -28,8 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.moviles.servitech.network.responses.article.ArticleDto
+import com.moviles.servitech.network.responses.article.fixedUrl
 import com.moviles.servitech.viewmodel.ArticleViewModel
 
+// muestra una lista de artículos con una interfaz de usuario que permite navegar a los detalles de cada artículo
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -100,8 +102,12 @@ private fun ArticleListItem(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+
+            val imageUrl = article.images.firstOrNull()?.fixedUrl
+            // import com.moviles.servitech.network.responses.article.fixedUrl
+
             AsyncImage(
-                model               = article.images.firstOrNull()?.url,
+                model = imageUrl,
                 contentDescription  = article.name,
                 modifier            = Modifier
                     .fillMaxWidth()
@@ -129,3 +135,4 @@ private fun ArticleListItem(
         }
     }
 }
+

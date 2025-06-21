@@ -4,6 +4,7 @@ import android.content.Context
 import com.moviles.servitech.common.Constants.API_BASE_URL
 import com.moviles.servitech.network.services.ArticleApiService
 import com.moviles.servitech.network.services.AuthApiService
+import com.moviles.servitech.network.services.RepairRequestApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,8 +14,10 @@ import okhttp3.Cache
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.Locale
 import javax.inject.Singleton
 
 /**
@@ -84,10 +87,31 @@ object RetrofitInstance {
                 .build()
         }
 
+        // This interceptor adds the Accept-Language header to requests
+        val languageInterceptor = Interceptor { chain ->
+            val request = chain.request().newBuilder()
+                .addHeader("Accept-Language", Locale.getDefault().language)
+                .build()
+            chain.proceed(request)
+        }
+
+        // This interceptor adds logging for debugging network issues
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+        
         return OkHttpClient.Builder()
             .cache(cache) // Set the cache for OkHttpClient
             .addInterceptor(offlineInterceptor) // Add the offline interceptor
+            .addInterceptor(languageInterceptor) // Add the language interceptor
             .addNetworkInterceptor(onlineInterceptor) // Add the online interceptor
+            .addInterceptor(loggingInterceptor) // Add the logging interceptor
+            .connectTimeout(
+                30,
+                java.util.concurrent.TimeUnit.SECONDS
+            ) // 30 seconds connection timeout
+            .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS) // 60 seconds read timeout
+            .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS) // 60 seconds write timeout
             .build() // Build the OkHttpClient
     }
 
@@ -130,5 +154,20 @@ object RetrofitInstance {
     @Singleton
     fun provideArticleService(retrofit: Retrofit): ArticleApiService =
         retrofit.create(ArticleApiService::class.java)
+
+    /**
+     * Provides the RepairRequestApiService for repair request-related API calls.
+     * This service is created using the Retrofit instance.
+     *
+     * This service handles operations such as fetching, creating, updating,
+     * and deleting repair requests.
+     *
+     * @param retrofit [Retrofit] instance for creating API services.
+     * @return [RepairRequestApiService] instance for repair request API calls.
+     */
+    @Provides
+    @Singleton
+    fun provideRepairRequestService(retrofit: Retrofit): RepairRequestApiService =
+        retrofit.create(RepairRequestApiService::class.java)
 
 }

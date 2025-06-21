@@ -9,7 +9,7 @@ import com.moviles.servitech.network.responses.auth.LoginResponse
 import com.moviles.servitech.network.responses.auth.RegisterResponse
 import com.moviles.servitech.repositories.AuthRepository
 import com.moviles.servitech.repositories.AuthResult
-import com.moviles.servitech.repositories.DataSource
+import com.moviles.servitech.repositories.helpers.DataSource
 import javax.inject.Inject
 
 /**
@@ -80,6 +80,24 @@ class AuthService @Inject constructor(
         return when (networkStatusTracker.isConnected.value) {
             true -> authRepo.logout(token, DataSource.Remote)
             false -> authRepo.logout(token, DataSource.Local)
+        }
+    }
+
+    /**
+     * Resets the password for the user with the provided email.
+     * This method checks the network connectivity status and
+     * calls the appropriate repository method to perform the password reset operation.
+     *
+     * @param email The email address of the user requesting a password reset.
+     * @return An [AuthResult] indicating the success or failure of the password reset operation.
+     */
+    suspend fun resetPassword(email: String): AuthResult<Unit> {
+        requireNotNull(email) {
+            stringProvider.getString(R.string.error_null_parameter_msg, "email")
+        }
+        return when (networkStatusTracker.isConnected.value) {
+            true -> authRepo.resetPassword(email, DataSource.Remote)
+            false -> authRepo.resetPassword(email, DataSource.Local)
         }
     }
 

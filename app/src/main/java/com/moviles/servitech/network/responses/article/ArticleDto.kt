@@ -1,8 +1,8 @@
 package com.moviles.servitech.network.responses.article
 
 import com.moviles.servitech.network.responses.CategoryDto
-import com.moviles.servitech.network.responses.ImageDto
-import com.moviles.servitech.network.responses.SubcategoryDto
+//import com.moviles.servitech.network.responses.ImageDto
+import com.moviles.servitech.network.responses.subcategory.SubcategoryDto
 
 data class ArticleDto(
     val id: Int,
@@ -15,3 +15,13 @@ data class ArticleDto(
     val subcategory: SubcategoryDto,
     val images: List<ImageDto>
 )
+data class ImageDto(
+    val title: String,
+    val path: String,
+    val alt: String
+
+
+)
+
+val ImageDto.fixedUrl: String
+    get() = path.replace("localhost", "10.0.2.2")
