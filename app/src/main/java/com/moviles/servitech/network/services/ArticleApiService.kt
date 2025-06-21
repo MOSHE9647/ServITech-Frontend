@@ -18,6 +18,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.Multipart
+import retrofit2.http.PUT
 import retrofit2.http.Part
 
 /** TODO: Add a more explicative description for this file.
@@ -102,7 +103,7 @@ interface ArticleApiService {
      * @return A [Response] containing an [ApiResponse] with the updated article.
      */
     @Multipart
-    @PUT("${Constants.API_ARTICLES_ROUTE}/{id}")
+    @POST("${Constants.API_ARTICLES_ROUTE}/{id}")
     @Headers(HEADER_ACCEPT_JSON)
     suspend fun updateArticle(
         @Header("Authorization") authToken: String,
@@ -114,7 +115,5 @@ interface ArticleApiService {
         @Part("subcategory_id") subcategoryId: RequestBody,
         @Part images: List<MultipartBody.Part>, // puede estar vacío o tener 1 imagen
         @Part("_method") method: RequestBody
-
     ): Response<ApiResponse<ArticleDto>>
-
 }
