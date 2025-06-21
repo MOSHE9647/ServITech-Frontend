@@ -11,6 +11,10 @@ import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
+import com.moviles.servitech.network.services.SupportRequestApiService
+
+
+
 /**
  * The `NetworkModule` provides the necessary dependencies related to network connectivity.
  * It is annotated with `@Module` to indicate that it is a Dagger module,
@@ -40,6 +44,11 @@ object NetworkModule {
         return retrofit.create(SubcategoryApi::class.java)
     }
 
+    @Provides
+    @Singleton
+    fun provideSupportRequestApiService(retrofit: Retrofit): SupportRequestApiService {
+        return retrofit.create(SupportRequestApiService::class.java)
+    }
 
 }
 
