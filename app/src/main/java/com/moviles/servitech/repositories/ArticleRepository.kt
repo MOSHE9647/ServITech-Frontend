@@ -29,7 +29,6 @@ class ArticleRepository @Inject constructor(
     private val service: ArticleApiService,
     private val sessionManager: SessionManager,
     private val fileHelper: FileHelper
-
 ) {
     /** Get all the articles */
     suspend fun fetchAll(): List<ArticleDto> {
@@ -157,28 +156,8 @@ class ArticleRepository @Inject constructor(
             false
         }
     }
-/*
-    // Updates an existing article with the given ID and request.
-    suspend fun update(id: Int, request: CreateArticleRequest): Boolean {
-        return try {
 
-            val token = getAuthTokenOrError(sessionManager)
-                ?: return error(R.string.error_authentication_required)
-            val authToken = "Bearer $token"
-
-            // Check if the user has admin role before proceeding
-            if (!checkRoleOrError(sessionManager, UserRole.ADMIN)) {
-                return error(R.string.error_user_not_authorized_msg)
-            }
-            val response = service.updateArticle(authToken,id, request)
-            Log.d("ArticleRepository", "Update status: ${response.code()}")
-            response.isSuccessful
-        } catch (e: Exception) {
-            Log.e("ArticleRepository", "Error al actualizar artículo", e)
-            false
-        }
-    }*/
-
+  // Helper function to log and return an error message
     suspend fun updateWithImage(
         id: Int,
         request: CreateArticleRequest,
@@ -224,7 +203,6 @@ class ArticleRepository @Inject constructor(
         }
     }
 
-    // Helper function to log and return an error message
     // Helper extension
     private fun String.toRequestBody(): RequestBody =
         toRequestBody("text/plain".toMediaTypeOrNull())

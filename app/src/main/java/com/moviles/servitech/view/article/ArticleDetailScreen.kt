@@ -28,6 +28,8 @@ import androidx.navigation.NavHostController
 import com.moviles.servitech.viewmodel.SubcategoryViewModel
 import androidx.compose.ui.text.input.KeyboardType
 import com.moviles.servitech.model.CreateArticleRequest
+import com.moviles.servitech.network.responses.article.ImageDto
+import com.moviles.servitech.network.responses.article.fixedUrl
 import com.moviles.servitech.network.responses.article.fixedUrl
 import com.moviles.servitech.viewmodel.utils.FileHelper
 import com.moviles.servitech.common.Utils.rememberSessionManager
@@ -35,8 +37,6 @@ import com.moviles.servitech.common.Utils.rememberSessionManager
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-
-
 
 // muestra el detalle de un artículo específico con una interfaz de usuario que permite editar y eliminar el artículo
 @SuppressLint("SuspiciousIndentation")

@@ -2,6 +2,7 @@ package com.moviles.servitech.network.services
 
 import com.moviles.servitech.common.Constants
 import com.moviles.servitech.common.Constants.HEADER_ACCEPT_JSON
+import com.moviles.servitech.model.CreateArticleRequest
 import com.moviles.servitech.network.responses.ApiResponse
 import com.moviles.servitech.network.responses.article.ArticleByIdResponse
 import com.moviles.servitech.network.responses.article.ArticleDto
@@ -101,7 +102,7 @@ interface ArticleApiService {
      * @return A [Response] containing an [ApiResponse] with the updated article.
      */
     @Multipart
-    @POST("${Constants.API_ARTICLES_ROUTE}/{id}")
+    @PUT("${Constants.API_ARTICLES_ROUTE}/{id}")
     @Headers(HEADER_ACCEPT_JSON)
     suspend fun updateArticle(
         @Header("Authorization") authToken: String,

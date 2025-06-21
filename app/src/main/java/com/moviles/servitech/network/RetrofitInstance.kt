@@ -99,7 +99,7 @@ object RetrofitInstance {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
-
+        
         return OkHttpClient.Builder()
             .cache(cache) // Set the cache for OkHttpClient
             .addInterceptor(offlineInterceptor) // Add the offline interceptor

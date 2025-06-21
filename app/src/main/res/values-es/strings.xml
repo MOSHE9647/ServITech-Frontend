@@ -87,6 +87,7 @@
     <string name="phone_icon_description">Bandera de Costa Rica</string>
 
     <string name="request_repair">Solicitar Reparación</string>
+    <string name="update_repair_request">Actualizar</string>
 
     <string name="customer_name">Nombre del Cliente</string>
     <string name="customer_phone">N° de Teléfono del Cliente</string>
