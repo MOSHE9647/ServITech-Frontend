@@ -23,7 +23,6 @@ class SubcategoryViewModel @Inject constructor(
             _subcategories.value = repository.fetchAll()
         }
     }
-
     fun getSubcategoriesByCategory(categoryName: String): List<SubcategoryDto> {
         return _subcategories.value.filter {
             it.category.name.equals(categoryName, ignoreCase = true)

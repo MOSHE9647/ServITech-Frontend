@@ -106,10 +106,7 @@ object RetrofitInstance {
             .addInterceptor(languageInterceptor) // Add the language interceptor
             .addNetworkInterceptor(onlineInterceptor) // Add the online interceptor
             .addInterceptor(loggingInterceptor) // Add the logging interceptor
-            .connectTimeout(
-                30,
-                java.util.concurrent.TimeUnit.SECONDS
-            ) // 30 seconds connection timeout
+            .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS) // 30 seconds connection timeout
             .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS) // 60 seconds read timeout
             .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS) // 60 seconds write timeout
             .build() // Build the OkHttpClient

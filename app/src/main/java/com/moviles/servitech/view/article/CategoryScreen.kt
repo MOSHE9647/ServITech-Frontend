@@ -126,20 +126,15 @@ fun CategoryScreen(
     // Handle logout state
     LaunchedEffect(logoutState) {
         when (val state = logoutState) {
-            is LogoutState.Loading -> { /* You can show a loading indicator if desired */
-            }
-
+            is LogoutState.Loading -> { /* You can show a loading indicator if desired */ }
             is LogoutState.Success -> {
                 showLogoutToast = true
                 navigateToLogin()
             }
-
             is LogoutState.Error -> {
                 logoutError = state.message
             }
-
-            else -> { /* No-op */
-            }
+            else -> { /* No-op */ }
         }
     }
 
@@ -254,8 +249,7 @@ fun CategoryScreen(
                 items(filteredSubcategories) { subcat ->
                     AssistChip(
                         onClick = {
-                            selectedSubcategoryId =
-                                if (selectedSubcategoryId == subcat.id) null else subcat.id
+                            selectedSubcategoryId = if (selectedSubcategoryId == subcat.id) null else subcat.id
                         },
                         label = { Text(subcat.name) },
                         leadingIcon = {
@@ -301,11 +295,7 @@ fun CategoryScreen(
             onDismiss = { showDialog = false },
             onSubmit = { request, imageUri ->
                 if (request.description.length < 10) {
-                    Toast.makeText(
-                        context,
-                        "Description must have at least 10 characters",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(context, "Description must have at least 10 characters", Toast.LENGTH_SHORT).show()
                 } else {
                     vm.createArticle(request, imageUri, selectedCategory)
                 }

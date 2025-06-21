@@ -4,13 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moviles.servitech.core.session.SessionManager
 import com.moviles.servitech.network.requests.supportRequest.CreateSupportRequest
 import com.moviles.servitech.network.services.SupportRequestApiService
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.moviles.servitech.model.SupportRequest
+import com.moviles.servitech.core.session.SessionManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel

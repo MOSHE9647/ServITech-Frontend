@@ -2,21 +2,24 @@ package com.moviles.servitech.network.services
 
 import com.moviles.servitech.common.Constants
 import com.moviles.servitech.common.Constants.HEADER_ACCEPT_JSON
+import com.moviles.servitech.model.CreateArticleRequest
 import com.moviles.servitech.network.responses.ApiResponse
 import com.moviles.servitech.network.responses.article.ArticleByIdResponse
 import com.moviles.servitech.network.responses.article.ArticleDto
 import com.moviles.servitech.network.responses.article.ArticlesResponse
+import retrofit2.Response
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Path
+
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import retrofit2.Response
 import retrofit2.http.DELETE
-import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.Multipart
-import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
-import retrofit2.http.Path
 
 /** TODO: Add a more explicative description for this file.
  * Service interface for fetching articles from the API.
@@ -47,7 +50,7 @@ interface ArticleApiService {
     ): Response<ArticlesResponse>
 
 
-    /**
+  /**
      * Creates a new article with the provided details.
      * @param name The name of the article.
      * @param description The description of the article.
@@ -68,7 +71,7 @@ interface ArticleApiService {
         @Part("category_id") categoryId: RequestBody,
         @Part("subcategory_id") subcategoryId: RequestBody,
         @Part images: List<MultipartBody.Part>
-    ): Response<Unit>
+  ): Response<Unit>
 
     /**
      * Fetches a specific article by its ID.
@@ -90,10 +93,8 @@ interface ArticleApiService {
 
     @DELETE("${Constants.API_ARTICLES_ROUTE}/{id}")
     @Headers(HEADER_ACCEPT_JSON)
-    suspend fun deleteArticle(
-        @Header("Authorization") authToken: String,
-        @Path("id") id: Int
-    ): Response<Void>
+    suspend fun deleteArticle(@Header("Authorization") authToken: String,
+                              @Path("id") id: Int): Response<Void>
 
     /**
      * Updates an existing article with the provided details.

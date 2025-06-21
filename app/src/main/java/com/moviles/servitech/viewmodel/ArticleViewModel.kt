@@ -2,18 +2,18 @@ package com.moviles.servitech.viewmodel
 
 import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moviles.servitech.model.CreateArticleRequest
-import com.moviles.servitech.network.responses.article.ArticleDto
 import com.moviles.servitech.repositories.ArticleRepository
+import com.moviles.servitech.network.responses.article.ArticleDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import androidx.compose.runtime.State
 
 
 @HiltViewModel
@@ -65,12 +65,13 @@ class ArticleViewModel @Inject constructor(
         _createSuccess.value = false
     }
 
-    /* Creates a new article with the given request and optional image URI.
-        * Logs the request details and the result of the creation operation.
-        *
-        * @param request The request containing article details.
-        * @param imageUri Optional URI of an image to associate with the article.
-        */
+ /* Creates a new article with the given request and optional image URI.
+     * Logs the request details and the result of the creation operation.
+     *
+     * @param request The request containing article details.
+     * @param imageUri Optional URI of an image to associate with the article.
+     */
+
 
 
     fun createArticle(request: CreateArticleRequest, imageUri: Uri?, categoryName: String) {
@@ -101,20 +102,21 @@ class ArticleViewModel @Inject constructor(
     }
 
 
-    /* Deletes an article by its ID and updates the delete success state.
-         * @param id The ID of the article to delete.
-         * @param onSuccess Callback to execute if the deletion is successful.
-         */
-    fun deleteArticle(id: Int, categoryName: String, onSuccess: () -> Unit) {
-        viewModelScope.launch {
-            val success = repo.deleteById(id)
-            _deleteSuccess.value = success
-            if (success) {
-                loadByCategory(categoryName) // ← recarga la lista
-                onSuccess()
-            }
+
+/* Deletes an article by its ID and updates the delete success state.
+     * @param id The ID of the article to delete.
+     * @param onSuccess Callback to execute if the deletion is successful.
+     */
+fun deleteArticle(id: Int, categoryName: String, onSuccess: () -> Unit) {
+    viewModelScope.launch {
+        val success = repo.deleteById(id)
+        _deleteSuccess.value = success
+        if (success) {
+            loadByCategory(categoryName) // ← recarga la lista
+            onSuccess()
         }
     }
+}
 
     /*Updates an existing article with the given ID and request.
      * @param id The ID of the article to update.
@@ -124,13 +126,7 @@ class ArticleViewModel @Inject constructor(
     private val _updateSuccess = MutableStateFlow(false)
     val updateSuccess: StateFlow<Boolean> = _updateSuccess
 
-    fun updateArticleWithImage(
-        id: Int,
-        request: CreateArticleRequest,
-        imageUri: Uri?,
-        category: String,
-        onSuccess: () -> Unit = {}
-    ) {
+    fun updateArticleWithImage(id: Int, request: CreateArticleRequest, imageUri: Uri?, category: String, onSuccess: () -> Unit = {}) {
         viewModelScope.launch {
             val result = repo.updateWithImage(id, request, imageUri)
             Log.d("UPDATE_ARTICLE", "Resultado: $result")

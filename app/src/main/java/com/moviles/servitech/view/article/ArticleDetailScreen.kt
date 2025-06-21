@@ -7,28 +7,36 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import com.moviles.servitech.viewmodel.ArticleViewModel
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
-import com.moviles.servitech.common.Utils.rememberSessionManager
-import com.moviles.servitech.model.CreateArticleRequest
-import com.moviles.servitech.network.responses.article.fixedUrl
-import com.moviles.servitech.viewmodel.ArticleViewModel
 import com.moviles.servitech.viewmodel.SubcategoryViewModel
+import androidx.compose.ui.text.input.KeyboardType
+import com.moviles.servitech.model.CreateArticleRequest
+import com.moviles.servitech.network.responses.article.ImageDto
+import com.moviles.servitech.network.responses.article.fixedUrl
+import com.moviles.servitech.network.responses.article.fixedUrl
+import com.moviles.servitech.viewmodel.utils.FileHelper
+import com.moviles.servitech.common.Utils.rememberSessionManager
+
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 
 // muestra el detalle de un artículo específico con una interfaz de usuario que permite editar y eliminar el artículo
 @SuppressLint("SuspiciousIndentation")
@@ -133,7 +141,7 @@ fun ArticleDetailScreen(
             Log.d("IMAGEN_ARTICULO", "article: $article")
             val imageUrl = article?.images?.firstOrNull()?.fixedUrl
             //import com.moviles.servitech.network.responses.article.fixedUrl
-
+            
             if (isLoading) {
                 Box(
                     modifier = Modifier
@@ -168,7 +176,7 @@ fun ArticleDetailScreen(
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
                         Button(
-                            onClick = {
+                            onClick = { 
                                 viewModel.reloadArticleById(articleId)
                             }
                         ) {
@@ -193,20 +201,21 @@ fun ArticleDetailScreen(
                     Log.d("IMAGEN_ARTICULO", "URL IMAGEN COMPLETA: $imageUrl")
 
 
-                    // show the image if available
-                    val displayImage = imageUri ?: imageUrl
 
-                    displayImage?.let {
-                        AsyncImage(
-                            model = it,
-                            contentDescription = "Imagen del artículo",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(180.dp)
-                                .padding(bottom = 16.dp),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
+                        // show the image if available
+                        val displayImage = imageUri ?: imageUrl
+
+                        displayImage?.let {
+                            AsyncImage(
+                                model = it,
+                                contentDescription = "Imagen del artículo",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(180.dp)
+                                    .padding(bottom = 16.dp),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
                     // Input fields for article details
 
                     val fieldColors = OutlinedTextFieldDefaults.colors(
@@ -223,9 +232,7 @@ fun ArticleDetailScreen(
                         label = { Text("Nombre") },
                         enabled = isEditing,
                         colors = fieldColors,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
                     )
                     OutlinedTextField(
                         value = description,
@@ -233,9 +240,7 @@ fun ArticleDetailScreen(
                         label = { Text("Descripción") },
                         enabled = isEditing,
                         colors = fieldColors,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
                     )
                     OutlinedTextField(
                         value = price,
@@ -244,9 +249,7 @@ fun ArticleDetailScreen(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         enabled = isEditing,
                         colors = fieldColors,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
                     )
                     OutlinedTextField(
                         value = currentCategory,
@@ -254,21 +257,13 @@ fun ArticleDetailScreen(
                         label = { Text("Categoría") },
                         enabled = false,
                         colors = fieldColors,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
                     )
 
 
                     if (isEditing) {
-                        val selectedSubcatName =
-                            filteredSubcategories.find { it.id == selectedSubcategoryId }?.name
-                                ?: "Seleccionar"
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp)
-                        ) {
+                        val selectedSubcatName = filteredSubcategories.find { it.id == selectedSubcategoryId }?.name ?: "Seleccionar"
+                        Box(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                             OutlinedTextField(
                                 value = selectedSubcatName,
                                 onValueChange = {},
@@ -276,9 +271,7 @@ fun ArticleDetailScreen(
                                 enabled = false,
                                 readOnly = true,
                                 colors = fieldColors,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { subcategoryExpanded = true }
+                                modifier = Modifier.fillMaxWidth().clickable { subcategoryExpanded = true }
 
 
                             )
@@ -305,9 +298,7 @@ fun ArticleDetailScreen(
                             label = { Text("Subcategoría") },
                             enabled = false,
                             colors = fieldColors,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp)
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
                         )
                     }
 
@@ -322,15 +313,14 @@ fun ArticleDetailScreen(
                             Button(
 
 
-                                onClick = {
+                            onClick = {
                                     if (isEditing) {
                                         val request = CreateArticleRequest(
                                             name = name,
                                             description = description,
                                             price = price.toDoubleOrNull() ?: 0.0,
                                             category_id = art.category.id,
-                                            subcategory_id = selectedSubcategoryId
-                                                ?: art.subcategory_id,
+                                            subcategory_id = selectedSubcategoryId ?: art.subcategory_id,
                                             images = emptyList() // o una lista vacía si ya estás manejando la imagen por separado
                                         )
 
@@ -340,11 +330,7 @@ fun ArticleDetailScreen(
                                             imageUri = imageUri, // image URI from the picker
                                             category = currentCategory,
                                             onSuccess = {
-                                                Toast.makeText(
-                                                    context,
-                                                    "Artículo actualizado correctamente",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
+                                                Toast.makeText(context, "Artículo actualizado correctamente", Toast.LENGTH_SHORT).show()
                                                 navController.popBackStack()
                                             }
                                         )
@@ -355,9 +341,7 @@ fun ArticleDetailScreen(
                                 },
                                 colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
                                 shape = RoundedCornerShape(50.dp),
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(48.dp)
+                                modifier = Modifier.weight(1f).height(48.dp)
                             ) {
                                 Text(if (isEditing) "Guardar" else "Editar")
                             }
@@ -372,11 +356,7 @@ fun ArticleDetailScreen(
                                         TextButton(onClick = {
                                             showConfirm = false
                                             viewModel.deleteArticle(articleId, currentCategory) {
-                                                Toast.makeText(
-                                                    context,
-                                                    "Artículo eliminado correctamente",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
+                                                Toast.makeText(context, "Artículo eliminado correctamente", Toast.LENGTH_SHORT).show()
                                                 navController.popBackStack()
                                             }
 
@@ -396,15 +376,9 @@ fun ArticleDetailScreen(
 
                             Button(
                                 onClick = { showConfirm = true },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(
-                                        0xFFB00020
-                                    )
-                                ),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB00020)),
                                 shape = RoundedCornerShape(50.dp),
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(48.dp)
+                                modifier = Modifier.weight(1f).height(48.dp)
                             ) {
                                 Text("Eliminar")
                             }

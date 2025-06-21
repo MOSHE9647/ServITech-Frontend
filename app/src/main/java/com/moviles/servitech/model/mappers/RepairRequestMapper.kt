@@ -137,6 +137,5 @@ fun RepairRequestResponse.toModel(): RepairRequest {
 fun List<RepairRequest>.modelToEntityList(): List<RepairRequestEntity> = this.map { it.toEntity() }
 fun List<RepairRequestResponse>.responseToModelList(): List<RepairRequest> =
     this.map { it.toModel() }
-
 fun List<RepairRequestWithImagesEntity>.withImagesToModelList(context: Context? = null): List<RepairRequest> =
     this.map { it.toModel(context) }

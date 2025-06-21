@@ -1,12 +1,13 @@
 package com.moviles.servitech.view.article
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Info
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -27,7 +28,9 @@ fun AddArticleDialog(
     onDismiss: () -> Unit,
     onSubmit: (CreateArticleRequest, Uri?) -> Unit,
     subcategories: List<SubcategoryDto>
-) {
+)
+
+{
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
@@ -77,18 +80,9 @@ fun AddArticleDialog(
         title = { Text("Añadir artículo") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    label = { Text("Nombre") })
-                OutlinedTextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    label = { Text("Descripción") })
-                OutlinedTextField(
-                    value = price,
-                    onValueChange = { price = it },
-                    label = { Text("Precio") })
+                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Nombre") })
+                OutlinedTextField(value = description, onValueChange = { description = it }, label = { Text("Descripción") })
+                OutlinedTextField(value = price, onValueChange = { price = it }, label = { Text("Precio") })
 
                 DropdownMenuBox(
                     items = filteredSubcategories,
@@ -140,7 +134,7 @@ fun DropdownMenuBox(
                 }
             }
         )
-        // show the dropdown menu when the text field is clicked
+    // show the dropdown menu when the text field is clicked
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             items.forEach { subcat ->
                 DropdownMenuItem(

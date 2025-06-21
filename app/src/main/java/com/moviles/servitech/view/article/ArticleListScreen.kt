@@ -107,7 +107,7 @@ private fun ArticleListItem(
             // import com.moviles.servitech.network.responses.article.fixedUrl
 
             AsyncImage(
-                model = imageUrl,
+                model               = imageUrl,
                 contentDescription  = article.name,
                 modifier            = Modifier
                     .fillMaxWidth()

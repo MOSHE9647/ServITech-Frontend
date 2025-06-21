@@ -22,6 +22,5 @@ data class ImageDto(
 
 
 )
-
 val ImageDto.fixedUrl: String
     get() = path.replace("localhost", "10.0.2.2")

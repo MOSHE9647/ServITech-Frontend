@@ -27,6 +27,7 @@ import com.moviles.servitech.view.auth.LoginScreen
 import com.moviles.servitech.view.auth.RegisterScreen
 import com.moviles.servitech.view.support.SupportRequestScreen
 import kotlinx.serialization.Serializable
+import androidx.hilt.navigation.compose.hiltViewModel
 
 /**
  * The `Screen` sealed class defines the different screens in the application.
@@ -39,13 +40,9 @@ sealed class Screen() {
     @Serializable object Login
     @Serializable object Register
     @Serializable object Home
-
     @Serializable
     object RepairRequest
-
-    @Serializable
-    data class Detail(val articleId: Int, val categoryName: String)
-
+    @Serializable data class Detail(val articleId: Int, val categoryName: String)
     @Serializable
     object ForgotPassword
     object SupportRequest
