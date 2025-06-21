@@ -162,7 +162,7 @@ fun CategoryScreen(
             )
         },
         floatingActionButton = {
-            if (isCategoryValid) {
+            if (isCategoryValid && user?.role?.lowercase() == "admin") {
                 FloatingActionButton(onClick = { showDialog = true }) {
                     Icon(Icons.Default.Add, contentDescription = "Add article")
                 }

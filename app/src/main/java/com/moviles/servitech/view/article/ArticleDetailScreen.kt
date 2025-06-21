@@ -30,6 +30,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import com.moviles.servitech.model.CreateArticleRequest
 import com.moviles.servitech.network.responses.article.fixedUrl
 import com.moviles.servitech.viewmodel.utils.FileHelper
+import com.moviles.servitech.common.Utils.rememberSessionManager
 
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -69,6 +70,10 @@ fun ArticleDetailScreen(
     val errorMessage by viewModel.errorMessage.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
+    // Session management
+    val sessionManager = rememberSessionManager(context)
+    val user by sessionManager.user.collectAsState(initial = null)
+    val isAdmin = user?.role?.lowercase() == "admin"
 
     LaunchedEffect(articleId) {
         viewModel.loadArticleById(articleId)
@@ -299,81 +304,84 @@ fun ArticleDetailScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        Button(
-
-
-                        onClick = {
-                                if (isEditing) {
-                                    val request = CreateArticleRequest(
-                                        name = name,
-                                        description = description,
-                                        price = price.toDoubleOrNull() ?: 0.0,
-                                        category_id = art.category.id,
-                                        subcategory_id = selectedSubcategoryId ?: art.subcategory_id,
-                                        images = emptyList() // o una lista vacía si ya estás manejando la imagen por separado
-                                    )
-
-                                    viewModel.updateArticleWithImage(
-                                        id = art.id,
-                                        request = request,
-                                        imageUri = imageUri, // image URI from the picker
-                                        category = currentCategory,
-                                        onSuccess = {
-                                            Toast.makeText(context, "Artículo actualizado correctamente", Toast.LENGTH_SHORT).show()
-                                            navController.popBackStack()
-                                        }
-                                    )
-
-                                } else {
-                                    isEditing = true
-                                }
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
-                            shape = RoundedCornerShape(50.dp),
-                            modifier = Modifier.weight(1f).height(48.dp)
+                    // Only show edit and delete buttons for admin users
+                    if (isAdmin) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            Text(if (isEditing) "Guardar" else "Editar")
-                        }
+                            Button(
 
 
-                        var showConfirm by remember { mutableStateOf(false) }
+                            onClick = {
+                                    if (isEditing) {
+                                        val request = CreateArticleRequest(
+                                            name = name,
+                                            description = description,
+                                            price = price.toDoubleOrNull() ?: 0.0,
+                                            category_id = art.category.id,
+                                            subcategory_id = selectedSubcategoryId ?: art.subcategory_id,
+                                            images = emptyList() // o una lista vacía si ya estás manejando la imagen por separado
+                                        )
 
-                        if (showConfirm) {
-                            AlertDialog(
-                                onDismissRequest = { showConfirm = false },
-                                confirmButton = {
-                                    TextButton(onClick = {
-                                        showConfirm = false
-                                        viewModel.deleteArticle(articleId, currentCategory) {
-                                            Toast.makeText(context, "Artículo eliminado correctamente", Toast.LENGTH_SHORT).show()
-                                            navController.popBackStack()
-                                        }
+                                        viewModel.updateArticleWithImage(
+                                            id = art.id,
+                                            request = request,
+                                            imageUri = imageUri, // image URI from the picker
+                                            category = currentCategory,
+                                            onSuccess = {
+                                                Toast.makeText(context, "Artículo actualizado correctamente", Toast.LENGTH_SHORT).show()
+                                                navController.popBackStack()
+                                            }
+                                        )
 
-                                    }) {
-                                        Text("Sí, eliminar")
+                                    } else {
+                                        isEditing = true
                                     }
                                 },
-                                dismissButton = {
-                                    TextButton(onClick = { showConfirm = false }) {
-                                        Text("Cancelar")
-                                    }
-                                },
-                                title = { Text("¿Estás seguro?") },
-                                text = { Text("Esta acción eliminará permanentemente el artículo.") }
-                            )
-                        }
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
+                                shape = RoundedCornerShape(50.dp),
+                                modifier = Modifier.weight(1f).height(48.dp)
+                            ) {
+                                Text(if (isEditing) "Guardar" else "Editar")
+                            }
 
-                        Button(
-                            onClick = { showConfirm = true },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB00020)),
-                            shape = RoundedCornerShape(50.dp),
-                            modifier = Modifier.weight(1f).height(48.dp)
-                        ) {
-                            Text("Eliminar")
+
+                            var showConfirm by remember { mutableStateOf(false) }
+
+                            if (showConfirm) {
+                                AlertDialog(
+                                    onDismissRequest = { showConfirm = false },
+                                    confirmButton = {
+                                        TextButton(onClick = {
+                                            showConfirm = false
+                                            viewModel.deleteArticle(articleId, currentCategory) {
+                                                Toast.makeText(context, "Artículo eliminado correctamente", Toast.LENGTH_SHORT).show()
+                                                navController.popBackStack()
+                                            }
+
+                                        }) {
+                                            Text("Sí, eliminar")
+                                        }
+                                    },
+                                    dismissButton = {
+                                        TextButton(onClick = { showConfirm = false }) {
+                                            Text("Cancelar")
+                                        }
+                                    },
+                                    title = { Text("¿Estás seguro?") },
+                                    text = { Text("Esta acción eliminará permanentemente el artículo.") }
+                                )
+                            }
+
+                            Button(
+                                onClick = { showConfirm = true },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB00020)),
+                                shape = RoundedCornerShape(50.dp),
+                                modifier = Modifier.weight(1f).height(48.dp)
+                            ) {
+                                Text("Eliminar")
+                            }
                         }
                     }
                 }
