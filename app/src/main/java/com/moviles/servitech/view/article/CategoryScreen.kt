@@ -98,11 +98,18 @@ fun CategoryScreen(
         },
         bottomBar = {
             NavigationBar {
-                val items = listOf(
+                val baseItems = listOf(
                     CAT_TECHNOLOGY to Icons.Default.Smartphone,
-                    CAT_ANIME to Icons.Default.Info,
-                    CAT_SUPPORT to Icons.Default.Settings
+                    CAT_ANIME to Icons.Default.Info
                 )
+
+                // Solo agregar el botón de soporte si el usuario NO es admin
+                val items = if (user?.role?.lowercase() != "admin") {
+                    baseItems + (CAT_SUPPORT to Icons.Default.Settings)
+                } else {
+                    baseItems
+                }
+
                 items.forEach { (cat, icon) ->
                     NavigationBarItem(
                         icon = { Icon(icon, contentDescription = cat) },
