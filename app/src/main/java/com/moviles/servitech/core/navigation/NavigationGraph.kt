@@ -26,6 +26,7 @@ import com.moviles.servitech.view.auth.LoginScreen
 import com.moviles.servitech.view.auth.RegisterScreen
 import com.moviles.servitech.view.support.SupportRequestScreen
 import kotlinx.serialization.Serializable
+import androidx.hilt.navigation.compose.hiltViewModel
 
 /**
  * The `Screen` sealed class defines the different screens in the application.
@@ -141,7 +142,9 @@ fun NavigationGraph() {
                         )
                     )
                 },
-                navController = navController
+                navController = navController,
+                navigateToLogin = { navController.navigate(Login) { popUpTo(0) } },
+                logoutViewModel = androidx.hilt.navigation.compose.hiltViewModel()
             )
 //            HomeScreen {
 //                navController.navigate(Login) { popUpTo(0) }

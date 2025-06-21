@@ -9,32 +9,39 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Smartphone
 import androidx.compose.material.icons.filled.SupportAgent
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
+import com.moviles.servitech.R
 import com.moviles.servitech.common.Constants.CAT_ANIME
 import com.moviles.servitech.common.Constants.CAT_SUPPORT
 import com.moviles.servitech.common.Constants.CAT_TECHNOLOGY
 import com.moviles.servitech.network.responses.article.ArticleDto
+import com.moviles.servitech.ui.components.HandleServerError
+import com.moviles.servitech.ui.components.LoadingIndicator
 import com.moviles.servitech.viewmodel.ArticleViewModel
 import com.moviles.servitech.viewmodel.SubcategoryViewModel
+import com.moviles.servitech.viewmodel.auth.LogoutState
+import com.moviles.servitech.viewmodel.auth.LogoutViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.delay
 
 import com.moviles.servitech.common.Utils.rememberSessionManager
 import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavController
-
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,7 +51,9 @@ fun CategoryScreen(
     navigateToDetail: (Int) -> Unit,
     vm: ArticleViewModel = hiltViewModel(),
     subcategoryVm: SubcategoryViewModel = hiltViewModel(),
-    navController: NavController
+    logoutViewModel: LogoutViewModel = hiltViewModel(),
+    navController: NavController,
+    navigateToLogin: () -> Unit = {}
 ) {
     var searchText by remember { mutableStateOf("") }
     var selectedSubcategoryId by remember { mutableStateOf<Int?>(null) }
@@ -58,6 +67,8 @@ fun CategoryScreen(
     val isCategoryValid = selectedCategory == CAT_ANIME || selectedCategory == CAT_TECHNOLOGY
     val sessionManager = rememberSessionManager(context)
     val user by sessionManager.user.collectAsState(initial = null)
+    val token by sessionManager.token.collectAsState(initial = "")
+    val logoutState by logoutViewModel.logoutState.observeAsState()
 
     // Carga artículos cuando cambia la categoría
     LaunchedEffect(selectedCategory) {
@@ -84,16 +95,76 @@ fun CategoryScreen(
         filteredArticles.groupBy { it.subcategory?.name ?: "" }
     }
 
+    // Estado local para mostrar el Toast de logout
+    var showLogoutToast by remember { mutableStateOf(false) }
+    var logoutError by remember { mutableStateOf<String?>(null) }
+
+    // Manejo del estado de logout
+    LaunchedEffect(logoutState) {
+        when (val state = logoutState) {
+            is LogoutState.Loading -> { /* Puedes mostrar un indicador de carga si lo deseas */ }
+            is LogoutState.Success -> {
+                showLogoutToast = true
+                navigateToLogin()
+            }
+            is LogoutState.Error -> {
+                logoutError = state.message
+            }
+            else -> { /* No-op */ }
+        }
+    }
+
+    if (showLogoutToast) {
+        Toast.makeText(context, "Sesión cerrada correctamente", Toast.LENGTH_LONG).show()
+        showLogoutToast = false
+    }
+    if (logoutError != null) {
+        AlertDialog(
+            onDismissRequest = { logoutError = null },
+            title = { Text("Error") },
+            text = { Text(logoutError ?: "") },
+            confirmButton = {
+                TextButton(onClick = { logoutError = null }) { Text("OK") }
+            }
+        )
+    }
+
+    LaunchedEffect(createSuccess) {
+        if (createSuccess) {
+            vm.loadByCategory(selectedCategory)
+            Toast.makeText(context, "Artículo agregado correctamente", Toast.LENGTH_SHORT).show()
+            showDialog = false
+            vm.resetCreateSuccess()
+        }
+    }
+
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(selectedCategory.replaceFirstChar { it.uppercase() }) })
+            TopAppBar(
+                title = { Text(selectedCategory.replaceFirstChar { it.uppercase() }) },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            if (!token.isNullOrEmpty()) {
+                                logoutViewModel.logout(token.orEmpty())
+                            } else {
+                                Toast.makeText(context, "No Token", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Logout,
+                            contentDescription = "Cerrar sesión"
+                        )
+                    }
+                }
+            )
         },
         floatingActionButton = {
             if (isCategoryValid) {
                 FloatingActionButton(onClick = { showDialog = true }) {
                     Icon(Icons.Default.Add, contentDescription = "Añadir artículo")
                 }
-
             }
         },
         bottomBar = {
@@ -186,15 +257,7 @@ fun CategoryScreen(
                     }
                 }
             }
-        }
-    }
 
-    LaunchedEffect(createSuccess) {
-        if (createSuccess) {
-            vm.loadByCategory(selectedCategory)
-            Toast.makeText(context, "Artículo agregado correctamente", Toast.LENGTH_SHORT).show()
-            showDialog = false
-            vm.resetCreateSuccess()
         }
     }
 
@@ -213,7 +276,6 @@ fun CategoryScreen(
         )
     }
 }
-
 
 @Composable
 fun ArticleCard(article: ArticleDto, onClick: () -> Unit) {
@@ -248,4 +310,3 @@ fun ArticleCard(article: ArticleDto, onClick: () -> Unit) {
         }
     }
 }
-
