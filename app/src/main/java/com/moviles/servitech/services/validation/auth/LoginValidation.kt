@@ -1,7 +1,10 @@
-package com.moviles.servitech.services.validation
+package com.moviles.servitech.services.validation.auth
 
 import com.moviles.servitech.R
 import com.moviles.servitech.core.providers.AndroidStringProvider
+import com.moviles.servitech.services.validation.ValidationResult
+import com.moviles.servitech.services.validation.invalid
+import com.moviles.servitech.services.validation.valid
 import javax.inject.Inject
 
 /**
@@ -23,17 +26,12 @@ class LoginValidation @Inject constructor(
      */
     fun validateEmail(email: String): ValidationResult {
         return when {
-            email.isEmpty() -> ValidationResult(
-                false,
-                stringProvider.getString(R.string.email_empty_error)
-            )
+            email.isEmpty() -> invalid(stringProvider.getString(R.string.email_empty_error))
             !email.matches(
                 Regex(pattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.(com|net|org|edu|gov|mil|info|io|co)$")
-            ) -> ValidationResult(
-                false,
-                stringProvider.getString(R.string.email_invalid_error)
-            )
-            else -> ValidationResult(true)
+            ) -> invalid(stringProvider.getString(R.string.email_invalid_error))
+
+            else -> valid()
         }
     }
 
@@ -46,15 +44,9 @@ class LoginValidation @Inject constructor(
      */
     fun validatePassword(password: String): ValidationResult {
         return when {
-            password.isEmpty() -> ValidationResult(
-                false,
-                stringProvider.getString(R.string.password_empty_error)
-            )
-            password.length <= 8 -> ValidationResult(
-                false,
-                stringProvider.getString(R.string.password_length_error)
-            )
-            else -> ValidationResult(true)
+            password.isEmpty() -> invalid(stringProvider.getString(R.string.password_empty_error))
+            password.length <= 8 -> invalid(stringProvider.getString(R.string.password_length_error))
+            else -> valid()
         }
     }
 
