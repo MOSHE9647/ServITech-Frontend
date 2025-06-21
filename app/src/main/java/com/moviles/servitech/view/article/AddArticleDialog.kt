@@ -40,7 +40,7 @@ fun AddArticleDialog(
 
     val context = LocalContext.current
 
-    // Filtrar subcategorías por categoría
+    // filter subcategories based on the selected category
     val filteredSubcategories = subcategories.filter {
         it.category.id == selectedCategoryId
     }
@@ -83,32 +83,15 @@ fun AddArticleDialog(
                 OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Nombre") })
                 OutlinedTextField(value = description, onValueChange = { description = it }, label = { Text("Descripción") })
                 OutlinedTextField(value = price, onValueChange = { price = it }, label = { Text("Precio") })
-/*
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(
-                        onClick = { selectedCategoryId = 1 },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (selectedCategoryId == 1) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
-                        )
-                    ) {
-                        Text("Anime")
-                    }
-                    Button(
-                        onClick = { selectedCategoryId = 2 },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (selectedCategoryId == 2) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
-                        )
-                    ) {
-                        Text("Tecnología")
-                    }
-                }
-*/
+
                 DropdownMenuBox(
                     items = filteredSubcategories,
                     selectedItem = selectedSubcategory,
                     onItemSelected = { selectedSubcategory = it }
                 )
 
+
+                //button for image selection
                 Button(onClick = { imagePickerLauncher.launch("image/*") }) {
                     Text("Seleccionar imagen")
                 }
@@ -123,12 +106,13 @@ fun AddArticleDialog(
                         contentScale = ContentScale.Crop
                     )
                 }
+
             }
         }
     )
 }
 
-// Reutilizable dropdown para seleccionar subcategoría
+// render the dropdown menu for subcategories
 @Composable
 fun DropdownMenuBox(
     items: List<SubcategoryDto>,
@@ -150,7 +134,7 @@ fun DropdownMenuBox(
                 }
             }
         )
-    // sirve para abrir el dropdown  que se muestra al hacer click en el icono
+    // show the dropdown menu when the text field is clicked
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             items.forEach { subcat ->
                 DropdownMenuItem(

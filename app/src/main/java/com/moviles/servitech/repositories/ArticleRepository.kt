@@ -11,7 +11,9 @@ import com.moviles.servitech.network.responses.article.ArticleDto
 import com.moviles.servitech.network.services.ArticleApiService
 import com.moviles.servitech.services.helpers.ServicesHelper.checkRoleOrError
 import com.moviles.servitech.services.helpers.ServicesHelper.getAuthTokenOrError
+import com.moviles.servitech.viewmodel.utils.FileHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -25,7 +27,8 @@ import javax.inject.Singleton
 class ArticleRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val service: ArticleApiService,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val fileHelper: FileHelper
 ) {
     /** Get all the articles */
     suspend fun fetchAll(): List<ArticleDto> {
@@ -96,13 +99,40 @@ class ArticleRepository @Inject constructor(
     }
     // Fetches an article by its ID.
     suspend fun fetchById(id: Int): ArticleDto {
-        val response = service.getArticleById(id)
-        return if (response.isSuccessful) {
-            response.body()?.data?.article ?: throw Exception("Artículo vacío")
-        } else {
-            val error = response.errorBody()?.string()
-            Log.e("ArticleRepository", "Error al obtener artículo: $error")
-            throw Exception("Error HTTP ${response.code()}")
+        return try {
+            val response = service.getArticleById(id)
+            Log.d("ArticleRepository", "Response code: ${response.code()}")
+            Log.d("ArticleRepository", "Response headers: ${response.headers()}")
+            
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+                if (responseBody != null) {
+                    Log.d("ArticleRepository", "Response body received successfully")
+                    responseBody.data?.article ?: throw Exception("Article data is null")
+                } else {
+                    Log.e("ArticleRepository", "Response body is null")
+                    throw Exception("Empty response body")
+                }
+            } else {
+                val errorBody = response.errorBody()?.string()
+                Log.e("ArticleRepository", "HTTP Error ${response.code()}: $errorBody")
+                throw Exception("HTTP Error ${response.code()}: ${errorBody ?: "Unknown error"}")
+            }
+        } catch (e: Exception) {
+            when (e) {
+                is java.io.EOFException -> {
+                    Log.e("ArticleRepository", "JSON parsing error - incomplete response for article $id", e)
+                    throw Exception("Server response is incomplete. Please try again.")
+                }
+                is com.google.gson.JsonSyntaxException -> {
+                    Log.e("ArticleRepository", "JSON syntax error for article $id", e)
+                    throw Exception("Invalid response format from server.")
+                }
+                else -> {
+                    Log.e("ArticleRepository", "Error fetching article $id", e)
+                    throw Exception("Failed to load article: ${e.message}")
+                }
+            }
         }
     }
     // deletes an article by its ID.
@@ -127,28 +157,52 @@ class ArticleRepository @Inject constructor(
         }
     }
 
-    // Updates an existing article with the given ID and request.
-    suspend fun update(id: Int, request: CreateArticleRequest): Boolean {
+  // Helper function to log and return an error message
+    suspend fun updateWithImage(
+        id: Int,
+        request: CreateArticleRequest,
+        imageUri: Uri?
+    ): Boolean {
         return try {
-
-            val token = getAuthTokenOrError(sessionManager)
-                ?: return error(R.string.error_authentication_required)
+            val token = getAuthTokenOrError(sessionManager) ?: return false
             val authToken = "Bearer $token"
 
-            // Check if the user has admin role before proceeding
-            if (!checkRoleOrError(sessionManager, UserRole.ADMIN)) {
-                return error(R.string.error_user_not_authorized_msg)
+            val name = request.name.toRequestBody("text/plain".toMediaType())
+            val description = request.description.toRequestBody("text/plain".toMediaType())
+            val price = request.price.toString().toRequestBody("text/plain".toMediaType())
+            val categoryId = request.category_id.toString().toRequestBody("text/plain".toMediaType())
+            val subcategoryId = request.subcategory_id.toString().toRequestBody("text/plain".toMediaType())
+            val methodOverride = "PUT".toRequestBody("text/plain".toMediaType()) // 👈 AQUI
+
+            val imageParts = mutableListOf<MultipartBody.Part>()
+            imageUri?.let {
+                val file = fileHelper.getFileFromUri(it)
+                val requestFile = file.asRequestBody("image/*".toMediaType())
+                val part = MultipartBody.Part.createFormData("images[]", file.name, requestFile)
+                imageParts.add(part)
             }
-            val response = service.updateArticle(authToken,id, request)
-            Log.d("ArticleRepository", "Update status: ${response.code()}")
+
+            //  Call ENDPOINT COMO POST CON override PUT
+            val response = service.updateArticle(
+                authToken,
+                id,
+                name,
+                description,
+                price,
+                categoryId,
+                subcategoryId,
+                imageParts,
+                methodOverride
+            )
+
+            Log.d("ArticleRepository", "Update with image status: ${response.code()}")
             response.isSuccessful
         } catch (e: Exception) {
-            Log.e("ArticleRepository", "Error al actualizar artículo", e)
+            Log.e("ArticleRepository", "Error al actualizar con imagen", e)
             false
         }
     }
 
-  // Helper function to log and return an error message
     // Helper extension
     private fun String.toRequestBody(): RequestBody =
         toRequestBody("text/plain".toMediaTypeOrNull())

@@ -14,6 +14,7 @@ import okhttp3.Cache
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.Locale
@@ -94,11 +95,20 @@ object RetrofitInstance {
             chain.proceed(request)
         }
 
+        // This interceptor adds logging for debugging network issues
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+        
         return OkHttpClient.Builder()
             .cache(cache) // Set the cache for OkHttpClient
             .addInterceptor(offlineInterceptor) // Add the offline interceptor
             .addInterceptor(languageInterceptor) // Add the language interceptor
             .addNetworkInterceptor(onlineInterceptor) // Add the online interceptor
+            .addInterceptor(loggingInterceptor) // Add the logging interceptor
+            .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS) // 30 seconds connection timeout
+            .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS) // 60 seconds read timeout
+            .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS) // 60 seconds write timeout
             .build() // Build the OkHttpClient
     }
 

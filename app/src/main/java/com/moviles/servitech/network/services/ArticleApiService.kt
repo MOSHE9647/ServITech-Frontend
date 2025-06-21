@@ -8,20 +8,16 @@ import com.moviles.servitech.network.responses.article.ArticleByIdResponse
 import com.moviles.servitech.network.responses.article.ArticleDto
 import com.moviles.servitech.network.responses.article.ArticlesResponse
 import retrofit2.Response
-import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.http.DELETE
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.Multipart
-import retrofit2.http.PUT
 import retrofit2.http.Part
 
 /** TODO: Add a more explicative description for this file.
@@ -105,13 +101,20 @@ interface ArticleApiService {
      * @param request The request containing updated article details.
      * @return A [Response] containing an [ApiResponse] with the updated article.
      */
+    @Multipart
     @PUT("${Constants.API_ARTICLES_ROUTE}/{id}")
     @Headers(HEADER_ACCEPT_JSON)
     suspend fun updateArticle(
         @Header("Authorization") authToken: String,
         @Path("id") id: Int,
-        @Body request: CreateArticleRequest
-    ): Response<ApiResponse<ArticleDto>>
+        @Part("name") name: RequestBody,
+        @Part("description") description: RequestBody,
+        @Part("price") price: RequestBody,
+        @Part("category_id") categoryId: RequestBody,
+        @Part("subcategory_id") subcategoryId: RequestBody,
+        @Part images: List<MultipartBody.Part>, // puede estar vacío o tener 1 imagen
+        @Part("_method") method: RequestBody
 
+    ): Response<ApiResponse<ArticleDto>>
 
 }

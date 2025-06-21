@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Smartphone
@@ -41,13 +42,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.SupportAgent
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
+import com.moviles.servitech.R
 import com.moviles.servitech.common.Constants.CAT_ANIME
 import com.moviles.servitech.common.Constants.CAT_REPAIR_REQUESTS
 import com.moviles.servitech.common.Constants.CAT_SUPPORT
@@ -57,6 +65,19 @@ import com.moviles.servitech.network.responses.article.fixedUrl
 import com.moviles.servitech.viewmodel.ArticleViewModel
 import com.moviles.servitech.viewmodel.SubcategoryViewModel
 
+import com.moviles.servitech.ui.components.HandleServerError
+import com.moviles.servitech.ui.components.LoadingIndicator
+import com.moviles.servitech.viewmodel.ArticleViewModel
+import com.moviles.servitech.viewmodel.SubcategoryViewModel
+import com.moviles.servitech.viewmodel.auth.LogoutState
+import com.moviles.servitech.viewmodel.auth.LogoutViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.moviles.servitech.network.responses.article.fixedUrl
+import kotlinx.coroutines.delay
+
+import com.moviles.servitech.common.Utils.rememberSessionManager
+import androidx.compose.runtime.collectAsState
+import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,7 +87,10 @@ fun CategoryScreen(
     navigateToDetail: (Int) -> Unit,
     vm: ArticleViewModel = hiltViewModel(),
     navigateToRepairRequests: () -> Unit,
-    subcategoryVm: SubcategoryViewModel = hiltViewModel()
+    subcategoryVm: SubcategoryViewModel = hiltViewModel(),
+    logoutViewModel: LogoutViewModel = hiltViewModel(),
+    navController: NavController,
+    navigateToLogin: () -> Unit = {}
 ) {
     var searchText by remember { mutableStateOf("") }
     var selectedSubcategoryId by remember { mutableStateOf<Int?>(null) }
@@ -78,6 +102,10 @@ fun CategoryScreen(
     val context = LocalContext.current
 
     val isCategoryValid = selectedCategory == CAT_ANIME || selectedCategory == CAT_TECHNOLOGY
+    val sessionManager = rememberSessionManager(context)
+    val user by sessionManager.user.collectAsState(initial = null)
+    val token by sessionManager.token.collectAsState(initial = "")
+    val logoutState by logoutViewModel.logoutState.observeAsState()
 
     // Carga artículos cuando cambia la categoría
     LaunchedEffect(selectedCategory) {
@@ -104,25 +132,97 @@ fun CategoryScreen(
         filteredArticles.groupBy { it.subcategory?.name ?: "" }
     }
 
+    // Local state to show logout Toast
+    var showLogoutToast by remember { mutableStateOf(false) }
+    var logoutError by remember { mutableStateOf<String?>(null) }
+
+    // Handle logout state
+    LaunchedEffect(logoutState) {
+        when (val state = logoutState) {
+            is LogoutState.Loading -> { /* You can show a loading indicator if desired */ }
+            is LogoutState.Success -> {
+                showLogoutToast = true
+                navigateToLogin()
+            }
+            is LogoutState.Error -> {
+                logoutError = state.message
+            }
+            else -> { /* No-op */ }
+        }
+    }
+
+    if (showLogoutToast) {
+        Toast.makeText(context, "Session closed successfully", Toast.LENGTH_LONG).show()
+        showLogoutToast = false
+    }
+    if (logoutError != null) {
+        AlertDialog(
+            onDismissRequest = { logoutError = null },
+            title = { Text("Error") },
+            text = { Text(logoutError ?: "") },
+            confirmButton = {
+                TextButton(onClick = { logoutError = null }) { Text("OK") }
+            }
+        )
+    }
+
+    LaunchedEffect(createSuccess) {
+        if (createSuccess) {
+            vm.loadByCategory(selectedCategory)
+            Toast.makeText(context, "Article added successfully", Toast.LENGTH_SHORT).show()
+            showDialog = false
+            vm.resetCreateSuccess()
+        }
+    }
+
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(selectedCategory.replaceFirstChar { it.uppercase() }) })
+            TopAppBar(
+                title = { Text(selectedCategory.replaceFirstChar { it.uppercase() }) },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            if (!token.isNullOrEmpty()) {
+                                logoutViewModel.logout(token.orEmpty())
+                            } else {
+                                Toast.makeText(context, "No Token", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Logout,
+                            contentDescription = "Logout"
+                        )
+                    }
+                }
+            )
         },
         floatingActionButton = {
-            if (isCategoryValid) {
+            if (isCategoryValid && user?.role?.lowercase() == "admin") {
                 FloatingActionButton(onClick = { showDialog = true }) {
-                    Icon(Icons.Default.Add, contentDescription = "Añadir artículo")
+                    Icon(Icons.Default.Add, contentDescription = "Add article")
                 }
             }
         },
         bottomBar = {
             NavigationBar {
-                listOf(
+                val baseItems = listOf(
                     CAT_TECHNOLOGY to Icons.Default.Smartphone,
                     CAT_ANIME to Icons.Default.Info,
                     CAT_SUPPORT to Icons.Default.Settings,
                     CAT_REPAIR_REQUESTS to Icons.Default.Build
                 ).forEach { (cat, icon) ->
+                    CAT_ANIME to Icons.Default.Info
+                )
+
+                // Only add the support button if the user is NOT admin.
+                val items = if (user?.role?.lowercase() != "admin") {
+                    baseItems + (CAT_SUPPORT to Icons.Default.Settings)
+                } else {
+                    baseItems
+                }
+
+                items.forEach { (cat, icon) ->
                     NavigationBarItem(
                         icon = { Icon(icon, contentDescription = cat) },
                         label = { Text(cat.replaceFirstChar { it.uppercase() }) },
@@ -132,6 +232,9 @@ fun CategoryScreen(
                                 navigateToRepairRequests()
                             }
                             if (selectedCategory != cat) {
+                            if (cat == CAT_SUPPORT) {
+                                navController.navigate("SupportRequest")
+                            } else if (selectedCategory != cat) {
                                 onCategoryChange(cat)
                             }
                         }
@@ -151,7 +254,7 @@ fun CategoryScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                placeholder = { Text("Buscar por nombre o subcategoría…") },
+                placeholder = { Text("Search by name or subcategory...") },
                 leadingIcon = { Icon(Icons.Default.Search, null) },
                 singleLine = true
             )
@@ -199,15 +302,7 @@ fun CategoryScreen(
                     }
                 }
             }
-        }
-    }
 
-    LaunchedEffect(createSuccess) {
-        if (createSuccess) {
-            vm.loadByCategory(selectedCategory)
-            Toast.makeText(context, "Artículo agregado correctamente", Toast.LENGTH_SHORT).show()
-            showDialog = false
-            vm.resetCreateSuccess()
         }
     }
 
@@ -218,7 +313,7 @@ fun CategoryScreen(
             onDismiss = { showDialog = false },
             onSubmit = { request, imageUri ->
                 if (request.description.length < 10) {
-                    Toast.makeText(context, "La descripción debe tener al menos 10 caracteres", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Description must have at least 10 characters", Toast.LENGTH_SHORT).show()
                 } else {
                     vm.createArticle(request, imageUri, selectedCategory)
                 }
@@ -226,7 +321,6 @@ fun CategoryScreen(
         )
     }
 }
-
 
 @Composable
 fun ArticleCard(article: ArticleDto, onClick: () -> Unit) {
