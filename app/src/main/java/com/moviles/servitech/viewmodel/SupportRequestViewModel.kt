@@ -20,7 +20,7 @@ class SupportRequestViewModel @Inject constructor(
     private val sessionManager: SessionManager
 ) : ViewModel() {
 
-    // Estados para los campos del formulario
+    // States for form fields
     private val _date = MutableLiveData("")
     val date: LiveData<String> = _date
 
@@ -30,7 +30,7 @@ class SupportRequestViewModel @Inject constructor(
     private val _detail = MutableLiveData("")
     val detail: LiveData<String> = _detail
 
-    // Estados para validación de errores
+    // States for error validation
     private val _dateError = MutableLiveData<String?>(null)
     val dateError: LiveData<String?> = _dateError
 
@@ -40,7 +40,7 @@ class SupportRequestViewModel @Inject constructor(
     private val _detailError = MutableLiveData<String?>(null)
     val detailError: LiveData<String?> = _detailError
 
-    // Estados para la UI
+    // States for UI
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
 
@@ -50,11 +50,11 @@ class SupportRequestViewModel @Inject constructor(
     private val _errorMessage = MutableLiveData<String?>(null)
     val errorMessage: LiveData<String?> = _errorMessage
 
-    // Estados para habilitar/deshabilitar el botón de envío
+    // States to enable/disable submit button
     private val _isFormValid = MutableLiveData(false)
     val isFormValid: LiveData<Boolean> = _isFormValid
 
-    // Funciones para actualizar los campos
+    // Functions to update fields
     fun updateDate(newDate: String) {
         _date.value = newDate
         validateDate()
@@ -73,25 +73,25 @@ class SupportRequestViewModel @Inject constructor(
         checkFormValidity()
     }
 
-    // Validaciones
+    // Validations
     private fun validateDate() {
         _dateError.value = if (_date.value.isNullOrBlank()) {
-            "La fecha es requerida"
+            "Date is required"
         } else null
     }
 
     private fun validateLocation() {
         _locationError.value = when {
-            _location.value.isNullOrBlank() -> "La ubicación es requerida"
-            _location.value!!.length < 10 -> "La ubicación debe tener al menos 10 caracteres"
+            _location.value.isNullOrBlank() -> "Location is required"
+            _location.value!!.length < 10 -> "Location must have at least 10 characters"
             else -> null
         }
     }
 
     private fun validateDetail() {
         _detailError.value = when {
-            _detail.value.isNullOrBlank() -> "El detalle es requerido"
-            _detail.value!!.length < 10 -> "El detalle debe tener al menos 10 caracteres"
+            _detail.value.isNullOrBlank() -> "Detail is required"
+            _detail.value!!.length < 10 -> "Detail must have at least 10 characters"
             else -> null
         }
     }
@@ -105,7 +105,7 @@ class SupportRequestViewModel @Inject constructor(
                 !_detail.value.isNullOrBlank()
     }
 
-    // Función principal para enviar la solicitud
+    // Main function to submit the request
     fun submitSupportRequest() {
         if (_isFormValid.value == true) {
             viewModelScope.launch {
@@ -119,10 +119,10 @@ class SupportRequestViewModel @Inject constructor(
                         detail = _detail.value!!
                     )
 
-                    // Obtener el token JWT del usuario autenticado
+                    // Get JWT token from authenticated user
                     val token = withContext(Dispatchers.IO) { sessionManager.getToken() }
                     if (token.isNullOrBlank()) {
-                        _errorMessage.value = "No se encontró el token de autenticación. Por favor, inicia sesión nuevamente."
+                        _errorMessage.value = "Authentication token not found. Please log in again."
                         _isLoading.value = false
                         return@launch
                     }
@@ -130,11 +130,11 @@ class SupportRequestViewModel @Inject constructor(
 
                     val response = api.createSupportRequest(authHeader, request)
 
-                    // Si llegamos aquí, la solicitud fue exitosa
+                    // If we reach here, the request was successful
                     _isSuccess.value = true
 
                 } catch (e: Exception) {
-                    _errorMessage.value = e.message ?: "Error desconocido al enviar la solicitud"
+                    _errorMessage.value = e.message ?: "Unknown error sending request"
                 } finally {
                     _isLoading.value = false
                 }
@@ -142,12 +142,12 @@ class SupportRequestViewModel @Inject constructor(
         }
     }
 
-    // Función para limpiar el estado de éxito (útil para resetear después de mostrar mensaje)
+    // Function to clear success state (useful to reset after showing message)
     fun clearSuccess() {
         _isSuccess.value = false
     }
 
-    // Función para limpiar errores
+    // Function to clear errors
     fun clearErrors() {
         _dateError.value = null
         _locationError.value = null
@@ -155,7 +155,7 @@ class SupportRequestViewModel @Inject constructor(
         _errorMessage.value = null
     }
 
-    // Función para resetear el formulario
+    // Function to reset form
     fun resetForm() {
         _date.value = ""
         _location.value = ""

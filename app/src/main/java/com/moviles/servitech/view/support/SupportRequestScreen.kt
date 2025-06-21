@@ -29,7 +29,7 @@ fun SupportRequestScreen(
 ) {
     val context = LocalContext.current
 
-    // Observar estados del ViewModel
+    // Observe ViewModel states
     val date by viewModel.date.observeAsState("")
     val location by viewModel.location.observeAsState("")
     val detail by viewModel.detail.observeAsState("")
@@ -43,26 +43,26 @@ fun SupportRequestScreen(
     val errorMessage by viewModel.errorMessage.observeAsState(null)
     val isFormValid by viewModel.isFormValid.observeAsState(false)
 
-    // Manejar éxito
+    // Handle success
     LaunchedEffect(isSuccess) {
         if (isSuccess) {
-            // Mostrar mensaje de éxito
+            // Show success message
             android.widget.Toast.makeText(
                 context,
-                "Solicitud de soporte enviada exitosamente",
+                "Support request sent successfully",
                 android.widget.Toast.LENGTH_LONG
             ).show()
 
-            // Resetear el formulario
+            // Reset form
             viewModel.clearSuccess()
             viewModel.resetForm()
 
-            // Navegar de vuelta o ejecutar callback de éxito
+            // Navigate back or execute success callback
             onSuccess()
         }
     }
 
-    // Manejar errores
+    // Handle errors
     LaunchedEffect(errorMessage) {
         errorMessage?.let { error ->
             android.widget.Toast.makeText(
@@ -76,10 +76,10 @@ fun SupportRequestScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Solicitud de Soporte") },
+                title = { Text("Support Request") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
@@ -93,31 +93,31 @@ fun SupportRequestScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Título y descripción
+            // Title and description
             Text(
-                text = "Solicitud de Soporte Técnico",
+                text = "Technical Support Request",
                 style = MaterialTheme.typography.headlineSmall
             )
 
             Text(
-                text = "Complete el formulario para solicitar asistencia técnica. Un administrador se pondrá en contacto con usted.",
+                text = "Complete the form to request technical assistance. An administrator will contact you.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Formulario
+            // Form
             CustomCard {
                 Column(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Campo de fecha
+                    // Date field
                     DatePickerField(
                         context = context,
-                        label = "Fecha de la solicitud",
-                        placeholder = "Seleccione la fecha",
+                        label = "Request date",
+                        placeholder = "Select date",
                         initialDate = date,
                         isError = dateError != null,
                         errorMessage = dateError,
@@ -125,10 +125,10 @@ fun SupportRequestScreen(
                         onDateChange = { viewModel.updateDate(it.orEmpty()) }
                     )
 
-                    // Campo de ubicación
+                    // Location field
                     CustomInputField(
-                        label = "Ubicación",
-                        placeholder = "Ej: San José, Costa Rica",
+                        label = "Location",
+                        placeholder = "Ex: San José, Costa Rica",
                         value = location,
                         onValueChange = { viewModel.updateLocation(it) },
                         keyboardType = KeyboardType.Text,
@@ -142,12 +142,12 @@ fun SupportRequestScreen(
                         imeAction = ImeAction.Next
                     )
 
-                    // Campo de detalle
+                    // Detail field
                     OutlinedTextField(
                         value = detail,
                         onValueChange = { viewModel.updateDetail(it) },
-                        label = { Text("Detalle de la solicitud") },
-                        placeholder = { Text("Describa detalladamente su problema o solicitud...") },
+                        label = { Text("Request detail") },
+                        placeholder = { Text("Describe your problem or request in detail...") },
                         isError = detailError != null,
                         enabled = !isLoading,
                         supportingText = {
@@ -162,15 +162,15 @@ fun SupportRequestScreen(
                 }
             }
 
-            // Botón de envío
+            // Submit button
             CustomButton(
-                text = if (isLoading) "Enviando..." else "Enviar Solicitud de Soporte",
+                text = if (isLoading) "Sending..." else "Send Support Request",
                 onClick = { viewModel.submitSupportRequest() },
                 enabled = isFormValid && !isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Indicador de carga
+            // Loading indicator
             if (isLoading) {
                 LoadingIndicator(
                     modifier = Modifier.align(Alignment.CenterHorizontally),

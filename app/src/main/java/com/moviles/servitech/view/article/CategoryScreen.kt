@@ -103,7 +103,7 @@ fun CategoryScreen(
                     CAT_ANIME to Icons.Default.Info
                 )
 
-                // Solo agregar el botón de soporte si el usuario NO es admin
+                // Only add the support button if the user is NOT admin.
                 val items = if (user?.role?.lowercase() != "admin") {
                     baseItems + (CAT_SUPPORT to Icons.Default.Settings)
                 } else {
